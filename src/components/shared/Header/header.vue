@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import router from "@/router";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref } from "vue";
 import { useUser } from "../../../composables/user";
 import LoginModal from "../../LoginModal/loginModal.vue";
 

@@ -6,14 +6,14 @@
     <v-card class="app__container">
       <v-layout class="app__container">
         <v-navigation-drawer permanent>
-          <v-list class="app__side-nav" density="compact" nav>
+          <v-list density="compact" nav>
             <v-list-item
               v-for="(item, index) in sideNavLinks"
               :key="index"
               class="side-nav__link"
               :prepend-icon="item.icon"
               :title="item.title"
-              @click="navigate(item.link)"
+              @click="() => navigate(item.link)"
             />
           </v-list>
         </v-navigation-drawer>
@@ -46,6 +46,11 @@ export default defineComponent({
   setup() {
     const sideNavLinks = [
       { title: "Home", link: "/", icon: "mdi-home" },
+      {
+        title: "Declaração de Óbito",
+        link: "/death-declaration",
+        icon: "mdi-information-variant",
+      },
       { title: "About", link: "/about", icon: "mdi-information-variant" },
     ];
 
