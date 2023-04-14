@@ -24,14 +24,14 @@
       class="about__linkedin"
       color="blue"
       icon="mdi-linkedin"
-      @click="redirectLinkedin"
+      @click="redirectLinkedin()"
     />
 
     <v-btn
       class="about__linkedin ml-5"
       color="black"
       icon="mdi-github"
-      @click="redirectGithub"
+      @click="redirectGithub()"
     />
   </page>
 </template>

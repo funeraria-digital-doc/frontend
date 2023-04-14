@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home/home.vue";
 import About from "../views/About/about.vue";
 import Profile from "../views/Profile/profile.vue";
+import DeathDeclaration from "../views/DeathDeclaration/deathDeclaration.vue";
 import { useUser } from "@/composables/user";
 
 const router = createRouter({
@@ -23,10 +24,15 @@ const router = createRouter({
       component: Profile,
       meta: { requiresAuth: true },
     },
+    {
+      path: "/death-declaration",
+      name: "death_declaration",
+      component: DeathDeclaration,
+    },
   ],
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   const { isUserAuthenticated } = useUser();
 
   if (to.meta.requiresAuth && !isUserAuthenticated()) {
