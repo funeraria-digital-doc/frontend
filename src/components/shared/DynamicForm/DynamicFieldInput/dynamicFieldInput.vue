@@ -26,10 +26,13 @@
     item-title="label"
     item-value="value"
   />
+
+  <date-picker v-if="field.input === 'date'" :field="field" />
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
+import DatePicker from "../../DatePicker/datePicker.vue";
 import type { DynamicField } from "../../../../models/dynamicField.model";
 
 export default defineComponent({
@@ -39,6 +42,9 @@ export default defineComponent({
       type: Object as PropType<DynamicField>,
       required: true,
     },
+  },
+  components: {
+    DatePicker,
   },
 });
 </script>
