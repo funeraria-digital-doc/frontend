@@ -10,6 +10,12 @@ export const DeathDeclarationPersonalFields: DynamicField[] = [
     rules,
   },
   {
+    label: "Data",
+    name: "data",
+    input: "date",
+    rules,
+  },
+  {
     label: "Are you human?",
     name: "human",
     input: "checkbox",
