@@ -1,6 +1,10 @@
 <template>
   <v-form ref="form" @submit.prevent="onSubmit">
-    <div v-for="field in fields" :key="field.name">
+    <div v-for="(field, index) in fields" :key="field.name">
+      <template v-for="subtitle in subtitles" :key="subtitle.index">
+        <form-subtitle v-if="index === subtitle.index" :subtitle="subtitle" />
+      </template>
+
       <dynamic-field-input :field="field" />
     </div>
 
@@ -10,9 +14,6 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, type PropType } from "vue";
-import type { DynamicField } from "../../../models/dynamicField.model";
-import DynamicFieldInput from "./DynamicFieldInput/dynamicFieldInput.vue";
-import { checkDuplicateNames } from "./dynamicForm.utils";
 
 export default defineComponent({
   name: "DynamicForm",
@@ -20,6 +21,15 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
+import type { DynamicField } from "../../../models/dynamicField.model";
+import DynamicFieldInput from "./DynamicFieldInput/dynamicFieldInput.vue";
+import {
+  checkDuplicateNames,
+  checkSubtitlesDuplicateIndexes,
+} from "./dynamicForm.utils";
+import formSubtitle from "./FormSubtitle/formSubtitle.vue";
+import type { FormSubtitle } from "@/models/formSubtitle.form";
+
 const props = defineProps({
   fields: {
     type: Array as PropType<Array<DynamicField>>,
@@ -28,6 +38,10 @@ const props = defineProps({
   actionBtnLabel: {
     type: String,
     required: true,
+  },
+  subtitles: {
+    type: Array as PropType<Array<FormSubtitle>>,
+    required: false,
   },
 });
 
@@ -59,6 +73,9 @@ const onSubmit = async (input: any) => {
 onMounted(() => {
   if (checkDuplicateNames(props.fields)) {
     console.error("Dynamic Form - Fields with duplicated names");
+  }
+  if (checkSubtitlesDuplicateIndexes(props.subtitles)) {
+    console.error("Dynamic Form - Subtitles with duplicated indexes");
   }
 });
 </script>

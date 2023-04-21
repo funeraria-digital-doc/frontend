@@ -1,33 +1,35 @@
 <template>
-  <v-text-field
-    v-if="field.input === 'text'"
-    :id="field.name"
-    :v-model="field.name"
-    :label="field.label"
-    :rules="field.rules"
-    :type="field.type"
-  />
+  <div class="dynamic-field">
+    <v-text-field
+      v-if="field.input === 'text'"
+      :id="field.name"
+      :v-model="field.name"
+      :label="field.label"
+      :rules="field.rules"
+      :type="field.type"
+    />
 
-  <v-checkbox
-    v-if="field.input === 'checkbox'"
-    :id="field.name"
-    :v-model="field.name"
-    :label="field.label"
-  />
+    <v-checkbox
+      v-if="field.input === 'checkbox'"
+      :id="field.name"
+      :v-model="field.name"
+      :label="field.label"
+    />
 
-  <v-select
-    v-if="field.input === 'select'"
-    :id="field.name"
-    :v-model="field.name"
-    :label="field.label"
-    :rules="field.rules"
-    :type="field.type"
-    :items="field.items"
-    item-title="label"
-    item-value="value"
-  />
+    <v-select
+      v-if="field.input === 'select'"
+      :id="field.name"
+      :v-model="field.name"
+      :label="field.label"
+      :rules="field.rules"
+      :type="field.type"
+      :items="field.items"
+      item-title="label"
+      item-value="value"
+    />
 
-  <date-picker v-if="field.input === 'date'" :field="field" />
+    <date-picker v-if="field.input === 'date'" :field="field" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -51,4 +53,8 @@ export default defineComponent({
 
 <script lang="ts" setup></script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.dynamic-field {
+  margin-bottom: 0.5rem;
+}
+</style>
