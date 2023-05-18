@@ -45,13 +45,13 @@ export default defineComponent({
   },
   setup() {
     const sideNavLinks = [
-      { title: "Home", link: "/", icon: "mdi-home" },
+      { title: "Página inicial", link: "/", icon: "mdi-home" },
       {
         title: "Declaração de Óbito",
         link: "/death-declaration",
         icon: "mdi-information-variant",
       },
-      { title: "About", link: "/about", icon: "mdi-information-variant" },
+      { title: "Contatos", link: "/contacts", icon: "mdi-information-variant" },
     ];
 
     const navigate = (link: string) => {

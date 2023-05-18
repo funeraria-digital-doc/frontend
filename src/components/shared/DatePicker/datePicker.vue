@@ -4,7 +4,6 @@
     :v-model="field.name"
     :label="field.label"
     :rules="field.rules"
-    :placeholder="getDateStr"
     type="date"
   />
 </template>
@@ -24,11 +23,6 @@ export default defineComponent({
 });
 </script>
 
-<script lang="ts" setup>
-const getDateStr = () => {
-  let s = new Date().toLocaleDateString();
-  return "dd/mm/aaaa";
-};
-</script>
+<script lang="ts" setup></script>
 
 <style lang="scss"></style>

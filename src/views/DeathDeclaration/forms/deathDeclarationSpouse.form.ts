@@ -23,7 +23,7 @@ export const DeathDeclarationSpouseForm: DynamicField[] = [
   },
   {
     label: "Idade do cônjuge",
-    name: "spouse_gender",
+    name: "spouse_age",
     input: "text",
   },
 ];

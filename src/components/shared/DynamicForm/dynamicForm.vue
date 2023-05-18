@@ -71,12 +71,8 @@ const onSubmit = async (input: any) => {
 };
 
 onMounted(() => {
-  if (checkDuplicateNames(props.fields)) {
-    console.error("Dynamic Form - Fields with duplicated names");
-  }
-  if (checkSubtitlesDuplicateIndexes(props.subtitles)) {
-    console.error("Dynamic Form - Subtitles with duplicated indexes");
-  }
+  checkDuplicateNames(props.fields);
+  checkSubtitlesDuplicateIndexes(props.subtitles);
 });
 </script>
 
