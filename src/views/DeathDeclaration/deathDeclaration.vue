@@ -2,12 +2,14 @@
   <page title="Declaração de Óbito">
     <p class="mb-6">Por favor introduza os seguintes dados.</p>
 
-    <dynamic-form
-      :fields="fields"
-      :subtitles="subtitles"
-      action-btn-label="Submeter"
-      @on-submit="onSubmit"
-    />
+    <div class="death-declaration__form">
+      <dynamic-form
+        :fields="fields"
+        :subtitles="subtitles"
+        action-btn-label="Submeter"
+        @on-submit="onSubmit"
+      />
+    </div>
   </page>
 </template>
 
@@ -39,3 +41,11 @@ const subtitles = [
 
 const onSubmit = (values: any) => console.log(values);
 </script>
+
+<style lang="scss">
+.death-declaration {
+  &__form {
+    max-width: 30rem;
+  }
+}
+</style>
