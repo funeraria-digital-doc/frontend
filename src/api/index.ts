@@ -15,7 +15,7 @@ export type Failable<T, E> =
 export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
 
 export const apiInstance = axios.create({
-  baseURL: import.meta.env.API_BASE_URL ?? "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000",
 });
 
 export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {

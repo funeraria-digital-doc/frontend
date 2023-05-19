@@ -21,12 +21,22 @@
 </template>
 
 <script setup lang="ts">
+import { listUsers } from "@/api/users";
 import Page from "../../components/shared/Page/page.vue";
+import { onMounted } from "vue";
 
 const redirectLinkedin = () =>
   window.open("https://www.linkedin.com/in/rafael-lopes-79851a150/");
 
 const redirectGithub = () => window.open("https://github.com/rafael8lopes/");
+
+onMounted(() => {
+  listUsers().then((resp) => {
+    if (resp.success) {
+      console.log("Users list:", resp.data);
+    }
+  });
+});
 </script>
 
 <style lang="scss">
