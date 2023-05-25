@@ -6,7 +6,9 @@
       class="contacts__linkedin"
       color="blue"
       icon="mdi-linkedin"
-      @click="redirectLinkedin()"
+      @click="
+        redirectLinkedin('https://www.linkedin.com/in/rafael-lopes-79851a150/')
+      "
     />
 
     <p>João Alves</p>
@@ -15,7 +17,11 @@
       class="contacts__linkedin"
       color="blue"
       icon="mdi-linkedin"
-      @click="redirectLinkedin()"
+      @click="
+        redirectLinkedin(
+          'https://www.linkedin.com/in/jo%C3%A3o-alves-84aba4223/'
+        )
+      "
     />
   </page>
 </template>
@@ -25,8 +31,7 @@ import { listUsers } from "@/api/users";
 import Page from "../../components/shared/Page/page.vue";
 import { onMounted } from "vue";
 
-const redirectLinkedin = () =>
-  window.open("https://www.linkedin.com/in/rafael-lopes-79851a150/");
+const redirectLinkedin = (url: string) => window.open(url);
 
 const redirectGithub = () => window.open("https://github.com/rafael8lopes/");
 
