@@ -1,9 +1,17 @@
 import { apiInstance, errorResponse, type ApiResponse } from ".";
 
-export async function loginUser(): Promise<ApiResponse<any>> {
+export async function loginUser(data: {
+  email: any;
+  password: any;
+}): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get("/accounts/login");
-
+    console.log('entra aqui!')
+    console.log(data)
+    const response = await apiInstance.post("/accounts/login/", {
+      username: data.email.value,
+      password: data.password.value,
+    });
+    console.log(response)
     return { success: true, data: response.data };
   } catch (e: any) {
     console.error("Login user error", e);

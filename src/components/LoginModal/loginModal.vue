@@ -65,17 +65,21 @@ const onSubmit = async () => {
   const { valid } = await form.value.validate();
 
   if (valid) {
-    loginUser().then((resp) => {
+    const data = {
+      email,
+      password,
+    };
+    loginUser(data).then((resp) => {
       if (resp.success) {
         updateUserName(email.value);
         closeModal();
       } else {
         // because this is mock we need mock a successful login
-        updateUserName(email.value); // delete this (mock)
-        closeModal(); // delete this (mock)
+        // updateUserName(email.value); // delete this (mock)
+        // closeModal(); // delete this (mock)
 
-        // hasErrorMessage.value = true;
-        // errorMessage.value = resp.error.title;
+        hasErrorMessage.value = true;
+        errorMessage.value = resp.error.title;
       }
     });
   }
