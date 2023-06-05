@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { listUsers } from "@/api/users";
+import { listAllUsers } from "@/api/users";
 import Page from "../../components/shared/Page/page.vue";
 import { onMounted } from "vue";
 
@@ -36,7 +36,7 @@ const redirectLinkedin = (url: string) => window.open(url);
 const redirectGithub = () => window.open("https://github.com/rafael8lopes/");
 
 onMounted(() => {
-  listUsers().then((resp) => {
+  listAllUsers().then((resp) => {
     if (resp.success) {
       console.log("Users list:", resp.data);
     }
