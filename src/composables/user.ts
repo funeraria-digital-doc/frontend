@@ -3,6 +3,7 @@ import { reactive } from "vue";
 
 const user = reactive({
   name: "",
+  email: "",
 });
 
 export function useUser() {
@@ -15,8 +16,9 @@ export function useUser() {
     router.push("/");
   };
 
-  const updateUserName = (newUserName: string) => {
-    user.name = newUserName;
+  const updateUserName = (data: { name: string; email: string }) => {
+    user.name = data.name;
+    user.email = data.email;
   };
 
   return { user, isUserAuthenticated, updateUserName, logoutUser };

@@ -14,7 +14,11 @@
             v-model="password"
             label="Palavra passe"
             :rules="fieldRules"
-          />
+            :type="showPassword ? 'text' : 'password'"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="showPassword = !showPassword"
+            class="input-group--focused"
+          ></v-text-field>
         </v-row>
       </v-container>
 
@@ -51,7 +55,7 @@ import { useUser } from "@/composables/user";
 const emit = defineEmits(["close-modal"]);
 const closeModal = () => emit("close-modal");
 const { updateUserName } = useUser();
-
+const showPassword = ref(false);
 const hasErrorMessage = ref(false);
 const errorMessage = ref("");
 
@@ -71,7 +75,7 @@ const onSubmit = async () => {
     };
     loginUser(data).then((resp) => {
       if (resp.success) {
-        updateUserName(email.value);
+        updateUserName(resp.data);
         closeModal();
       } else {
         // because this is mock we need mock a successful login

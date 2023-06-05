@@ -5,13 +5,10 @@ export async function loginUser(data: {
   password: any;
 }): Promise<ApiResponse<any>> {
   try {
-    console.log('entra aqui!')
-    console.log(data)
     const response = await apiInstance.post("/accounts/login/", {
       username: data.email.value,
       password: data.password.value,
     });
-    console.log(response)
     return { success: true, data: response.data };
   } catch (e: any) {
     console.error("Login user error", e);
@@ -19,13 +16,52 @@ export async function loginUser(data: {
   }
 }
 
-export async function listUsers(): Promise<ApiResponse<any>> {
+export async function listAllUsers(): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.get("/accounts/list-all-users/");
 
     return { success: true, data: response.data };
   } catch (e: any) {
     console.error("List users error", e);
+    return errorResponse(e);
+  }
+}
+
+export async function listAllActiveUsers(): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get("/accounts/list-active-users/");
+
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    console.error("List active users error", e);
+    return errorResponse(e);
+  }
+}
+
+export async function getProfile(): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get("/accounts/profile/");
+
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    console.error("Get Profile error", e);
+    return errorResponse(e);
+  }
+}
+
+export async function editProfile(data: {
+  username: { value: any };
+  email: { value: any };
+}): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.patch("/accounts/profile/", {
+      username: data.username.value,
+      email: data.email.value,
+    });
+
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    console.error("Get Profile error", e);
     return errorResponse(e);
   }
 }
