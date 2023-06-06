@@ -52,16 +52,30 @@ export async function getProfile(): Promise<ApiResponse<any>> {
 export async function editProfile(data: {
   username: { value: any };
   email: { value: any };
+  password: { value: any };
+  password_confirm: { value: any };
+  token: { value: any };
 }): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.patch("/accounts/profile/", {
-      username: data.username.value,
-      email: data.email.value,
-    });
+    console.log(data.token)
+    const response = await apiInstance.patch(
+      "/accounts/edit-profile/",
+      {
+        username: data.username.value,
+        email: data.email.value,
+        password: data.password.value,
+        password_confirm: data.password_confirm.value,
+      },
+      {
+        headers: {
+          Authorization: "Token " + data.token,
+        },
+      }
+    );
 
     return { success: true, data: response.data };
   } catch (e: any) {
-    console.error("Get Profile error", e);
+    console.error("Edit Profile error", e);
     return errorResponse(e);
   }
 }
