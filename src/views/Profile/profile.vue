@@ -57,12 +57,18 @@ const confirmPassword = ref("");
 const fieldRules = [(v: string) => !!v || "Campo obrigatório"];
 
 const passwordRules = [
-  (value: string) => password.value === value || "Passwords do not match."
+  (value: string) => password.value === value || "Passwords do not match.",
 ];
 
 const requiredIfNotEmpty = () => {
   if (password.value !== "" || confirmPassword.value !== "") {
-    return [(v: any) => !!v || "This field is required."];
+    if (password.value === "") {
+      return [(v: any) => !!v || "O campo Palavra Passe é obrigatório"];
+    } else {
+      return [
+        (v: any) => !!v || "O campo Confirmar Palavra Passe é obrigatório",
+      ];
+    }
   }
   return [];
 };
