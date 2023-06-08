@@ -2,7 +2,7 @@
   <div>
     <v-toolbar prominent :elevation="8">
       <v-toolbar-title @click="handleHome" id="app-name">
-        Vue template
+        Funerária Digital
       </v-toolbar-title>
 
       <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">

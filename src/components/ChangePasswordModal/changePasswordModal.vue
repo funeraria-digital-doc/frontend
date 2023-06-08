@@ -1,30 +1,33 @@
 <template>
-  <modal title="Autenticação" @close-modal="closeModal">
+  <modal title="Alterar Palavra Passe" @close-modal="closeModal">
     <v-form v-if="!isLoading" ref="form" @submit.prevent="onSubmit">
       <v-container>
         <v-row>
           <v-text-field
-            v-model="email"
-            label="Nome de utilizador"
-            :rules="fieldRules"
-          />
-        </v-row>
-        <v-row>
-          <v-text-field
-            v-model="password"
+            v-model.trim="password"
             label="Palavra passe"
-            :rules="fieldRules"
+            :rules="passwordRules"
             :type="showPassword ? 'text' : 'password'"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append-inner="showPassword = !showPassword"
             class="input-group--focused"
           ></v-text-field>
         </v-row>
+        <v-row>
+          <v-text-field
+            v-model.trim="confirmPassword"
+            label="Confirmar Palavra passe"
+            :rules="passwordConfirmRules"
+            :type="showConfirmPassword ? 'text' : 'password'"
+            :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="showConfirmPassword = !showConfirmPassword"
+            class="input-group--focused"
+          ></v-text-field>
+        </v-row>
       </v-container>
-
-      <v-btn type="submit" class="mt-2">Entrar</v-btn>
+      <v-btn type="submit" class="mt-2">Alterar</v-btn>
     </v-form>
-    <v-container v-else class="login_spinner">
+    <v-container v-else class="change_password_spinner">
       <v-progress-circular
         :size="70"
         :width="7"
@@ -32,7 +35,6 @@
         color="primary"
       ></v-progress-circular>
     </v-container>
-
     <v-snackbar
       v-model="hasErrorMessage"
       :timeout="2000"
@@ -49,7 +51,7 @@ import { defineComponent, ref } from "vue";
 import Modal from "../shared/Modal/modal.vue";
 
 export default defineComponent({
-  name: "LoginModal",
+  name: "ChangePasswordModal",
   components: {
     Modal,
   },
@@ -57,39 +59,51 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { loginUser } from "@/api/users";
-import { useUser } from "@/composables/user";
+import { changePassword } from "@/api/users";
 
 const emit = defineEmits(["close-modal"]);
 const closeModal = () => emit("close-modal");
-const { updateUserName } = useUser();
-const showPassword = ref(false);
 const hasErrorMessage = ref(false);
 const errorMessage = ref("");
 
 const form = ref();
-const email = ref("");
 const password = ref("");
+const confirmPassword = ref("");
 const isLoading = ref(false);
-const fieldRules = [(v: string) => !!v || "Campo obrigatório"];
-
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+const passwordRules = [
+  (value: string) => !!value || "Palavra passe é obrigatória",
+  (value: string) =>
+    password.value === value || "Palavras Passe não são iguais.",
+];
+const passwordConfirmRules = [
+  (value: string) => !!value || "Confirmar Palavra passe é obrigatória",
+  (value: string) =>
+    password.value === value || "Palavras Passe não são iguais.",
+];
+const props = defineProps(["token"]);
 const onSubmit = async () => {
+  console.log(form.value);
   const { valid } = await form.value.validate();
-
+  console.log(valid);
   if (valid) {
+    console.log("is valid");
+    console.log("token", props.token);
     isLoading.value = true;
     const data = {
-      email,
       password,
+      confirmPassword,
+      token: props.token,
     };
-    await loginUser(data).then((resp) => {
+    await changePassword(data).then((resp) => {
       if (resp.success) {
-        updateUserName(resp.data);
+        //updateUserName(resp.data);
         closeModal();
       } else {
         console.log(resp);
         hasErrorMessage.value = true;
-        errorMessage.value = resp.error.data;
+        //errorMessage.value = resp.error.data;
       }
     });
   }
@@ -98,7 +112,7 @@ const onSubmit = async () => {
 </script>
 
 <style lang="scss">
-.login_spinner {
+.change_password_spinner {
   display: flex;
   justify-content: center;
 }

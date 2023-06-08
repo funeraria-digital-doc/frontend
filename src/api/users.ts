@@ -11,8 +11,33 @@ export async function loginUser(data: {
     });
     return { success: true, data: response.data };
   } catch (e: any) {
-    console.error("Login user error", e);
-    return errorResponse(e);
+    return { error: e.response };
+  }
+}
+
+export async function changePassword(data: {
+  password: any;
+  confirmPassword: any;
+  token: any;
+}): Promise<ApiResponse<any>> {
+  try {
+    console.log(data.token)
+    const response = await apiInstance.post(
+      "/accounts/change-password/",
+      {
+        password: data.password.value,
+        confirm_password: data.confirmPassword.value,
+      },
+      {
+        headers: {
+          Authorization: "Token " + data.token,
+        },
+      }
+    );
+    console.log(response);
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.response };
   }
 }
 
@@ -52,19 +77,15 @@ export async function getProfile(): Promise<ApiResponse<any>> {
 export async function editProfile(data: {
   username: { value: any };
   email: { value: any };
-  password: { value: any };
-  password_confirm: { value: any };
   token: { value: any };
 }): Promise<ApiResponse<any>> {
   try {
-    console.log(data.token)
+    console.log(data.token);
     const response = await apiInstance.patch(
       "/accounts/edit-profile/",
       {
         username: data.username.value,
         email: data.email.value,
-        password: data.password.value,
-        password_confirm: data.password_confirm.value,
       },
       {
         headers: {
