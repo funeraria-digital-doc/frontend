@@ -50,10 +50,14 @@ export default defineComponent({
         title: "Declaração de Óbito",
         link: "/death-declaration",
         icon: "mdi-information-variant",
+        children: [
+          { title: "Submenu Item 1", icon: "mdi-file", to: "/submenu-1" },
+          { title: "Submenu Item 2", icon: "mdi-file", to: "/submenu-2" },
+        ],
       },
       { title: "Contatos", link: "/contacts", icon: "mdi-information-variant" },
     ];
-
+    
     const navigate = (link: string) => {
       router.push(link);
     };
