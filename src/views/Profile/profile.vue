@@ -63,11 +63,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useUser } from "@/composables/user";
-import { ref } from "vue";
-import Page from "../../components/shared/Page/page.vue";
-import { editProfile } from "@/api/users";
-import ChangePasswordModal from "@/components/ChangePasswordModal/changePasswordModal.vue";
+import { useUser } from '@/composables/user';
+import { ref } from 'vue';
+import Page from '../../components/shared/Page/page.vue';
+import { editProfile } from '@/api/users';
+import ChangePasswordModal from '@/components/ChangePasswordModal/changePasswordModal.vue';
 const { user } = useUser();
 const username = ref(user.name);
 const email = ref(user.email);
@@ -91,7 +91,7 @@ const handleFileChange = (event: any) => {
     imageUrl.value = URL.createObjectURL(file);
   }
 };
-const fieldRules = [(v: string) => !!v || "Campo obrigatório"];
+const fieldRules = [(v: string) => !!v || 'Campo obrigatório'];
 
 const onSubmit = async () => {
   const { valid } = await form.value.validate();
@@ -110,7 +110,7 @@ const onSubmit = async () => {
         // because this is mock we need mock a successful login
         // updateUserName(email.value); // delete this (mock)
         // closeModal(); // delete this (mock)
-        console.log("erro");
+        console.log('erro');
       }
     });
   }

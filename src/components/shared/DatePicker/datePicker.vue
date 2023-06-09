@@ -9,11 +9,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from "vue";
-import type { DynamicField } from "../../../models/dynamicField.model";
+import { defineComponent, type PropType } from 'vue';
+import type { DynamicField } from '../../../models/dynamicField.model';
 
 export default defineComponent({
-  name: "DynamicFieldInput",
+  name: 'DynamicFieldInput',
   props: {
     field: {
       type: Object as PropType<DynamicField>,

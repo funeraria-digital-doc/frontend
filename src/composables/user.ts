@@ -1,31 +1,57 @@
-import router from "@/router";
-import { reactive } from "vue";
+import { getProfile } from '@/api/users';
+import router from '@/router';
+import { TOKEN_KEY } from '@/utils/constants';
+import {
+  deleteLocalStorage,
+  getLocalStorage,
+  saveLocalStorage,
+} from '@/utils/localStorage';
+import { reactive } from 'vue';
 
 const user = reactive({
-  name: "",
-  email: "",
-  token: "",
+  name: '',
+  email: '',
 });
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.name !== "";
+    return user.name !== '';
   };
 
   const logoutUser = () => {
-    user.name = "";
-    router.push("/");
+    user.name = '';
+    user.email = '';
+
+    deleteLocalStorage(TOKEN_KEY);
+    router.push('/');
   };
 
-  const updateUserName = (data: {
+  const updateUser = (data: {
     name: string;
     email: string;
-    token: string;
+    token?: string;
   }) => {
     user.name = data.name;
     user.email = data.email;
-    user.token = data.token;
+
+    data.token && saveLocalStorage(TOKEN_KEY, data.token);
   };
 
-  return { user, isUserAuthenticated, updateUserName, logoutUser };
+  const authenticateUserFromToken = () => {
+    const token = getLocalStorage(TOKEN_KEY);
+
+    if (token) {
+      getProfile().then((resp) => {
+        resp.success && updateUser(resp.data);
+      });
+    }
+  };
+
+  return {
+    user,
+    isUserAuthenticated,
+    authenticateUserFromToken,
+    updateUser,
+    logoutUser,
+  };
 }
