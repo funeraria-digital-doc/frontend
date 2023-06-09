@@ -37,11 +37,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import Modal from "../shared/Modal/modal.vue";
+import { defineComponent, ref } from 'vue';
+import Modal from '../shared/Modal/modal.vue';
 
 export default defineComponent({
-  name: "LoginModal",
+  name: 'LoginModal',
   components: {
     Modal,
   },
@@ -49,21 +49,21 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { loginUser } from "@/api/users";
-import { useUser } from "@/composables/user";
+import { loginUser } from '@/api/users';
+import { useUser } from '@/composables/user';
 
-const emit = defineEmits(["close-modal"]);
-const closeModal = () => emit("close-modal");
-const { updateUserName } = useUser();
+const emit = defineEmits(['close-modal']);
+const closeModal = () => emit('close-modal');
+const { updateUser } = useUser();
 const showPassword = ref(false);
 const hasErrorMessage = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 
 const form = ref();
-const email = ref("");
-const password = ref("");
+const email = ref('');
+const password = ref('');
 
-const fieldRules = [(v: string) => !!v || "Campo obrigatório"];
+const fieldRules = [(v: string) => !!v || 'Campo obrigatório'];
 
 const onSubmit = async () => {
   const { valid } = await form.value.validate();
@@ -75,13 +75,9 @@ const onSubmit = async () => {
     };
     loginUser(data).then((resp) => {
       if (resp.success) {
-        updateUserName(resp.data);
+        updateUser(resp.data);
         closeModal();
       } else {
-        // because this is mock we need mock a successful login
-        // updateUserName(email.value); // delete this (mock)
-        // closeModal(); // delete this (mock)
-
         hasErrorMessage.value = true;
         errorMessage.value = resp.error.title;
       }

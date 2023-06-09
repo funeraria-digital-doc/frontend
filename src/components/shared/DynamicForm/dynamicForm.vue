@@ -13,22 +13,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, type PropType } from "vue";
+import { defineComponent, onMounted, ref, type PropType } from 'vue';
 
 export default defineComponent({
-  name: "DynamicForm",
+  name: 'DynamicForm',
 });
 </script>
 
 <script lang="ts" setup>
-import type { DynamicField } from "../../../models/dynamicField.model";
-import DynamicFieldInput from "./DynamicFieldInput/dynamicFieldInput.vue";
+import type { DynamicField } from '../../../models/dynamicField.model';
+import DynamicFieldInput from './DynamicFieldInput/dynamicFieldInput.vue';
 import {
   checkDuplicateNames,
   checkSubtitlesDuplicateIndexes,
-} from "./dynamicForm.utils";
-import formSubtitle from "./FormSubtitle/formSubtitle.vue";
-import type { FormSubtitle } from "@/models/formSubtitle.form";
+} from './dynamicForm.utils';
+import formSubtitle from './FormSubtitle/formSubtitle.vue';
+import type { FormSubtitle } from '@/models/formSubtitle.form';
 
 const props = defineProps({
   fields: {
@@ -45,7 +45,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["on-submit"]);
+const emit = defineEmits(['on-submit']);
 const form = ref();
 
 const onSubmit = async (input: any) => {
@@ -58,7 +58,7 @@ const onSubmit = async (input: any) => {
       const fieldName = input.target[i].id;
 
       if (
-        props.fields.find((i) => i.name === fieldName)?.input === "checkbox"
+        props.fields.find((i) => i.name === fieldName)?.input === 'checkbox'
       ) {
         values[fieldName] = input.target[i].checked;
       } else {
@@ -66,7 +66,7 @@ const onSubmit = async (input: any) => {
       }
     }
 
-    emit("on-submit", values);
+    emit('on-submit', values);
   }
 };
 

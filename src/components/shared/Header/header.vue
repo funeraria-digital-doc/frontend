@@ -5,7 +5,10 @@
         Vue template
       </v-toolbar-title>
 
-      <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
+      <v-btn
+        v-if="!isUserAuthenticated() && authFromTokenLoaded"
+        @click="onOpenLogin"
+      >
         Entrar &nbsp;
         <v-icon>mdi-export</v-icon>
       </v-btn>
@@ -38,20 +41,22 @@
 </template>
 
 <script lang="ts">
-import router from "@/router";
-import { defineComponent, ref } from "vue";
-import { useUser } from "../../../composables/user";
-import LoginModal from "../../LoginModal/loginModal.vue";
+import router from '@/router';
+import { defineComponent, onBeforeMount, ref } from 'vue';
+import { useUser } from '../../../composables/user';
+import LoginModal from '../../LoginModal/loginModal.vue';
 
 export default defineComponent({
-  name: "AppHeader",
+  name: 'AppHeader',
   components: {
     LoginModal,
   },
   setup() {
-    const { user, isUserAuthenticated, logoutUser } = useUser();
+    const { user, isUserAuthenticated, logoutUser, authenticateUserFromToken } =
+      useUser();
 
     let isLoginModalOpen = ref(false);
+    let authFromTokenLoaded = ref(false);
 
     const onOpenLogin = () => {
       isLoginModalOpen.value = true;
@@ -62,20 +67,25 @@ export default defineComponent({
     };
 
     const handleHome = () => {
-      router.push("/");
+      router.push('/');
     };
 
     const handleProfile = () => {
-      router.push("profile");
+      router.push('profile');
     };
 
     const accountLinks = [
-      { title: "Perfil", action: handleProfile },
-      { title: "Encerrar", action: logoutUser },
+      { title: 'Perfil', action: handleProfile },
+      { title: 'Encerrar', action: logoutUser },
     ];
+
+    onBeforeMount(() => {
+      authenticateUserFromToken();
+    });
 
     return {
       user,
+      authFromTokenLoaded,
       isUserAuthenticated,
       accountLinks,
       onOpenLogin,
