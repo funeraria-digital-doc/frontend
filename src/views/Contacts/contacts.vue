@@ -27,18 +27,16 @@
 </template>
 
 <script setup lang="ts">
-import { listAllUsers } from "@/api/users";
-import Page from "../../components/shared/Page/page.vue";
-import { onMounted } from "vue";
+import { listAllUsers } from '@/api/users';
+import Page from '../../components/shared/Page/page.vue';
+import { onMounted } from 'vue';
 
 const redirectLinkedin = (url: string) => window.open(url);
-
-const redirectGithub = () => window.open("https://github.com/rafael8lopes/");
 
 onMounted(() => {
   listAllUsers().then((resp) => {
     if (resp.success) {
-      console.log("Users list:", resp.data);
+      console.log('Users list:', resp.data);
     }
   });
 });
