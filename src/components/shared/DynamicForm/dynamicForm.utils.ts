@@ -1,5 +1,5 @@
-import type { DynamicField } from "@/models/dynamicField.model";
-import type { FormSubtitle } from "@/models/formSubtitle.form";
+import type { DynamicField } from '@/models/dynamicField.model';
+import type { FormSubtitle } from '@/models/formSubtitle.form';
 
 export const checkDuplicateNames = (arr: DynamicField[]) => {
   arr.map((item) => {

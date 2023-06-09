@@ -5,11 +5,11 @@
 </template>
 
 <script lang="ts">
-import type { FormSubtitle } from "@/models/formSubtitle.form";
-import { defineComponent, type PropType } from "vue";
+import type { FormSubtitle } from '@/models/formSubtitle.form';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
-  name: "FormSubtitle",
+  name: 'FormSubtitle',
   props: {
     subtitle: {
       type: Object as PropType<FormSubtitle>,

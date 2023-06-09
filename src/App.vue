@@ -31,36 +31,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import router from "@/router";
-import { RouterView } from "vue-router";
-import AppHeader from "./components/shared/Header/header.vue";
-import AppFooter from "./components/shared/Footer/footer.vue";
+import { defineComponent, onBeforeMount } from 'vue';
+import { RouterView } from 'vue-router';
+import AppHeader from './components/shared/Header/header.vue';
+import AppFooter from './components/shared/Footer/footer.vue';
 
 export default defineComponent({
+  name: 'LoginModal',
   components: {
     AppHeader,
     AppFooter,
     RouterView,
   },
-  setup() {
-    const sideNavLinks = [
-      { title: "Página inicial", link: "/", icon: "mdi-home" },
-      {
-        title: "Declaração de Óbito",
-        link: "/death-declaration",
-        icon: "mdi-information-variant",
-      },
-      { title: "Contatos", link: "/contacts", icon: "mdi-information-variant" },
-    ];
-
-    const navigate = (link: string) => {
-      router.push(link);
-    };
-
-    return { sideNavLinks, navigate };
-  },
 });
+</script>
+
+<script lang="ts" setup>
+import router from '@/router';
+
+const sideNavLinks = [
+  { title: 'Página inicial', link: '/', icon: 'mdi-home' },
+  {
+    title: 'Declaração de Óbito',
+    link: '/death-declaration',
+    icon: 'mdi-information-variant',
+  },
+  { title: 'Contatos', link: '/contacts', icon: 'mdi-information-variant' },
+];
+
+const navigate = (link: string) => {
+  router.push(link);
+};
 </script>
 
 <style scoped lang="scss">

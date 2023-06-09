@@ -42,31 +42,31 @@
 </template>
 
 <script lang="ts" setup>
-import { useUser } from "@/composables/user";
-import { ref, computed } from "vue";
-import Page from "../../components/shared/Page/page.vue";
-import { editProfile } from "@/api/users";
+import { useUser } from '@/composables/user';
+import { ref, computed } from 'vue';
+import Page from '../../components/shared/Page/page.vue';
+import { editProfile } from '@/api/users';
 const { user } = useUser();
 const username = ref(user.name);
 const email = ref(user.email);
 const form = ref();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
-const password = ref("");
-const confirmPassword = ref("");
-const fieldRules = [(v: string) => !!v || "Campo obrigatório"];
+const password = ref('');
+const confirmPassword = ref('');
+const fieldRules = [(v: string) => !!v || 'Campo obrigatório'];
 
 const passwordRules = [
-  (value: string) => password.value === value || "Passwords do not match.",
+  (value: string) => password.value === value || 'Passwords do not match.',
 ];
 
 const requiredIfNotEmpty = () => {
-  if (password.value !== "" || confirmPassword.value !== "") {
-    if (password.value === "") {
-      return [(v: any) => !!v || "O campo Palavra Passe é obrigatório"];
+  if (password.value !== '' || confirmPassword.value !== '') {
+    if (password.value === '') {
+      return [(v: any) => !!v || 'O campo Palavra Passe é obrigatório'];
     } else {
       return [
-        (v: any) => !!v || "O campo Confirmar Palavra Passe é obrigatório",
+        (v: any) => !!v || 'O campo Confirmar Palavra Passe é obrigatório',
       ];
     }
   }
@@ -81,8 +81,8 @@ const onSubmit = async () => {
     const data = {
       username,
       email,
-      password: "",
-      password_confirm: "",
+      password: '',
+      password_confirm: '',
       // password,
       // password_confirm: confirmPassword,
       token: user.token,
@@ -95,7 +95,7 @@ const onSubmit = async () => {
         // because this is mock we need mock a successful login
         // updateUserName(email.value); // delete this (mock)
         // closeModal(); // delete this (mock)
-        console.log("erro");
+        console.log('erro');
       }
     });
   }

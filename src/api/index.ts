@@ -1,5 +1,7 @@
-import axios from "axios";
-import type { AxiosError } from "axios";
+import { TOKEN_KEY } from '@/utils/constants';
+import { getLocalStorage } from '@/utils/localStorage';
+import axios from 'axios';
+import type { AxiosError } from 'axios';
 
 export type ApiError<E = {}> = E & {
   type: string;
@@ -14,23 +16,34 @@ export type Failable<T, E> =
 
 export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
 
+const token = getLocalStorage(TOKEN_KEY);
 export const apiInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
+  headers: token ? { Authorization: `Token ${token}` } : {},
 });
 
 export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {
   if (e.response != null) {
-    const data: any = e.response.data ?? {};
+    const defaultMessage =
+      'The server encountered an internal error and was unable to complete your request.';
+    const defaultType = 'Server error';
 
-    const error: ApiError<E> = {
-      type: data.type ?? "about:blank",
-      title: data.title ?? "Internal server error",
-      detail:
-        data.detail ??
-        "The server encountered an internal error and was unable to complete your request.",
-      status: data.status ?? e.response.status ?? 500,
-      ...data,
-    };
+    const data: any = e.response.data ?? {};
+    const error: ApiError<E> =
+      typeof data === 'string'
+        ? {
+            type: defaultType,
+            title: data,
+            detail: defaultMessage,
+            status: e.response.status ?? 500,
+          }
+        : {
+            type: data.type ?? defaultType,
+            title: data.title ?? 'Internal server error',
+            detail: data.detail ?? defaultMessage,
+            status: data.status ?? e.response.status ?? 500,
+            ...data,
+          };
 
     return { success: false, error };
   } else {

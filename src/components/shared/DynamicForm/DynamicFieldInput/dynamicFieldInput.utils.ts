@@ -5,7 +5,7 @@ export const fieldRules = (
 ) => {
   const rules = [];
 
-  isRequired && rules.push((v: string) => !!v || "Campo obrigatório");
+  isRequired && rules.push((v: string) => !!v || 'Campo obrigatório');
 
   minLength &&
     rules.push(
