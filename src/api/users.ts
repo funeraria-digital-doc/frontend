@@ -16,6 +16,32 @@ export async function loginUser(data: {
   }
 }
 
+export async function changePassword(data: {
+  password: any;
+  confirmPassword: any;
+  token: any;
+}): Promise<ApiResponse<any>> {
+  try {
+    console.log(data.token)
+    const response = await apiInstance.post(
+      "/accounts/change-password/",
+      {
+        password: data.password.value,
+        confirm_password: data.confirmPassword.value,
+      },
+      {
+        headers: {
+          Authorization: "Token " + data.token,
+        },
+      }
+    );
+    console.log(response);
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.response };
+  }
+}
+
 export async function listAllUsers(): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.get('/accounts/list-all-users/');
@@ -52,8 +78,6 @@ export async function getProfile(): Promise<ApiResponse<any>> {
 export async function editProfile(data: {
   username: { value: any };
   email: { value: any };
-  password: { value: any };
-  password_confirm: { value: any };
   token: { value: any };
 }): Promise<ApiResponse<any>> {
   try {
@@ -63,8 +87,6 @@ export async function editProfile(data: {
       {
         username: data.username.value,
         email: data.email.value,
-        password: data.password.value,
-        password_confirm: data.password_confirm.value,
       },
       {
         headers: {
