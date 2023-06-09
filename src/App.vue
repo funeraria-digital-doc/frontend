@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount } from 'vue';
+import { defineComponent } from 'vue';
 import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
@@ -55,6 +55,10 @@ const sideNavLinks = [
     title: 'Declaração de Óbito',
     link: '/death-declaration',
     icon: 'mdi-information-variant',
+    children: [
+      { title: 'Submenu Item 1', icon: 'mdi-file', to: '/submenu-1' },
+      { title: 'Submenu Item 2', icon: 'mdi-file', to: '/submenu-2' },
+    ],
   },
   { title: 'Contatos', link: '/contacts', icon: 'mdi-information-variant' },
 ];
