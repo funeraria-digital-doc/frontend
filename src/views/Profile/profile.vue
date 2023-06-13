@@ -1,30 +1,32 @@
 <template>
   <page title="Profile">
+    <v-container>
+      <v-row>
+        <div class="profile-picture">
+          <label for="profile-input" class="profile-label">
+            <div class="profile-preview" v-if="imageUrl">
+              <img :src="imageUrl" alt="Profile Preview" />
+            </div>
+            <div v-else class="profile-placeholder">
+              <v-icon class="profile-icon">mdi-camera</v-icon>
+              <span class="profile-text">Upload Image</span>
+            </div>
+            <input
+              type="file"
+              id="profile-input"
+              class="profile-input"
+              accept="image/*"
+              @change="handleFileChange"
+            />
+          </label>
+          <v-btn @click="saveProfileImage" type="button" class="profile-save"
+            >Save</v-btn
+          >
+        </div>
+      </v-row>
+    </v-container>
     <v-form ref="form" @submit.prevent="onSubmit">
       <v-container>
-        <v-row>
-          <div class="profile-picture">
-            <label for="profile-input" class="profile-label">
-              <div class="profile-preview" v-if="imageUrl">
-                <img :src="imageUrl" alt="Profile Preview" />
-              </div>
-              <div v-else class="profile-placeholder">
-                <v-icon class="profile-icon">mdi-camera</v-icon>
-                <span class="profile-text">Upload Image</span>
-              </div>
-              <input
-                type="file"
-                id="profile-input"
-                class="profile-input"
-                accept="image/*"
-                @change="handleFileChange"
-              />
-            </label>
-            <v-btn @click="console.log('cenas')" class="profile-save"
-              >Save</v-btn
-            >
-          </div>
-        </v-row>
         <v-row>
           <v-text-field
             v-model="username"
@@ -60,14 +62,20 @@
       </v-container>
     </v-form>
   </page>
+  <error-success-message
+    :hasMessage="hasMessage"
+    :message="message"
+    :isSuccess="isSuccess"
+  ></error-success-message>
 </template>
 
 <script lang="ts" setup>
 import { useUser } from '@/composables/user';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Page from '../../components/shared/Page/page.vue';
-import { editProfile } from '@/api/users';
+import { editProfile, getProfileImage, editProfileImage } from '@/api/users';
 import ChangePasswordModal from '@/components/ChangePasswordModal/changePasswordModal.vue';
+import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 const { user } = useUser();
 const username = ref(user.name);
 const email = ref(user.email);
@@ -75,6 +83,9 @@ const form = ref();
 const imageUrl = ref(null);
 const image = ref(null);
 const isChangePasswordOpen = ref(false);
+const hasMessage = ref(false)
+const isSuccess = ref(false)
+const message = ref('')
 
 const onOpenChangePassword = () => {
   isChangePasswordOpen.value = true;
@@ -104,17 +115,63 @@ const onSubmit = async () => {
     };
     editProfile(data).then((resp) => {
       if (resp.success) {
-        //updateUserName(resp.data);
-        console.log(resp.data);
+        hasMessage.value = true
+        message.value = 'success edit profile'
+        isSuccess.value = true
       } else {
-        // because this is mock we need mock a successful login
-        // updateUserName(email.value); // delete this (mock)
-        // closeModal(); // delete this (mock)
-        console.log('erro');
+        hasMessage.value = true
+        message.value = 'error edit profile'
+        isSuccess.value = false
       }
     });
   }
 };
+
+const saveProfileImage = () => {
+  console.log('cenas');
+  console.log(image.value);
+  if (image.value) {
+    editProfileImage(user.token, image.value).then((resp) => {
+      if (resp.success) {
+        hasMessage.value = true
+        message.value = 'success edit profile'
+        isSuccess.value = true
+      } else {
+        hasMessage.value = true
+        message.value = 'error edit profile'
+        isSuccess.value = false
+      }
+    });
+  } else {
+    console.log('no image');
+  }
+};
+
+const base64ToFile = (base64Data: string) => {
+  const filename = username.value + '_picture.jpg';
+  const byteCharacters = atob(base64Data); // Decode the base64 data
+  const byteArrays = [];
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i)); // Convert each character to its byte value
+  }
+
+  const byteArray = new Uint8Array(byteArrays); // Create a Uint8Array from the byte values
+  return new File([byteArray], filename, { type: 'image/jpeg' }); // Create a File object from the Uint8Array
+};
+onMounted(() => {
+  console.log(user);
+  getProfileImage(user.token).then((resp) => {
+    if (resp.success) {
+      imageUrl.value = 'data:image/jpeg;base64,' + resp.data.image;
+      image.value = base64ToFile(resp.data.image);
+      console.log(image.value);
+      console.log(resp.data);
+    } else {
+      console.log('erro');
+    }
+  });
+});
 </script>
 
 <style scoped>

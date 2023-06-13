@@ -22,16 +22,16 @@ export async function changePassword(data: {
   token: any;
 }): Promise<ApiResponse<any>> {
   try {
-    console.log(data.token)
+    console.log(data.token);
     const response = await apiInstance.post(
-      "/accounts/change-password/",
+      '/accounts/change-password/',
       {
         password: data.password.value,
         confirm_password: data.confirmPassword.value,
       },
       {
         headers: {
-          Authorization: "Token " + data.token,
+          Authorization: 'Token ' + data.token,
         },
       }
     );
@@ -64,9 +64,13 @@ export async function listAllActiveUsers(): Promise<ApiResponse<any>> {
   }
 }
 
-export async function getProfile(): Promise<ApiResponse<any>> {
+export async function getProfile(token: string): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get('/accounts/profile/');
+    const response = await apiInstance.get('/accounts/profile/', {
+      headers: {
+        Authorization: 'Token ' + token,
+      },
+    });
 
     return { success: true, data: response.data };
   } catch (e: any) {
@@ -98,6 +102,42 @@ export async function editProfile(data: {
     return { success: true, data: response.data };
   } catch (e: any) {
     console.error('Edit Profile error', e);
+    return errorResponse(e);
+  }
+}
+
+export async function getProfileImage(
+  token: string
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get('/accounts/profile-image/', {
+      headers: {
+        Authorization: 'Token ' + token,
+      },
+    });
+
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    console.error('Get Profile Image error', e);
+    return errorResponse(e);
+  }
+}
+
+export async function editProfileImage(
+  token: string,
+  image: ImageData
+): Promise<ApiResponse<any>> {
+  try {
+    const formData = new FormData();
+    formData.append('file', image);
+    await apiInstance.post('/accounts/file-upload/', formData, {
+      headers: {
+        Authorization: 'Token ' + token,
+      },
+    });
+    return { success: true };
+  } catch (e: any) {
+    console.error('edit Profile Image error', e);
     return errorResponse(e);
   }
 }

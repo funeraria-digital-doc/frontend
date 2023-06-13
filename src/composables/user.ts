@@ -11,6 +11,7 @@ import { reactive } from 'vue';
 const user = reactive({
   name: '',
   email: '',
+  token: '',
 });
 
 export function useUser() {
@@ -21,28 +22,36 @@ export function useUser() {
   const logoutUser = () => {
     user.name = '';
     user.email = '';
-
+    user.token = '';
     deleteLocalStorage(TOKEN_KEY);
     router.push('/');
   };
 
   const updateUser = (data: {
-    name: string;
+    username: string;
     email: string;
     token?: string;
   }) => {
-    user.name = data.name;
-    user.email = data.email;
-
+    console.log(data);
     data.token && saveLocalStorage(TOKEN_KEY, data.token);
+    const token = getLocalStorage(TOKEN_KEY);
+    getProfile(token).then((resp) => {
+      console.log(resp);
+      if (resp.success) {
+        user.name = resp.data.username;
+        user.email = resp.data.email;
+      }
+      user.token = token;
+    });
   };
 
   const authenticateUserFromToken = () => {
     const token = getLocalStorage(TOKEN_KEY);
 
     if (token) {
-      getProfile().then((resp) => {
+      getProfile(token).then((resp) => {
         resp.success && updateUser(resp.data);
+        user.token = token;
       });
     }
   };
