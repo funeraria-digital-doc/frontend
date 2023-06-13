@@ -5,6 +5,10 @@
         Funerária Digital
       </v-toolbar-title>
 
+      <!-- <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
+        Entrar &nbsp;
+        <v-icon>mdi-export</v-icon>
+      </v-btn> -->
       <v-btn
         v-if="!isUserAuthenticated() && authFromTokenLoaded"
         @click="onOpenLogin"
@@ -54,9 +58,9 @@ export default defineComponent({
   setup() {
     const { user, isUserAuthenticated, logoutUser, authenticateUserFromToken } =
       useUser();
-
+    console.log(user);
     let isLoginModalOpen = ref(false);
-    let authFromTokenLoaded = ref(false);
+    let authFromTokenLoaded = ref(true);
 
     const onOpenLogin = () => {
       isLoginModalOpen.value = true;
