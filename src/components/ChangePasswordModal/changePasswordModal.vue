@@ -47,11 +47,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import Modal from "../shared/Modal/modal.vue";
+import { defineComponent, ref } from 'vue';
+import Modal from '../shared/Modal/modal.vue';
 
 export default defineComponent({
-  name: "ChangePasswordModal",
+  name: 'ChangePasswordModal',
   components: {
     Modal,
   },
@@ -59,37 +59,37 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { changePassword } from "@/api/users";
+import { changePassword } from '@/api/users';
 
-const emit = defineEmits(["close-modal"]);
-const closeModal = () => emit("close-modal");
+const emit = defineEmits(['close-modal']);
+const closeModal = () => emit('close-modal');
 const hasErrorMessage = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 
 const form = ref();
-const password = ref("");
-const confirmPassword = ref("");
+const password = ref('');
+const confirmPassword = ref('');
 const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const passwordRules = [
-  (value: string) => !!value || "Palavra passe é obrigatória",
+  (value: string) => !!value || 'Palavra passe é obrigatória',
   (value: string) =>
-    password.value === value || "Palavras Passe não são iguais.",
+    password.value === value || 'Palavras Passe não são iguais.',
 ];
 const passwordConfirmRules = [
-  (value: string) => !!value || "Confirmar Palavra passe é obrigatória",
+  (value: string) => !!value || 'Confirmar Palavra passe é obrigatória',
   (value: string) =>
-    password.value === value || "Palavras Passe não são iguais.",
+    password.value === value || 'Palavras Passe não são iguais.',
 ];
-const props = defineProps(["token"]);
+const props = defineProps(['token']);
 const onSubmit = async () => {
   console.log(form.value);
   const { valid } = await form.value.validate();
   console.log(valid);
   if (valid) {
-    console.log("is valid");
-    console.log("token", props.token);
+    console.log('is valid');
+    console.log('token', props.token);
     isLoading.value = true;
     const data = {
       password,

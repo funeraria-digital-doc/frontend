@@ -42,9 +42,13 @@ export async function changePassword(data: {
   }
 }
 
-export async function listAllUsers(): Promise<ApiResponse<any>> {
+export async function listAllUsers(token: string): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get('/accounts/list-all-users/');
+    const response = await apiInstance.get('/accounts/list-all-users/', {
+      headers: {
+        Authorization: 'Token ' + token,
+      },
+    });
 
     return { success: true, data: response.data };
   } catch (e: any) {
@@ -53,9 +57,15 @@ export async function listAllUsers(): Promise<ApiResponse<any>> {
   }
 }
 
-export async function listAllActiveUsers(): Promise<ApiResponse<any>> {
+export async function listAllActiveUsers(
+  token: string
+): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get('/accounts/list-active-users/');
+    const response = await apiInstance.get('/accounts/list-active-users/', {
+      headers: {
+        Authorization: 'Token ' + token,
+      },
+    });
 
     return { success: true, data: response.data };
   } catch (e: any) {

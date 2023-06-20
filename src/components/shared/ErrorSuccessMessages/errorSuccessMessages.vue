@@ -5,6 +5,7 @@
       :timeout="2000"
       location="top right"
       :color="color"
+      ref="snackbar"
     >
       {{ message }}
     </v-snackbar>
@@ -23,6 +24,7 @@ const props = defineProps(['isSuccess', 'hasMessage', 'message']);
 const hasMessage = ref(false);
 const message = ref('');
 const color = ref('');
+const snackbar = ref(null);
 watch(
   () => props.hasMessage,
   (newValue) => {
@@ -34,6 +36,7 @@ watch(
     } else {
       color.value = 'red-darken-2';
     }
+    snackbar.value.isActive = true;
   }
 );
 </script>

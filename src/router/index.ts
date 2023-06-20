@@ -3,6 +3,8 @@ import Home from '../views/Home/home.vue';
 import Contacts from '../views/Contacts/contacts.vue';
 import Profile from '../views/Profile/profile.vue';
 import DeathDeclaration from '../views/DeathDeclaration/deathDeclaration.vue';
+import Users from '../views/Users/users.vue';
+import Groups from '../views/Groups/groups.vue';
 import { useUser } from '@/composables/user';
 
 const router = createRouter({
@@ -29,6 +31,18 @@ const router = createRouter({
       name: 'death_declaration',
       component: DeathDeclaration,
     },
+    {
+      path: '/users',
+      name: 'users',
+      component: Users,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/groups',
+      name: 'groups',
+      component: Groups,
+      meta: { requiresAuth: true },
+    }
   ],
 });
 
