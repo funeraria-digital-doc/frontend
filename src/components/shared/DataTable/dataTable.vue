@@ -3,11 +3,11 @@
     :items-per-page="itemsPerPage"
     :items-per-page-options="itemsPerPageOptions"
     :headers="headers"
-    :items="props.items"
+    :items="serverItems"
     item-value="name"
     class="elevation-1 d-flex flex-column"
     density="comfortable"
-    :loading="props.loading"
+    :loading="loading"
     loading-text="A carregar"
   >
     <template v-slot:top>
@@ -19,32 +19,58 @@
             class="mb-2 d-flex align-self-end"
             v-bind="props"
           >
-            New Item
+            {{ propsData.data.createButtonTitle }}
           </v-btn>
         </template>
         <v-card>
           <v-card-title class="mt-3">
             <span class="text-h5 ml-6">{{ formTitle }}</span>
           </v-card-title>
-          <slot name="editModal" :edited-item="editedItem"></slot>
+          <v-card-text>
+            <v-form ref="form" validate-on="submit" @submit.prevent="save">
+              <v-container v-for="field in propsData.data.fields" :key="field">
+                <v-row>
+                  <v-col cols="12" sm="12" md="12">
+                    <v-text-field
+                      v-if="field.type === 'text-field'"
+                      :id="field.name"
+                      v-model="editedItem[field.name]"
+                      :rules="field.rules"
+                      :label="field.label"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue-darken-1" variant="text" @click="close">
+                  {{ propsData.data.createEditButtons.cancel }}
+                </v-btn>
+                <v-btn color="blue-darken-1" variant="text" type="submit">
+                  {{ propsData.data.createEditButtons.action }}
+                </v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card-text>
         </v-card>
       </v-dialog>
       <!-- diaalog para delete -->
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-          <v-card-title class="text-h5"
-            >Are you sure you want to delete this item?</v-card-title
-          >
+          <v-card-title
+            class="text-h5 text-center"
+            v-html="propsData.data.deleteText"
+          ></v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue-darken-1" variant="text" @click="closeDelete"
-              >Cancel</v-btn
-            >
+            <v-btn color="blue-darken-1" variant="text" @click="closeDelete">{{
+              propsData.data.deleteButtons.cancel
+            }}</v-btn>
             <v-btn
               color="blue-darken-1"
               variant="text"
               @click="deleteItemConfirm"
-              >OK</v-btn
+              >{{ propsData.data.deleteButtons.action }}</v-btn
             >
             <v-spacer></v-spacer>
           </v-card-actions>
@@ -52,25 +78,25 @@
       </v-dialog>
     </template>
     <template v-slot:item.actions="{ item }">
-      <slot name="actions" :item="item"></slot>
+      <v-icon size="small" class="me-2" @click="editItem(item.raw)">
+        mdi-pencil
+      </v-icon>
+      <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
     </template>
-    <!-- <template v-slot:no-data>
-      <v-btn color="primary" @click="initialize"> Reset </v-btn>
-    </template> -->
   </v-data-table>
-  <error-success-message
-    :hasMessage="hasMessage"
-    :message="message"
-    :isSuccess="isSuccess"
-  ></error-success-message>
-
-  <!-- @update:options="loadItems" -->
+  <error-success-message ref="snack"></error-success-message>
 </template>
-
 <script lang="ts">
-import { defineComponent, ref, computed, nextTick, watch } from 'vue';
+import {
+  defineComponent,
+  ref,
+  computed,
+  nextTick,
+  watch,
+  onMounted,
+} from 'vue';
 import { VDataTable } from 'vuetify/labs/VDataTable';
-import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
+import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
 export default defineComponent({
   name: 'UsersDataTable',
   components: {
@@ -80,7 +106,7 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const props = defineProps(['headers', 'items', 'loading']);
+const propsData = defineProps(['data']);
 /*
 Exemplo de header
 type DataTableHeader = {
@@ -98,13 +124,13 @@ type DataTableHeader = {
     sort?: DataTableCompareFunction;
 };
 */
-const hasMessage = ref(false);
-const isSuccess = ref(false);
-const message = ref('');
+const form = ref();
+const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
-const headers = ref(props.headers);
+const headers = ref(propsData.data.headers);
 const itemsPerPageOptions = ref([
+  { value: 5, title: '5' },
   { value: 10, title: '10' },
   { value: 15, title: '15' },
   { value: 20, title: '20' },
@@ -114,23 +140,14 @@ const itemsPerPageOptions = ref([
 const itemsPerPage = ref(10);
 const serverItems = ref([]);
 const editedIndex = ref(-1);
-const editedItem = ref({
-  name: '',
-  calories: 0,
-  fat: 0,
-  carbs: 0,
-  protein: 0,
-});
-const defaultItem = ref({
-  name: '',
-  calories: 0,
-  fat: 0,
-  carbs: 0,
-  protein: 0,
-});
+const editedItem = ref({});
+const defaultItem = ref({});
 const formTitle = computed(() => {
-  return editedIndex.value === -1 ? 'New Item' : 'Edit Item';
+  return editedIndex.value === -1
+    ? propsData.data.newItemTitle
+    : propsData.data.editItemTitle;
 });
+const snack = ref(null);
 
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
@@ -142,8 +159,12 @@ function deleteItem(item) {
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
 }
-function deleteItemConfirm() {
-  serverItems.value.splice(editedIndex.value, 1);
+async function deleteItemConfirm() {
+  await propsData.data.delete(
+    serverItems.value[editedIndex.value].id,
+    serverItems,
+    snack
+  );
   closeDelete();
 }
 function close() {
@@ -161,34 +182,44 @@ function closeDelete() {
   });
 }
 
-defineExpose({
-  closeDialog,
-  errorSuccessMessage,
-});
-async function closeDialog() {
-  dialog.value = false;
-}
-
-function errorSuccessMessage(messageProps: {
-  hasData: any;
-  hasMessage: boolean;
-  message: string;
-  isSuccess: boolean;
-}) {
-  console.log('---');
-  console.log(messageProps);
-  if (messageProps.hasData) {
-    hasMessage.value = messageProps.hasMessage;
-    message.value = messageProps.message;
-    isSuccess.value = messageProps.isSuccess;
+async function save() {
+  const { valid } = await form.value.validate();
+  if (valid) {
+    try {
+      if (editedIndex.value > -1) {
+        await propsData.data.edit(
+          editedItem.value,
+          editedIndex.value,
+          serverItems,
+          snack
+        );
+      } else {
+        await propsData.data.save(editedItem.value, serverItems, snack);
+      }
+      close();
+    } catch (error) {
+      console.error(error);
+      // Handle the error here if necessary
+    }
   }
 }
 
 watch(dialog, (val) => {
-  val || closeDialog();
+  val || close();
 });
 watch(dialogDelete, (val) => {
   val || closeDelete();
+});
+
+onMounted(() => {
+  propsData.data.getData(loading, serverItems);
+  const fields = propsData.data.fields;
+  let newEditedItem = {};
+  for (let i = 0; i < fields.length; i++) {
+    newEditedItem[fields[i].name] = '';
+  }
+  editedItem.value = newEditedItem;
+  defaultItem.value = newEditedItem;
 });
 </script>
 

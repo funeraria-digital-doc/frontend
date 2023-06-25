@@ -1,67 +1,98 @@
-import { groupsList, groupCreate } from '@/api/groups';
-import { getLocalStorage } from '@/utils/localStorage';
-import { TOKEN_KEY } from '@/utils/constants';
+import { groupsList, groupCreate, groupEdit, groupDelete } from '@/api/groups';
 
 export const getGroups = async (loading, groups) => {
-  const token = getLocalStorage(TOKEN_KEY);
-  if (token) {
-    groupsList().then((resp) => {
+  groupsList().then((resp) => {
+    if (resp.success) {
+      const groupsData = resp.data.map((group: { id: any; name: any }) => {
+        return {
+          id: group.id,
+          name: group.name,
+        };
+      });
+      groups.value = groupsData;
+    } else {
+      console.log('erro', resp);
+    }
+    loading.value = false;
+  });
+};
+
+export const createGroup = async (newGroup: any, groups: any, snack: any) => {
+  try {
+    groupCreate(newGroup).then((resp) => {
       if (resp.success) {
-        const groupsData = resp.data.map((group: { id: any; name: any }) => {
-          return {
-            id: group.id,
-            name: group.name,
-          };
-        });
-        groups.value = groupsData;
+        groups.value.push(resp.data.group);
+        snack.value.showSnackbar('Funerária criada com sucesso.', '', true);
       } else {
-        console.log('erro', resp);
+        snack.value.showSnackbar(
+          'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
+          JSON.stringify(resp.error.error),
+          false
+        );
       }
-      loading.value = false;
     });
-  } else {
-    console.log('no token');
+  } catch (e: any) {
+    snack.value.showSnackbar(
+      'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
+      JSON.stringify(e),
+      false
+    );
   }
 };
 
-export const createGroup = async (
-  loading,
-  groups,
-  newGroup,
-  datatableComponent
+export const editGroup = async (
+  editedGroup: any,
+  index: string | number,
+  groups: { value: { [x: string]: any } },
+  snack: any
 ) => {
-  const token = getLocalStorage(TOKEN_KEY);
-  if (token) {
-    groupCreate(newGroup).then((resp) => {
+  try {
+    groupEdit(editedGroup).then((resp) => {
       if (resp.success) {
-        const newGroups = groups.value;
-        newGroups.push(resp.data.group);
-        groups.value = newGroups;
-        datatableComponent.value.closeDialog();
-        datatableComponent.value.errorSuccessMessage({
-          hasData: true,
-          hasMessage: true,
-          message: 'Funerária criada com sucesso!',
-          isSuccess: true,
-        });
+        groups.value[index] = resp.data;
+        snack.value.showSnackbar('Funerária editada com sucesso.', '', true);
       } else {
-        datatableComponent.value.errorSuccessMessage({
-          hasData: true,
-          hasMessage: false,
-          message: 'Erro ao criar Funerária!',
-          isSuccess: false,
-        });
+        snack.value.showSnackbar(
+          'Ocorreu um erro ao editar a funerária. <br>Por favor, tente novamente mais tarde.',
+          JSON.stringify(resp.error.error),
+          false
+        );
       }
-      loading.value = false;
     });
-  } else {
-    datatableComponent.value.errorSuccessMessage({
-      hasData: true,
-      hasMessage: false,
-      message: 'Não está Autenticado',
-      isSuccess: false,
-    });
-    loading.value = false;
+  } catch (e: any) {
+    snack.value.showSnackbar(
+      'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
+      JSON.stringify(e),
+      false
+    );
   }
-  
+};
+
+export const deleteGroup = async (
+  id: string | number,
+  groups: { value: { [x: string]: any } },
+  snack: any
+) => {
+  try {
+    groupDelete(id).then((resp) => {
+      if (resp.success) {
+        groups.value = groups.value.filter(
+          (obj: { id: string | number }) => obj.id !== id
+        );
+        snack.value.showSnackbar('Funerária eliminada com sucesso.', '', true);
+      } else {
+        snack.value.showSnackbar(
+          'Ocorreu um erro ao eliminar a funerária. <br>Por favor, tente novamente mais tarde.',
+          JSON.stringify(resp.error.error),
+          false
+        );
+      }
+    });
+  } catch (e: any) {
+    snack.value.showSnackbar(
+      'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
+      JSON.stringify(e),
+      false
+    );
+  }
 };

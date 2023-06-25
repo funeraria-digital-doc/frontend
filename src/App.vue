@@ -36,25 +36,25 @@ import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 
+
 export default defineComponent({
   name: 'LoginModal',
   components: {
     AppHeader,
     AppFooter,
-    RouterView,
+    RouterView
   },
 });
 </script>
 
 <script lang="ts" setup>
 import router from '@/router';
-
 const sideNavLinks = [
   { title: 'Página inicial', link: '/', icon: 'mdi-home' },
   {
     title: 'Declaração de Óbito',
     link: '/death-declaration',
-    icon: 'mdi-information-variant'
+    icon: 'mdi-information-variant',
   },
   { title: 'Contatos', link: '/contacts', icon: 'mdi-information-variant' },
   { title: 'Utilizadores', link: '/users', icon: 'mdi-information-variant' },
