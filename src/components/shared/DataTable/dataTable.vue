@@ -2,7 +2,7 @@
   <v-data-table
     :items-per-page="itemsPerPage"
     :items-per-page-options="itemsPerPageOptions"
-    items-per-page-text="cenas"
+    items-per-page-text="items por página"
     :headers="headers"
     :items="serverItems"
     item-value="name"
