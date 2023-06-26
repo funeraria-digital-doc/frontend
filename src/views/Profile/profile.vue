@@ -128,8 +128,6 @@ const onSubmit = async () => {
 };
 
 const saveProfileImage = () => {
-  console.log('cenas');
-  console.log(image.value);
   if (image.value) {
     editProfileImage(user.token, image.value).then((resp) => {
       if (resp.success) {
@@ -143,7 +141,7 @@ const saveProfileImage = () => {
       }
     });
   } else {
-    console.log('no image');
+    console.error('no image');
   }
 };
 
@@ -160,15 +158,12 @@ const base64ToFile = (base64Data: string) => {
   return new File([byteArray], filename, { type: 'image/jpeg' }); // Create a File object from the Uint8Array
 };
 onMounted(() => {
-  console.log(user);
   getProfileImage(user.token).then((resp) => {
     if (resp.success) {
       imageUrl.value = 'data:image/jpeg;base64,' + resp.data.image;
       image.value = base64ToFile(resp.data.image);
-      console.log(image.value);
-      console.log(resp.data);
     } else {
-      console.log('erro');
+      console.error('erro');
     }
   });
 });

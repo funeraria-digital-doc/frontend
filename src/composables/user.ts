@@ -32,11 +32,9 @@ export function useUser() {
     email: string;
     token?: string;
   }) => {
-    console.log(data);
     data.token && saveLocalStorage(TOKEN_KEY, data.token);
     const token = getLocalStorage(TOKEN_KEY);
     getProfile(token).then((resp) => {
-      console.log(resp);
       if (resp.success) {
         user.name = resp.data.username;
         user.email = resp.data.email;
