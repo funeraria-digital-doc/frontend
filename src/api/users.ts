@@ -22,7 +22,6 @@ export async function changePassword(data: {
   token: any;
 }): Promise<ApiResponse<any>> {
   try {
-    console.log(data.token);
     const response = await apiInstance.post(
       '/accounts/change-password/',
       {
@@ -35,7 +34,6 @@ export async function changePassword(data: {
         },
       }
     );
-    console.log(response);
     return { success: true };
   } catch (e: any) {
     return { error: e.response };
@@ -95,7 +93,6 @@ export async function editProfile(data: {
   token: { value: any };
 }): Promise<ApiResponse<any>> {
   try {
-    console.log(data.token);
     const response = await apiInstance.patch(
       '/accounts/edit-profile/',
       {

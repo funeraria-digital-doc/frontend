@@ -84,12 +84,8 @@ const passwordConfirmRules = [
 ];
 const props = defineProps(['token']);
 const onSubmit = async () => {
-  console.log(form.value);
   const { valid } = await form.value.validate();
-  console.log(valid);
   if (valid) {
-    console.log('is valid');
-    console.log('token', props.token);
     isLoading.value = true;
     const data = {
       password,
@@ -101,7 +97,6 @@ const onSubmit = async () => {
         //updateUserName(resp.data);
         closeModal();
       } else {
-        console.log(resp);
         hasErrorMessage.value = true;
         //errorMessage.value = resp.error.data;
       }

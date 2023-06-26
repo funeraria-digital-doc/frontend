@@ -105,10 +105,8 @@ const groupRules = [
       : 'A escolha de uma é obrigatória.',
 ];
 const save = async () => {
-  console.log('save');
   const { valid } = await form.value.validate();
   if (valid && datatableComponent.value) {
-    //console.log(datatableComponent.value)
     //datatableComponent.value.saveItem(editedItem);
   }
 };
@@ -123,7 +121,6 @@ onMounted(() => {
   if (token) {
     groupsList().then((resp) => {
       if (resp.success) {
-        console.log(resp.data);
         const groupsData = resp.data.map((group: { id: any; name: any }) => {
           return {
             id: group.id,
@@ -133,13 +130,12 @@ onMounted(() => {
         });
         groups.value = groupsData;
       } else {
-        console.log('erro', resp);
+        console.error('erro', resp);
       }
       loading.value = false;
     });
     listAllUsers(token).then((resp) => {
       if (resp.success) {
-        console.log(resp.data);
         const usersData = resp.data.users.map(
           (user: {
             id: any;
@@ -165,12 +161,12 @@ onMounted(() => {
         );
         users.value = usersData;
       } else {
-        console.log('erro');
+        console.error('erro');
       }
       loading.value = false;
     });
   } else {
-    console.log('no token');
+    console.error('no token');
   }
 });
 </script>

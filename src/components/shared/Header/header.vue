@@ -58,7 +58,6 @@ export default defineComponent({
   setup() {
     const { user, isUserAuthenticated, logoutUser, authenticateUserFromToken } =
       useUser();
-    console.log(user);
     let isLoginModalOpen = ref(false);
     let authFromTokenLoaded = ref(true);
 

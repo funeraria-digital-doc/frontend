@@ -11,7 +11,7 @@ export const getGroups = async (loading, groups) => {
       });
       groups.value = groupsData;
     } else {
-      console.log('erro', resp);
+      console.error('erro', resp);
     }
     loading.value = false;
   });
