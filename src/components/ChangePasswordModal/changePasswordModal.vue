@@ -82,16 +82,18 @@ const passwordConfirmRules = [
   (value: string) =>
     password.value === value || 'Palavras Passe não são iguais.',
 ];
-const props = defineProps(['token']);
+
 const onSubmit = async () => {
   const { valid } = await form.value.validate();
+
   if (valid) {
     isLoading.value = true;
+
     const data = {
       password,
       confirmPassword,
-      token: props.token,
     };
+
     await changePassword(data).then((resp) => {
       if (resp.success) {
         //updateUserName(resp.data);

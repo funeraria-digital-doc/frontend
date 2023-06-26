@@ -1,4 +1,4 @@
-import { getProfile } from '@/api/users';
+import { getProfile, loginUser } from '@/api/users';
 import router from '@/router';
 import { TOKEN_KEY } from '@/utils/constants';
 import {
@@ -6,57 +6,71 @@ import {
   getLocalStorage,
   saveLocalStorage,
 } from '@/utils/localStorage';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 const user = reactive({
   name: '',
   email: '',
-  token: '',
 });
+
+const isAuthFromTokenLoaded = ref(false);
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.name !== '';
+    return user.name !== '' && isAuthFromTokenLoaded.value;
   };
 
   const logoutUser = () => {
     user.name = '';
     user.email = '';
-    user.token = '';
+
     deleteLocalStorage(TOKEN_KEY);
     router.push('/');
   };
 
-  const updateUser = (data: {
-    username: string;
-    email: string;
-    token?: string;
-  }) => {
-    data.token && saveLocalStorage(TOKEN_KEY, data.token);
-    const token = getLocalStorage(TOKEN_KEY);
-    getProfile(token).then((resp) => {
-      if (resp.success) {
-        user.name = resp.data.username;
-        user.email = resp.data.email;
-      }
-      user.token = token;
-    });
+  const updateUser = (data: { username: string; email: string }) => {
+    user.name = data.username;
+    user.email = data.email;
+  };
+
+  const authenticateUser = (data: any) => {
+    return loginUser(data)
+      .then((resp) => {
+        if (resp.success) {
+          saveLocalStorage(TOKEN_KEY, resp.data.token);
+          isAuthFromTokenLoaded.value = true;
+          updateUser(resp.data);
+
+          return resp;
+        }
+      })
+      .catch((e) => {
+        return e;
+      });
   };
 
   const authenticateUserFromToken = () => {
     const token = getLocalStorage(TOKEN_KEY);
 
     if (token) {
-      getProfile(token).then((resp) => {
-        resp.success && updateUser(resp.data);
-        user.token = token;
-      });
+      getProfile()
+        .then((resp) => {
+          resp.success && updateUser(resp.data);
+          isAuthFromTokenLoaded.value = true;
+        })
+        .catch(() => {
+          isAuthFromTokenLoaded.value = true;
+        });
+    } else {
+      isAuthFromTokenLoaded.value = true;
     }
   };
 
   return {
     user,
     isUserAuthenticated,
+    isAuthFromTokenLoaded,
+    authenticateUser,
     authenticateUserFromToken,
     updateUser,
     logoutUser,
