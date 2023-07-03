@@ -36,13 +36,15 @@ export async function changePassword(data: {
   }
 }
 
-export async function listAllUsers(token: string): Promise<ApiResponse<any>> {
+export async function listAllUsers(): Promise<ApiResponse<any>> {
+  //token: string
   try {
-    const response = await apiInstance.get('/accounts/list-all-users/', {
-      headers: {
-        Authorization: 'Token ' + token,
-      },
-    });
+    // const response = await apiInstance.get('/accounts/list-all-users/', {
+    //   headers: {
+    //     Authorization: 'Token ' + token,
+    //   },
+    // })
+    const response = await apiInstance.get('/accounts/list-all-users/');
 
     return { success: true, data: response.data };
   } catch (e: any) {
@@ -119,5 +121,35 @@ export async function editProfileImage(
   } catch (e: any) {
     console.error('Edit profile image error', e);
     return errorResponse(e);
+  }
+}
+
+export async function userCreate(data: any): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post('/accounts/create-user/', data);
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return { error: e.response };
+  }
+}
+
+export async function userDelete(id: any): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post('/accounts/remove/' + id + '/');
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return { error: e.response };
+  }
+}
+
+export async function userEdit(data: any): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post(
+      '/accounts/edit-user/' + data.id + '/',
+      data
+    );
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return { error: e.response };
   }
 }
