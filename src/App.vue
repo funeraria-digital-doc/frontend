@@ -1,6 +1,5 @@
 <template>
-  <v-app>
-    <!-- TODO add image to header and side bar -->
+  <v-app v-if="isAuthFromTokenLoaded">
     <app-header />
 
     <v-card class="app__container">
@@ -31,10 +30,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onBeforeMount } from 'vue';
 import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
+import { useUser } from './composables/user';
 
 
 export default defineComponent({
@@ -49,6 +49,9 @@ export default defineComponent({
 
 <script lang="ts" setup>
 import router from '@/router';
+
+const { isAuthFromTokenLoaded, authenticateUserFromToken } = useUser();
+
 const sideNavLinks = [
   { title: 'Página inicial', link: '/', icon: 'mdi-home' },
   {
@@ -64,6 +67,10 @@ const sideNavLinks = [
 const navigate = (link: string) => {
   router.push(link);
 };
+
+onBeforeMount(() => {
+  authenticateUserFromToken();
+});
 </script>
 
 <style scoped lang="scss">

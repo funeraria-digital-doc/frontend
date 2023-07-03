@@ -27,19 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { listAllUsers } from '@/api/users';
 import Page from '../../components/shared/Page/page.vue';
-import { onMounted } from 'vue';
 
 const redirectLinkedin = (url: string) => window.open(url);
-
-onMounted(() => {
-  listAllUsers().then((resp) => {
-    if (resp.success) {
-      console.log('Users list:', resp.data);
-    }
-  });
-});
 </script>
 
 <style lang="scss">

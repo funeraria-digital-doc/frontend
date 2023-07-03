@@ -43,10 +43,7 @@
         width="auto"
         transition="dialog-top-transition"
       >
-        <change-password-modal
-          @close-modal="onCloseChangePassword"
-          :token="user.token"
-        />
+        <change-password-modal @close-modal="onCloseChangePassword" />
       </v-dialog>
       <v-container>
         <v-row class="submit_button_bar">
@@ -83,9 +80,9 @@ const form = ref();
 const imageUrl = ref(null);
 const image = ref(null);
 const isChangePasswordOpen = ref(false);
-const hasMessage = ref(false)
-const isSuccess = ref(false)
-const message = ref('')
+const hasMessage = ref(false);
+const isSuccess = ref(false);
+const message = ref('');
 
 const onOpenChangePassword = () => {
   isChangePasswordOpen.value = true;
@@ -111,17 +108,16 @@ const onSubmit = async () => {
     const data = {
       username,
       email,
-      token: user.token,
     };
     editProfile(data).then((resp) => {
       if (resp.success) {
-        hasMessage.value = true
-        message.value = 'success edit profile'
-        isSuccess.value = true
+        hasMessage.value = true;
+        message.value = 'success edit profile';
+        isSuccess.value = true;
       } else {
-        hasMessage.value = true
-        message.value = 'error edit profile'
-        isSuccess.value = false
+        hasMessage.value = true;
+        message.value = 'error edit profile';
+        isSuccess.value = false;
       }
     });
   }
@@ -129,19 +125,19 @@ const onSubmit = async () => {
 
 const saveProfileImage = () => {
   if (image.value) {
-    editProfileImage(user.token, image.value).then((resp) => {
+    editProfileImage(image.value).then((resp) => {
       if (resp.success) {
-        hasMessage.value = true
-        message.value = 'success edit profile'
-        isSuccess.value = true
+        hasMessage.value = true;
+        message.value = 'success edit profile';
+        isSuccess.value = true;
       } else {
-        hasMessage.value = true
-        message.value = 'error edit profile'
-        isSuccess.value = false
+        hasMessage.value = true;
+        message.value = 'error edit profile';
+        isSuccess.value = false;
       }
     });
   } else {
-    console.error('no image');
+    console.error('Save profile image - no image');
   }
 };
 
@@ -158,12 +154,12 @@ const base64ToFile = (base64Data: string) => {
   return new File([byteArray], filename, { type: 'image/jpeg' }); // Create a File object from the Uint8Array
 };
 onMounted(() => {
-  getProfileImage(user.token).then((resp) => {
+  getProfileImage().then((resp) => {
     if (resp.success) {
       imageUrl.value = 'data:image/jpeg;base64,' + resp.data.image;
       image.value = base64ToFile(resp.data.image);
     } else {
-      console.error('erro');
+      console.error('Get profile image error');
     }
   });
 });

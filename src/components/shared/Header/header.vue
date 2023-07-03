@@ -5,14 +5,7 @@
         Funerária Digital
       </v-toolbar-title>
 
-      <!-- <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
-        Entrar &nbsp;
-        <v-icon>mdi-export</v-icon>
-      </v-btn> -->
-      <v-btn
-        v-if="!isUserAuthenticated() && authFromTokenLoaded"
-        @click="onOpenLogin"
-      >
+      <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
         Entrar &nbsp;
         <v-icon>mdi-export</v-icon>
       </v-btn>
@@ -45,9 +38,7 @@
 </template>
 
 <script lang="ts">
-import router from '@/router';
-import { defineComponent, onBeforeMount, ref } from 'vue';
-import { useUser } from '../../../composables/user';
+import { defineComponent, ref } from 'vue';
 import LoginModal from '../../LoginModal/loginModal.vue';
 
 export default defineComponent({
@@ -55,49 +46,37 @@ export default defineComponent({
   components: {
     LoginModal,
   },
-  setup() {
-    const { user, isUserAuthenticated, logoutUser, authenticateUserFromToken } =
-      useUser();
-    let isLoginModalOpen = ref(false);
-    let authFromTokenLoaded = ref(true);
-
-    const onOpenLogin = () => {
-      isLoginModalOpen.value = true;
-    };
-
-    const onCloseLogin = () => {
-      isLoginModalOpen.value = false;
-    };
-
-    const handleHome = () => {
-      router.push('/');
-    };
-
-    const handleProfile = () => {
-      router.push('profile');
-    };
-
-    const accountLinks = [
-      { title: 'Perfil', action: handleProfile },
-      { title: 'Encerrar', action: logoutUser },
-    ];
-
-    onBeforeMount(() => {
-      authenticateUserFromToken();
-    });
-
-    return {
-      user,
-      authFromTokenLoaded,
-      isUserAuthenticated,
-      accountLinks,
-      onOpenLogin,
-      onCloseLogin,
-      handleHome,
-      isLoginModalOpen,
-    };
-  },
 });
+</script>
+
+<script setup lang="ts">
+import router from '@/router';
+import { useUser } from '../../../composables/user';
+
+const { user, isUserAuthenticated, logoutUser } = useUser();
+
+let isLoginModalOpen = ref(false);
+
+const onOpenLogin = () => {
+  isLoginModalOpen.value = true;
+};
+
+const onCloseLogin = () => {
+  isLoginModalOpen.value = false;
+};
+
+const handleHome = () => {
+  router.push('/');
+};
+
+const handleProfile = () => {
+  router.push('profile');
+};
+
+const accountLinks = [
+  { title: 'Perfil', action: handleProfile },
+  { title: 'Encerrar', action: logoutUser },
+];
 </script>
 
 <style lang="scss">

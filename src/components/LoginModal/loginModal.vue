@@ -57,12 +57,11 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { loginUser } from '@/api/users';
 import { useUser } from '@/composables/user';
 
 const emit = defineEmits(['close-modal']);
 const closeModal = () => emit('close-modal');
-const { updateUser } = useUser();
+const { authenticateUser } = useUser();
 const showPassword = ref(false);
 const hasErrorMessage = ref(false);
 const errorMessage = ref('');
@@ -82,9 +81,9 @@ const onSubmit = async () => {
       email,
       password,
     };
-    await loginUser(data).then((resp) => {
+
+    await authenticateUser(data).then((resp) => {
       if (resp.success) {
-        updateUser(resp.data);
         closeModal();
       } else {
         hasErrorMessage.value = true;
@@ -92,6 +91,7 @@ const onSubmit = async () => {
       }
     });
   }
+
   isLoading.value = false;
 };
 </script>
