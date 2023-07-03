@@ -31,7 +31,7 @@
             <v-form ref="form" validate-on="submit" @submit.prevent="save">
               <v-container v-for="field in propsData.data.fields" :key="field">
                 <v-row>
-                  <v-col cols="12" sm="12" md="12">
+                  <v-col :cols="field.col" :sm="field.col" :md="field.col">
                     <v-text-field
                       v-if="field.type === 'text-field'"
                       :id="field.name"
@@ -39,6 +39,23 @@
                       :rules="field.rules"
                       :label="field.label"
                     ></v-text-field>
+
+                    <v-checkbox
+                      v-if="field.type === 'checkbox'"
+                      :id="field.name"
+                      v-model="editedItem[field.name]"
+                      :label="field.label"
+                    />
+                    <v-select
+                      v-if="field.type === 'select'"
+                      :id="field.name"
+                      v-model="editedItem[field.name]"
+                      :label="field.label"
+                      :rules="field.rules"
+                      :items="field.items"
+                      item-title="label"
+                      item-value="value"
+                    />
                   </v-col>
                 </v-row>
               </v-container>
@@ -78,6 +95,7 @@
         </v-card>
       </v-dialog>
     </template>
+
     <template v-slot:item.actions="{ item }">
       <v-icon size="small" class="me-2" @click="editItem(item.raw)">
         mdi-pencil
@@ -153,7 +171,23 @@ const snack = ref(null);
 
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
-  editedItem.value = Object.assign({}, item);
+  let newItem = {};
+  for (let i = 0; i < Object.keys(item).length; i++) {
+    const key = Object.keys(item)[i];
+    const value = item[key];
+    const field = propsData.data.fields.find((f: any) => f.name === key);
+    if (field) {
+      newItem[key] = getLabelValue(
+        key,
+        field.type,
+        value,
+        propsData.data.fields
+      );
+    } else {
+      newItem[key] = value;
+    }
+  }
+  editedItem.value = Object.assign({}, newItem);
   dialog.value = true;
 }
 function deleteItem(item) {
@@ -174,6 +208,7 @@ function close() {
   nextTick(() => {
     editedItem.value = Object.assign({}, defaultItem.value);
     editedIndex.value = -1;
+    setFields();
   });
 }
 function closeDelete() {
@@ -181,6 +216,7 @@ function closeDelete() {
   nextTick(() => {
     editedItem.value = Object.assign({}, defaultItem.value);
     editedIndex.value = -1;
+    setFields();
   });
 }
 
@@ -189,16 +225,24 @@ async function save() {
   if (valid) {
     try {
       if (editedIndex.value > -1) {
-        await propsData.data.edit(
-          editedItem.value,
-          editedIndex.value,
-          serverItems,
-          snack
-        );
+        propsData.data
+          .edit(
+            editedItem.value,
+            editedIndex.value,
+            serverItems,
+            snack,
+            propsData.data.fields
+          )
+          .then(() => {
+            close();
+          });
       } else {
-        await propsData.data.save(editedItem.value, serverItems, snack);
+        propsData.data
+          .save(editedItem.value, serverItems, snack, propsData.data.fields)
+          .then(() => {
+            close();
+          });
       }
-      close();
     } catch (error) {
       console.error(error);
       // Handle the error here if necessary
@@ -213,8 +257,7 @@ watch(dialogDelete, (val) => {
   val || closeDelete();
 });
 
-onMounted(() => {
-  propsData.data.getData(loading, serverItems);
+function setFields() {
   const fields = propsData.data.fields;
   let newEditedItem = {};
   for (let i = 0; i < fields.length; i++) {
@@ -222,6 +265,31 @@ onMounted(() => {
   }
   editedItem.value = newEditedItem;
   defaultItem.value = newEditedItem;
+}
+
+function getLabelValue(key: string, type: string, label: any, fields: any) {
+  const field = fields.find((f: { name: string }) => f.name === key);
+  let value = null;
+  if (type == 'checkbox') {
+    if (label === field.true_value_label) {
+      value = true;
+    } else {
+      value = false;
+    }
+  } else if (type == 'select') {
+    const val = field.items.find((i: { label: any }) => i.label === label);
+    if (val && val['value']) {
+      value = val['value'];
+    }
+  } else {
+    value = label;
+  }
+  return value;
+}
+
+onMounted(() => {
+  propsData.data.getData(loading, serverItems, propsData.data.fields);
+  setFields();
 });
 </script>
 

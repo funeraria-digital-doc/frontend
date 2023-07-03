@@ -28,7 +28,7 @@ export function useUser() {
   };
 
   const updateUser = (data: {
-    username: string;
+    name: string;
     email: string;
     token?: string;
   }) => {
@@ -36,7 +36,7 @@ export function useUser() {
     const token = getLocalStorage(TOKEN_KEY);
     getProfile(token).then((resp) => {
       if (resp.success) {
-        user.name = resp.data.username;
+        user.name = resp.data.name;
         user.email = resp.data.email;
       }
       user.token = token;
