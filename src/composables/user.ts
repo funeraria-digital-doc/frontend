@@ -28,8 +28,8 @@ export function useUser() {
     router.push('/');
   };
 
-  const updateUser = (data: { username: string; email: string }) => {
-    user.name = data.username;
+  const updateUser = (data: { name: string; email: string }) => {
+    user.name = data.name;
     user.email = data.email;
   };
 
