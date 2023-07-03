@@ -9,7 +9,11 @@ export async function loginUser(data: {
       username: data.email.value,
       password: data.password.value,
     });
-    return { success: true, data: response.data };
+
+    return {
+      success: true,
+      data: { ...response.data, username: response.data.name },
+    };
   } catch (e: any) {
     console.error('Login user error', e);
     return errorResponse(e);
@@ -19,24 +23,16 @@ export async function loginUser(data: {
 export async function changePassword(data: {
   password: any;
   confirmPassword: any;
-  token: any;
 }): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.post(
-      '/accounts/change-password/',
-      {
-        password: data.password.value,
-        confirm_password: data.confirmPassword.value,
-      },
-      {
-        headers: {
-          Authorization: 'Token ' + data.token,
-        },
-      }
-    );
-    return { success: true };
+    const response = await apiInstance.post('/accounts/change-password/', {
+      password: data.password.value,
+      confirm_password: data.confirmPassword.value,
+    });
+
+    return { success: true, data: response.data };
   } catch (e: any) {
-    return { error: e.response };
+    return errorResponse(e);
   }
 }
 
@@ -74,17 +70,13 @@ export async function listAllActiveUsers(
   }
 }
 
-export async function getProfile(token: string): Promise<ApiResponse<any>> {
+export async function getProfile(): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get('/accounts/profile/', {
-      headers: {
-        Authorization: 'Token ' + token,
-      },
-    });
+    const response = await apiInstance.get('/accounts/profile/');
 
     return { success: true, data: response.data };
   } catch (e: any) {
-    console.error('Get Profile error', e);
+    console.error('Get profile error', e);
     return errorResponse(e);
   }
 }
@@ -92,21 +84,12 @@ export async function getProfile(token: string): Promise<ApiResponse<any>> {
 export async function editProfile(data: {
   username: { value: any };
   email: { value: any };
-  token: { value: any };
 }): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.patch(
-      '/accounts/edit-profile/',
-      {
-        username: data.username.value,
-        email: data.email.value,
-      },
-      {
-        headers: {
-          Authorization: 'Token ' + data.token,
-        },
-      }
-    );
+    const response = await apiInstance.patch('/accounts/edit-profile/', {
+      username: data.username.value,
+      email: data.email.value,
+    });
 
     return { success: true, data: response.data };
   } catch (e: any) {
@@ -115,38 +98,28 @@ export async function editProfile(data: {
   }
 }
 
-export async function getProfileImage(
-  token: string
-): Promise<ApiResponse<any>> {
+export async function getProfileImage(): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get('/accounts/profile-image/', {
-      headers: {
-        Authorization: 'Token ' + token,
-      },
-    });
+    const response = await apiInstance.get('/accounts/profile-image/');
 
     return { success: true, data: response.data };
   } catch (e: any) {
-    console.error('Get Profile Image error', e);
+    console.error('Get profile image error', e);
     return errorResponse(e);
   }
 }
 
 export async function editProfileImage(
-  token: string,
   image: ImageData
 ): Promise<ApiResponse<any>> {
   try {
     const formData = new FormData();
-    formData.append('file', image);
-    await apiInstance.post('/accounts/file-upload/', formData, {
-      headers: {
-        Authorization: 'Token ' + token,
-      },
-    });
-    return { success: true };
+    formData.append('file', image as any);
+    const response = await apiInstance.post('/accounts/file-upload/', formData);
+
+    return { success: true, data: response.data };
   } catch (e: any) {
-    console.error('edit Profile Image error', e);
+    console.error('Edit profile image error', e);
     return errorResponse(e);
   }
 }
