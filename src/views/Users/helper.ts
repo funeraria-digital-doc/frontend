@@ -71,7 +71,7 @@ export const createUser = async (
       } else {
         snack.value.showSnackbar(
           'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
-          JSON.stringify(resp),
+          resp.error && resp.error.data ? JSON.stringify(resp.error.data) : '',
           false
         );
       }
@@ -130,7 +130,7 @@ export const editUser = async (
       } else {
         snack.value.showSnackbar(
           'Ocorreu um erro ao editar a funerária. <br>Por favor, tente novamente mais tarde.',
-          JSON.stringify(resp),
+          resp.error && resp.error.data ? JSON.stringify(resp.error.data) : '',
           false
         );
       }

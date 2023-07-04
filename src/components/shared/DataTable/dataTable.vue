@@ -55,6 +55,7 @@
                       :items="field.items"
                       item-title="label"
                       item-value="value"
+                      clearable
                     />
                   </v-col>
                 </v-row>
