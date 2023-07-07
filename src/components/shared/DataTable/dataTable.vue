@@ -12,7 +12,11 @@
     loading-text="A carregar"
   >
     <template v-slot:top>
-      <v-dialog v-model="dialog" max-width="500px">
+      <v-dialog
+        v-if="propsData.data.createAndEditByModal"
+        v-model="dialog"
+        max-width="500px"
+      >
         <template v-slot:activator="{ props }">
           <v-btn
             color="primary"
@@ -73,6 +77,12 @@
           </v-card-text>
         </v-card>
       </v-dialog>
+
+      <div v-else class="d-flex" style="justify-content: end">
+        <v-btn color="primary" dark class="mb-2 d-flex align-self-end">
+          {{ propsData.data.createButtonTitle }}
+        </v-btn>
+      </div>
       <!-- diaalog para delete -->
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
@@ -97,8 +107,21 @@
       </v-dialog>
     </template>
 
-    <template v-slot:item.actions="{ item }">
+    <template
+      v-if="propsData.data.createAndEditByModal"
+      v-slot:item.actions="{ item }"
+    >
       <v-icon size="small" class="me-2" @click="editItem(item.raw)">
+        mdi-pencil
+      </v-icon>
+      <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+    </template>
+    <template v-else v-slot:item.actions="{ item }">
+      <v-icon
+        size="small"
+        class="me-2"
+        @click="getRedirectLink('edit', item.raw)"
+      >
         mdi-pencil
       </v-icon>
       <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
@@ -286,6 +309,13 @@ function getLabelValue(key: string, type: string, label: any, fields: any) {
     value = label;
   }
   return value;
+}
+
+function getRedirectLink(mode, item){
+  console.log(item)
+  // if(mode == "edit"){
+
+  // }
 }
 
 onMounted(() => {
