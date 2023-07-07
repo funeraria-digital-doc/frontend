@@ -5,6 +5,7 @@ import Profile from '../views/Profile/profile.vue';
 import DeathDeclaration from '../views/DeathDeclaration/deathDeclaration.vue';
 import Users from '../views/Users/users.vue';
 import Groups from '../views/Groups/groups.vue';
+import Templates from '../views/Templates/templates.vue';
 import { useUser } from '@/composables/user';
 
 const router = createRouter({
@@ -41,6 +42,12 @@ const router = createRouter({
       path: '/groups',
       name: 'groups',
       component: Groups,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/templates',
+      name: 'templates',
+      component: Templates,
       meta: { requiresAuth: true },
     }
   ],

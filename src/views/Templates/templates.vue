@@ -1,0 +1,30 @@
+<template>
+  <page title="Templates">
+    <data-table :data="data"></data-table>
+  </page>
+</template>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import DataTable from '../../components/shared/DataTable/dataTable.vue';
+import * as constants from './constants';
+import { getTemplates, deleteTemplate } from './helper';
+export default defineComponent({
+  name: 'UsersDatatable',
+  components: {
+    DataTable,
+  },
+});
+</script>
+<script lang="ts" setup>
+import Page from '../../components/shared/Page/page.vue';
+
+const data = {
+  createAndEditByModal: false,
+  homeLink: '/groups',
+  headers: constants.headers,
+  createButtonTitle: 'Criar Template',
+  deleteText: 'Tem a certeza de que quer <br>eliminar este Template?',
+  delete: deleteTemplate,
+  getData: getTemplates,
+};
+</script>

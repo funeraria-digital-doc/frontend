@@ -62,6 +62,7 @@ const sideNavLinks = [
   { title: 'Contatos', link: '/contacts', icon: 'mdi-information-variant' },
   { title: 'Utilizadores', link: '/users', icon: 'mdi-information-variant' },
   { title: 'Funerárias', link: '/groups', icon: 'mdi-information-variant' },
+  { title: 'Templates', link: '/templates', icon: 'mdi-information-variant' },
 ];
 
 const navigate = (link: string) => {
