@@ -6,6 +6,7 @@ import DeathDeclaration from '../views/DeathDeclaration/deathDeclaration.vue';
 import Users from '../views/Users/users.vue';
 import Groups from '../views/Groups/groups.vue';
 import Templates from '../views/Templates/templates.vue';
+import TemplatesForm from '../views/Templates/templatesForm.vue';
 import { useUser } from '@/composables/user';
 
 const router = createRouter({
@@ -48,6 +49,18 @@ const router = createRouter({
       path: '/templates',
       name: 'templates',
       component: Templates,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/templates/create',
+      name: 'templates_create',
+      component: TemplatesForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/templates/:id/edit',
+      name: 'templates_edit',
+      component: TemplatesForm,
       meta: { requiresAuth: true },
     }
   ],

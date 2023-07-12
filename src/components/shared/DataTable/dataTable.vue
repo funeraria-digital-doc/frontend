@@ -79,7 +79,13 @@
       </v-dialog>
 
       <div v-else class="d-flex" style="justify-content: end">
-        <v-btn color="primary" dark class="mb-2 d-flex align-self-end">
+        <v-btn
+          type="button"
+          @click="getRedirectLink('create', '')"
+          color="primary"
+          dark
+          class="mb-2 d-flex align-self-end"
+        >
           {{ propsData.data.createButtonTitle }}
         </v-btn>
       </div>
@@ -130,6 +136,7 @@
   <error-success-message ref="snack"></error-success-message>
 </template>
 <script lang="ts">
+import router from '@/router';
 import {
   defineComponent,
   ref,
@@ -311,11 +318,14 @@ function getLabelValue(key: string, type: string, label: any, fields: any) {
   return value;
 }
 
-function getRedirectLink(mode, item){
-  console.log(item)
-  // if(mode == "edit"){
-
-  // }
+function getRedirectLink(mode: string, item: any) {
+  let link = '';
+  if (mode == 'edit') {
+    link = propsData.data.homeLink + '/' + item.id + '/edit';
+  } else if (mode == 'create') {
+    link = propsData.data.homeLink + '/create';
+  }
+  router.push(link);
 }
 
 onMounted(() => {

@@ -1,4 +1,5 @@
-import { templateList } from '@/api/templates';
+import { templateItem, templateList } from '@/api/templates';
+import type { Ref } from 'vue';
 
 export const getTemplates = async (
   loading: { value: boolean },
@@ -10,20 +11,16 @@ export const getTemplates = async (
       let templateData = [];
       if (resp.data.length > 0) {
         templateData = resp.data.map((template: any) => {
-          console.log(template);
           return {
             id: template.id,
             title: template.title,
-            group: getLabel('group', 'select', template.group_id, fields),
+            group_id: getLabel('group_id', 'select', template.group_id, fields),
             send_type: getLabel(
               'send_type',
               'select',
               template.send_type,
               fields
             ),
-            // send_email_to: template.send_email_to,
-            // send_email_to_cc: template.send_email_to_cc,
-            // send_email_to_bcc: template.send_email_to_bcc,
           };
         });
       }
@@ -36,8 +33,40 @@ export const getTemplates = async (
   });
 };
 
-export function deleteTemplate(){
-  return true
+export const getSingleTemplate = async (
+  id: string,
+  template: any,
+  loading: Ref<{}>,
+  defaultObj
+) => {
+  templateItem(id).then((resp) => {
+    if (resp.success) {
+      if (resp.data.id) {
+        template.value = {
+          title: resp.data.title,
+          group_id: resp.data.group_id,
+          send_type: resp.data.send_type,
+          send_email_to: resp.data.send_email_to,
+          send_email_to_cc: resp.data.send_email_to_cc,
+          send_email_to_bcc: resp.data.send_email_to_bcc,
+          file: resp.data.file,
+          validations:
+            resp.data.validations &&
+            Object.keys(resp.data.validations).length > 0
+              ? resp.data.validations
+              : defaultObj,
+        };
+        console.log(template.value);
+      }
+    } else {
+      console.error('erro', resp);
+    }
+    loading.value = false;
+  });
+};
+
+export function deleteTemplate() {
+  return true;
 }
 
 export function getLabel(key: string, type: string, value: any, fields: any) {

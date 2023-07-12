@@ -8,7 +8,7 @@ export const headers = [
     key: 'title',
     sortable: true,
   },
-  { title: 'Funerária', align: 'end', key: 'group', sortable: true },
+  { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
   { title: 'Ficheiro', align: 'end', key: 'file', sortable: true },
   { title: 'Validações', align: 'end', key: 'validations', sortable: true },
   { title: 'Tipo de Envio', align: 'end', key: 'send_type', sortable: true },
@@ -60,51 +60,21 @@ async function getGroups() {
 export const fields = [
   {
     name: 'title',
-    // type: 'text-field',
-    // label: 'Titulo',
-    // rules: nameRules,
-    // col: 12,
+    type: 'text-field'
   },
   {
-    name: 'group',
-    // type: 'select',
-    // label: 'Funeraria',
-    // rules: [],
-    // col: 12,
+    name: 'group_id',
+    type: 'select',
     items: await getGroups(),
   },
   {
     name: 'send_type',
-    // type: 'select',
-    // label: 'Tipo de Envio',
-    // rules: [],
-    // col: 12,
+    type: 'select',
     items: [
       { label: 'Nenhum', value: 'NONE' },
       { label: 'Documento', value: 'DOCUMENT' },
       { label: 'Email', value: 'EMAIL' },
       { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
     ],
-  },
-  // {
-  //   name: 'send_email_to',
-  //   type: 'text-field',
-  //   label: 'Destinatário',
-  //   rules: emailRules,
-  //   col: 12,
-  // },
-  // {
-  //   name: 'send_email_to_cc',
-  //   type: 'text-field',
-  //   label: 'Destinatário cc',
-  //   rules: emailRules,
-  //   col: 12,
-  // },
-  // {
-  //   name: 'send_email_to_bcc',
-  //   type: 'text-field',
-  //   label: 'Destinatário bcc',
-  //   rules: emailRules,
-  //   col: 12,
-  // },
+  }
 ];
