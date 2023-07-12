@@ -4,9 +4,22 @@ export async function templateList(): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.get('/template-logic/list/');
 
-    return { success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   } catch (e: any) {
     console.error('List templates error', e);
+    return errorResponse(e);
+  }
+}
+
+export async function templateItem(id: string): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get(
+      '/template-logic/get-template/' + id + '/'
+    );
+
+    return { success: true, data: response.data.data };
+  } catch (e: any) {
+    console.error('Get single template error', e);
     return errorResponse(e);
   }
 }

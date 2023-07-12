@@ -20,8 +20,9 @@ import Page from '../../components/shared/Page/page.vue';
 
 const data = {
   createAndEditByModal: false,
-  homeLink: '/groups',
+  homeLink: '/templates',
   headers: constants.headers,
+  fields: constants.fields,
   createButtonTitle: 'Criar Template',
   deleteText: 'Tem a certeza de que quer <br>eliminar este Template?',
   delete: deleteTemplate,
