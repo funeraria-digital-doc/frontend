@@ -1,28 +1,36 @@
-<template class="contacts">
+<template>
   <page title="Contatos">
-    <p>Rafael Lopes</p>
+    <div class="contacts">
+      <div class="contacts__element">
+        <v-btn
+          class="contacts__linkedin"
+          color="blue"
+          icon="mdi-linkedin"
+          @click="
+            redirectLinkedin(
+              'https://www.linkedin.com/in/rafael-lopes-79851a150/'
+            )
+          "
+        />
 
-    <v-btn
-      class="contacts__linkedin"
-      color="blue"
-      icon="mdi-linkedin"
-      @click="
-        redirectLinkedin('https://www.linkedin.com/in/rafael-lopes-79851a150/')
-      "
-    />
+        <p>Rafael Lopes</p>
+      </div>
 
-    <p>João Alves</p>
+      <div class="contacts__element">
+        <v-btn
+          class="contacts__linkedin"
+          color="blue"
+          icon="mdi-linkedin"
+          @click="
+            redirectLinkedin(
+              'https://www.linkedin.com/in/jo%C3%A3o-alves-84aba4223/'
+            )
+          "
+        />
 
-    <v-btn
-      class="contacts__linkedin"
-      color="blue"
-      icon="mdi-linkedin"
-      @click="
-        redirectLinkedin(
-          'https://www.linkedin.com/in/jo%C3%A3o-alves-84aba4223/'
-        )
-      "
-    />
+        <p>João Alves</p>
+      </div>
+    </div>
   </page>
 </template>
 
@@ -34,12 +42,26 @@ const redirectLinkedin = (url: string) => window.open(url);
 
 <style lang="scss">
 .contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+
   &__title {
     margin-bottom: 1rem;
   }
 
+  &__element {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    > p {
+      font-size: 1.2rem;
+    }
+  }
+
   &__linkedin {
-    margin-top: 2rem;
     cursor: pointer;
   }
 }
