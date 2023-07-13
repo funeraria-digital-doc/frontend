@@ -1,7 +1,7 @@
 <template>
   <page :title="templatesTitle">
     <v-form
-      v-if="!loading"
+      v-if="!isLoading"
       ref="form"
       validate-on="submit"
       @submit.prevent="save"
@@ -218,11 +218,11 @@ const template = ref({
   send_email_to: [],
   send_email_to_cc: [],
   send_email_to_bcc: [],
-  validations: [defaultObj],
+  validations: [{ ...defaultObj }],
 });
 const mode = ref('');
 const form = ref();
-const loading = ref(true);
+const isLoading = ref(true);
 const fieldTypeItems = [
   { label: 'Texto', value: 'TEXT' },
   { label: 'Verdadeiro/Falso', value: 'BOOLEAN' },
@@ -242,14 +242,15 @@ const fieldTypeItems = [
 ];
 
 const templatesTitle = computed(() => {
-  if (mode.value === 'edit') {
-    if (template.value.title) {
-      return 'Editar Template - ' + template.value.title;
-    } else {
-      return 'Editar Template';
-    }
+  if (mode.value === 'create') {
+    return 'Criar Template';
+  } else if (mode.value === 'edit') {
+    return template.value.title
+      ? `Editar Template - ${template.value.title}`
+      : 'Editar Template';
   }
-  return 'Criar Template';
+
+  return '';
 });
 
 async function save() {
@@ -268,6 +269,7 @@ const addValidation = () => {
     Math.max(...newNumberKeys) >= 0
       ? (Math.max(...newNumberKeys) + 1).toString()
       : '0';
+
   template.value.validations[greatestNumberKey] = defaultObj;
 
   //template.value.validations.push(defaultObj);
@@ -284,13 +286,12 @@ const removeMember = (index) => {
 
 onBeforeMount(async () => {
   if (route.name === 'templates_edit') {
-    mode.value = 'edit';
-    const templateId = route.params.id;
-    await getSingleTemplate(templateId, template, loading, defaultObj).then(
-      (resp) => {
-        console.log('cenas', template.value);
-      }
-    );
+    getSingleTemplate(route.params.id as string, defaultObj).then((resp) => {
+      console.log(resp);
+      resp && (template.value = resp);
+      mode.value = 'edit';
+      isLoading.value = false;
+    });
   } else if (route.name === 'templates_create') {
     mode.value = 'create';
   }

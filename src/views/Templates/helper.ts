@@ -33,16 +33,11 @@ export const getTemplates = async (
   });
 };
 
-export const getSingleTemplate = async (
-  id: string,
-  template: any,
-  loading: Ref<{}>,
-  defaultObj
-) => {
-  templateItem(id).then((resp) => {
+export const getSingleTemplate = async (id: string, defaultObj: any) => {
+  return templateItem(id).then((resp) => {
     if (resp.success) {
       if (resp.data.id) {
-        template.value = {
+        return {
           title: resp.data.title,
           group_id: resp.data.group_id,
           send_type: resp.data.send_type,
@@ -54,14 +49,12 @@ export const getSingleTemplate = async (
             resp.data.validations &&
             Object.keys(resp.data.validations).length > 0
               ? resp.data.validations
-              : defaultObj,
+              : [{ ...defaultObj }],
         };
-        console.log(template.value);
       }
     } else {
-      console.error('erro', resp);
+      console.error('Get template error:', resp);
     }
-    loading.value = false;
   });
 };
 
