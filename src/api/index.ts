@@ -17,6 +17,7 @@ export type Failable<T, E> =
 export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
 
 const token = getLocalStorage(TOKEN_KEY);
+
 export const apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
   headers: token ? { Authorization: `Token ${token}` } : {},

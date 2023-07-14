@@ -17,7 +17,7 @@ const isAuthFromTokenLoaded = ref(false);
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.name !== '' && isAuthFromTokenLoaded.value;
+    return user.name !== '';
   };
 
   const logoutUser = () => {
@@ -34,19 +34,13 @@ export function useUser() {
   };
 
   const authenticateUser = (data: any) => {
-    return loginUser(data)
-      .then((resp) => {
-        if (resp.success) {
-          saveLocalStorage(TOKEN_KEY, resp.data.token);
-          isAuthFromTokenLoaded.value = true;
-          updateUser(resp.data);
-
-          return resp;
-        }
-      })
-      .catch((e) => {
-        return e;
-      });
+    return loginUser(data).then((resp) => {
+      if (resp.success) {
+        saveLocalStorage(TOKEN_KEY, resp.data.token);
+        updateUser(resp.data);
+      }
+      return resp;
+    });
   };
 
   const authenticateUserFromToken = () => {
