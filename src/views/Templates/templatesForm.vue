@@ -67,10 +67,8 @@
               closable-chips
               hint="escrever email para enviar em cc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
-            ></v-combobox>
+            />
           </v-col>
-        </v-row>
-        <v-row>
           <v-col :cols="6" :sm="6" :md="6">
             <v-combobox
               id="send_email_to_bcc"
@@ -82,7 +80,7 @@
               closable-chips
               hint="escrever email para enviar em bcc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
-            ></v-combobox>
+            />
           </v-col>
         </v-row>
         <v-row>
