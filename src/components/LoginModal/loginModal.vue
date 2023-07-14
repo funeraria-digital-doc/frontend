@@ -35,7 +35,7 @@
 
     <v-snackbar
       v-model="hasErrorMessage"
-      :timeout="2000"
+      :timeout="3000"
       location="top right"
       color="red-darken-2"
     >

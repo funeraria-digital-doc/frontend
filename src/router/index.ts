@@ -47,9 +47,13 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const { isUserAuthenticated } = useUser();
+  const { isUserAuthenticated, isAuthFromTokenLoaded } = useUser();
 
-  if (to.meta.requiresAuth && !isUserAuthenticated()) {
+  if (
+    to.meta.requiresAuth &&
+    !isUserAuthenticated() &&
+    isAuthFromTokenLoaded.value
+  ) {
     return {
       path: '/',
       name: 'home',
