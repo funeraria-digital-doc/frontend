@@ -68,7 +68,13 @@
             ></v-combobox>
           </v-col>
           <v-col :cols="4" :sm="4" :md="4">
+            <v-combobox
               id="send_email_to_cc"
+              v-model="template.send_email_to_cc"
+              label="Enviar email em cc para"
+              :items="[]"
+              multiple
+              chips
               closable-chips
               hint="escrever email para enviar em cc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
@@ -86,6 +92,11 @@
               hint="escrever email para enviar em bcc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
             ></v-combobox>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col :cols="12" :sm="12" :md="12">
+            <div>
               <v-card
                 class="px-4 py-2 mb-4"
                 v-for="(validation, index) in template.validations"
@@ -374,5 +385,5 @@ onBeforeMount(async () => {
     mode.value = 'create';
     isLoading.value = false;
   }
-})
+});
 </script>
