@@ -38,13 +38,13 @@ export const nameRules = [
   (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
 ];
 
-export const emailRules = [
-  (value: string) => {
-    const pattern =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return pattern.test(value) || 'Email Inválido.';
-  },
+export const groupRules = [
+  (value: string) => !!value || 'É obrigatório escolher 1 opção.'
 ];
+
+export const fieldTypeRules = [
+  (value: string[]) => !!value || 'O Tipo de Campo é Obrigatório.',
+]
 
 async function getGroups() {
   const resp = await groupsList();
