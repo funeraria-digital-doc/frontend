@@ -16,7 +16,6 @@ export async function templateItem(id: string): Promise<ApiResponse<any>> {
     const response = await apiInstance.get(
       '/template-logic/get-template/' + id + '/'
     );
-    console.log(response.data.data);
     return { success: true, data: response.data.data };
   } catch (e: any) {
     console.error('Get single template error', e);
