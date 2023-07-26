@@ -1,4 +1,5 @@
 import { templateDelete, templateItem, templateList } from '@/api/templates';
+import type { Ref } from 'vue';
 
 export const getTemplates = async (
   loading: { value: boolean },

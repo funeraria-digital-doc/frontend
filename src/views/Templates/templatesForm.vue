@@ -8,7 +8,7 @@
     >
       <v-container>
         <v-row>
-          <v-col :cols="6" :sm="6" :md="6">
+          <v-col cols="6" sm="6" md="6">
             <v-text-field
               :id="'title_' + template.title"
               v-model="template.title"
@@ -16,7 +16,7 @@
               :rules="constants.nameRules"
             ></v-text-field>
           </v-col>
-          <v-col :cols="6" :sm="6" :md="6">
+          <v-col cols="6" sm="6" md="6">
             <v-select
               :id="'group_id_' + template.group_id"
               v-model="template.group_id"
@@ -30,7 +30,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col :cols="6" :sm="6" :md="6">
+          <v-col cols="6" sm="6" md="6">
             <v-select
               :id="'send_type_' + template.send_type"
               v-model="template.send_type"
@@ -42,7 +42,7 @@
               item-value="value"
             />
           </v-col>
-          <v-col :cols="6" :sm="6" :md="6">
+          <v-col cols="6" sm="6" md="6">
             <v-file-input
               id="template_file"
               v-model="file_temp"
@@ -54,7 +54,7 @@
           </v-col>
         </v-row>
         <v-row v-if="isEmailOption">
-          <v-col :cols="4" :sm="4" :md="4">
+          <v-col cols="4" sm="4" md="4">
             <v-combobox
               id="send_email_to"
               v-model="template.send_email_to"
@@ -67,7 +67,7 @@
               persistent-hint
             ></v-combobox>
           </v-col>
-          <v-col :cols="4" :sm="4" :md="4">
+          <v-col cols="4" sm="4" md="4">
             <v-combobox
               id="send_email_to_cc"
               v-model="template.send_email_to_cc"
@@ -80,7 +80,7 @@
               persistent-hint
             ></v-combobox>
           </v-col>
-          <v-col :cols="4" :sm="4" :md="4">
+          <v-col cols="4" sm="4" md="4">
             <v-combobox
               id="send_email_to_bcc"
               v-model="template.send_email_to_bcc"
@@ -95,7 +95,29 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col :cols="12" :sm="12" :md="12">
+          <v-col cols="12" sm="12" md="12">
+            <v-card class="mx-auto">
+              <v-list>
+                <v-list-subheader>Validações</v-list-subheader>
+                <v-list-item
+                  v-for="(item, i) in template.validations"
+                  :key="i"
+                  :value="item"
+                  color="white"
+                  variant="elevated"
+                >
+                  <template v-slot:prepend>
+                    <v-icon icon="mdi-arrow-right-bold-circle-outline"></v-icon>
+                  </template>
+
+                  <v-list-item-title v-text="item.name"></v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" sm="12" md="12">
             <div>
               <v-card
                 class="px-4 py-2 mb-4"
@@ -178,11 +200,22 @@ export default defineComponent({
 </script>
 <script lang="ts" setup>
 const route = useRoute();
+
 const defaultObj = {
   name: null,
   optional: true,
   field_type: null,
   is_field_custom: true,
+  options: [],
+  placeholder: '',
+  format: '',
+  is_date_numeric: false,
+  label: '',
+  db_collection: '',
+  db_field_reference: '',
+  min: null,
+  max: null,
+  default_value: [],
 };
 const template = ref({
   id: null,
@@ -230,9 +263,8 @@ const templatesTitle = computed(() => {
 
   return '';
 });
-//const formIsValid = ref(false);
+
 async function save() {
-  //form.value = { ...template.value };
   if (
     template.value.validations.length == 1 &&
     JSON.stringify(template.value.validations) === JSON.stringify([defaultObj])
@@ -363,7 +395,10 @@ const saveEditValidation = (validation: any, index: number) => {
   console.log('save edit2', index);
   openCloseModal.value = false;
   editIndex.value = null;
-  template.value.validations[index] = validation;
+  template.value.validations[index] = {
+    ...template.value.validations[index],
+    ...validation.value,
+  };
   validationItemEdit = {};
 };
 const cancelEditValidation = () => {
