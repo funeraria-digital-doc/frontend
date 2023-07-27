@@ -10,21 +10,7 @@ export const headers = [
   },
   { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
   { title: 'Ficheiro', align: 'end', key: 'file', sortable: true },
-  //{ title: 'Validações', align: 'end', key: 'validations', sortable: true },
   { title: 'Tipo de Envio', align: 'end', key: 'send_type', sortable: true },
-  // { title: 'Destinatário', align: 'end', key: 'send_email_to', sortable: true },
-  // {
-  //   title: 'Destinatário cc',
-  //   align: 'end',
-  //   key: 'send_email_to_cc',
-  //   sortable: true,
-  // },
-  // {
-  //   title: 'Destinatário bb',
-  //   align: 'end',
-  //   key: 'send_email_to_bcc',
-  //   sortable: true,
-  // },
   {
     title: 'Ações',
     key: 'actions',
@@ -33,7 +19,29 @@ export const headers = [
 ];
 
 export const nameRules = [
-  (value: string) => !!value || 'O Nome é Obrigatório.',
+  (value: string) => !!value || 'O Nome da variável é Obrigatório.',
+  (value: string) => (value || '').length >= 4 || 'Mínimo 4 caracteres',
+  (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
+];
+
+export const textRules = [
+  (value: string) => {
+    if (value == '' || value == null) {
+      return true;
+    } else {
+      if (value.length < 4) {
+        return 'Mínimo 4 caracteres';
+      } else if (value.length > 60) {
+        return 'Máximo 60 caracteres';
+      } else{
+        return true
+      }
+    }
+  },
+];
+
+export const labelRules = [
+  (value: string) => !!value || 'O Nome do campo é Obrigatório.',
   (value: string) => (value || '').length >= 4 || 'Mínimo 4 caracteres',
   (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
 ];

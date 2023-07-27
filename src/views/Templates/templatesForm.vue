@@ -94,54 +94,23 @@
             ></v-combobox>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="template.validations.length > 0">
           <v-col cols="12" sm="12" md="12">
-            <v-card class="mx-auto">
-              <v-list>
-                <v-list-subheader>Validações</v-list-subheader>
-                <v-list-item
-                  v-for="(item, i) in template.validations"
-                  :key="i"
-                  :value="item"
-                  color="white"
-                  variant="elevated"
-                >
-                  <template v-slot:prepend>
-                    <v-icon icon="mdi-arrow-right-bold-circle-outline"></v-icon>
-                  </template>
-
-                  <v-list-item-title v-text="item.name"></v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" sm="12" md="12">
-            <div>
-              <v-card
-                class="px-4 py-2 mb-4"
-                v-for="(validation, index) in template.validations"
-                :key="index"
+            <v-list>
+              <v-list-subheader>Validações</v-list-subheader>
+              <v-list-item
+                v-for="(item, i) in template.validations"
+                :key="i"
+                :value="item"
+                :title="item.name"
+                color="white"
+                variant="plain"
+                prepend-icon="mdi-arrow-right-bold-circle-outline"
+                mandatory="false"
+                @click="editValidation(i)"
               >
-                <validation-item
-                  :validation="validation"
-                  :index="index"
-                  @save="saveValidationName"
-                  @edit="editValidation"
-                />
-                <div class="d-flex" style="justify-content: end">
-                  <v-btn
-                    color="red-darken-1"
-                    variant="text"
-                    type="button"
-                    @click="removeMember(index)"
-                    >Eliminar</v-btn
-                  >
-                </div>
-              </v-card>
-              <v-btn @click="addValidation" color="primary">Adicionar</v-btn>
-            </div>
+              </v-list-item>
+            </v-list>
           </v-col>
         </v-row>
       </v-container>
@@ -149,24 +118,6 @@
         Submeter
       </v-btn>
     </v-form>
-    <v-dialog v-model="changeVars" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5 text-center"
-          >Deseja substituir todas as validações?</v-card-title
-        >
-        <v-card-text v-html="varsDisplay" class="text-center"></v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue-darken-1" variant="text" @click="closeChangeVars"
-            >Não</v-btn
-          >
-          <v-btn color="blue-darken-1" variant="text" @click="saveChangeVars"
-            >Sim</v-btn
-          >
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <validation-edit-modal
       v-if="openCloseModal"
       :editModal="openCloseModal"
@@ -183,7 +134,6 @@ import { useRoute } from 'vue-router';
 import * as constants from './constants';
 import { getSingleTemplate } from './helper';
 import Page from '../../components/shared/Page/page.vue';
-import ValidationItem from './components/validationItem.vue';
 import ValidationEditModal from './components/validationEditModal.vue';
 import {
   getVariablesFromFile,
@@ -193,7 +143,6 @@ import {
 export default defineComponent({
   name: 'TemplatesForm',
   components: {
-    ValidationItem,
     ValidationEditModal,
   },
 });
@@ -213,7 +162,7 @@ const defaultObj = {
   label: '',
   db_collection: '',
   db_field_reference: '',
-  min: null,
+  min: 0,
   max: null,
   default_value: [],
 };
@@ -226,19 +175,13 @@ const template = ref({
   send_email_to_cc: [],
   send_email_to_bcc: [],
   file: '',
-  validations: [{ ...defaultObj }],
+  validations: [],
 });
-let validationItemEdit = reactive({});
+let validationItemEdit = ref();
 const file_temp = ref(null);
 const mode = ref('');
 const form = ref();
 const isLoading = ref(true);
-const changeVars = ref(false);
-const changeVarsValues = ref({
-  vars: [],
-  validationVars: {},
-  varEquals: [],
-});
 const openCloseModal = ref(false);
 const editIndex = ref(null);
 
@@ -293,20 +236,8 @@ async function save() {
     }
   });
 }
-const addValidation = () => {
-  template.value.validations.push({ ...defaultObj });
-};
-
-const removeMember = (index: Number) => {
-  template.value.validations.splice(index, 1);
-  if (template.value.validations.length == 0) {
-    template.value.validations.push({ ...defaultObj });
-  }
-  template.value.validations = [...template.value.validations];
-};
 
 const handleFileUpload = (file: Blob[]) => {
-  //if (template.value.file) {
   getVariablesFromFile(file[0]).then((resp: any) => {
     console.log(resp);
     if (
@@ -323,83 +254,31 @@ const handleFileUpload = (file: Blob[]) => {
       } else {
         template.value.file = '';
       }
-      var varsEqual = checkVariablesEqual(resp.data.variables);
-      changeVarsValues.value.validationVars = {
-        ...template.value.validations,
-      };
-      changeVarsValues.value.vars = resp.data.variables;
-      changeVarsValues.value.varEquals = varsEqual;
-      changeVars.value = true;
+      let newValidations = resp.data.variables.map((item: any) => {
+        return { ...defaultObj, name: item };
+      });
+      template.value.validations = newValidations ? newValidations : [];
     }
   });
-  //}
-};
-
-function checkVariablesEqual(requestValidations: any) {
-  var compareObj = template.value.validations
-    .filter((item) => requestValidations.indexOf(item.name) >= 0)
-    .map((itemVal) => itemVal.name);
-  return compareObj ? compareObj : [];
-}
-
-function closeChangeVars() {
-  changeVarsValues.value = {
-    vars: [],
-    validationVars: {},
-    varEquals: [],
-  };
-}
-
-function saveChangeVars() {
-  let newValidations = changeVarsValues.value.vars.map((item) => {
-    return { ...defaultObj, name: item };
-  });
-  template.value.validations = newValidations ? newValidations : [];
-  changeVarsValues.value = {
-    vars: [],
-    validationVars: {},
-    varEquals: [],
-  };
-  changeVars.value = false;
-}
-
-const varsDisplay = computed(() => {
-  var response = '';
-  if (changeVarsValues.value.varEquals.length > 0) {
-    response += '<h3>Variáveis iguais encontradas:</h3>';
-  }
-  changeVarsValues.value.varEquals.map((item) => {
-    response += '<p>' + item + '</p>';
-  });
-  if (changeVarsValues.value.vars.length > 0) {
-    response += '<h3>Todas as variáveis do ficheiro:</h3>';
-  }
-  changeVarsValues.value.vars.map((item) => {
-    response += '<p>' + item + '</p>';
-  });
-  return response;
-});
-
-const saveValidationName = (validation: any, index: number) => {
-  template.value.validations[index].name = validation;
 };
 
 const editValidation = (index: number) => {
-  validationItemEdit = { ...template.value.validations[index] };
+  validationItemEdit.value = { ...template.value.validations[index] };
+  console.log('antes', template.value.validations[index])
+  console.log('antes1', validationItemEdit.value)
   openCloseModal.value = true;
   editIndex.value = index;
 };
 
 const saveEditValidation = (validation: any, index: number) => {
-  console.log('save edit1', validation);
-  console.log('save edit2', index);
   openCloseModal.value = false;
   editIndex.value = null;
   template.value.validations[index] = {
     ...template.value.validations[index],
-    ...validation.value,
+    ...validation,
   };
-  validationItemEdit = {};
+  validationItemEdit.value = {};
+  console.log('resultado', template.value.validations[index])
 };
 const cancelEditValidation = () => {
   console.log('cancel edit');

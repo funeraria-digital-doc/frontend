@@ -15,7 +15,7 @@
                 :id="'name_' + props.index"
                 v-model="validation.name"
                 :rules="constants.nameRules"
-                label="Nome"
+                label="Nome da variável"
               ></v-text-field>
             </v-col>
             <!-- field_type -->
@@ -33,14 +33,6 @@
             </v-col>
           </v-row>
           <v-row>
-            <!-- optional -->
-            <v-col cols="6" sm="6" md="6">
-              <v-checkbox
-                :id="'optional_' + props.index"
-                v-model="validation.optional"
-                label="Opcional?"
-              />
-            </v-col>
             <!-- is_field_custom -->
             <v-col cols="6" sm="6" md="6">
               <v-checkbox
@@ -116,69 +108,65 @@
               />
             </v-col>
           </v-row>
-          <v-expansion-panels>
-            <v-expansion-panel title="Campos avançados">
-              <v-expansion-panel-text>
-                <v-row>
-                  <!-- default_value -->
-                  <v-col cols="12" sm="12" md="12">
-                    <v-combobox
-                      :id="'default_value_' + props.index"
-                      v-model="validation.default_value"
-                      label="Valores por defeito"
-                      :items="[]"
-                      multiple
-                      chips
-                      closable-chips
-                    ></v-combobox>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <!-- placeholder -->
-                  <v-col cols="6" sm="6" md="6">
-                    <v-text-field
-                      :id="'placeholder_' + props.index"
-                      v-model="validation.placeholder"
-                      :rules="constants.nameRules"
-                      label="Placeholder"
-                    ></v-text-field>
-                  </v-col>
-                  <!-- label -->
-                  <v-col cols="6" sm="6" md="6">
-                    <v-text-field
-                      :id="'label_' + props.index"
-                      v-model="validation.label"
-                      :rules="constants.nameRules"
-                      label="Label"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <!-- min -->
-                  <v-col v-if="showMin" cols="6" sm="6" md="6">
-                    <v-text-field
-                      :id="'min_' + props.index"
-                      v-model="validation.min"
-                      label="Minimo"
-                    ></v-text-field>
-                  </v-col>
-                  <!-- max -->
-                  <v-col
-                    :cols="maxFieldSpan"
-                    :sm="maxFieldSpan"
-                    :md="maxFieldSpan"
-                  >
-                    <v-text-field
-                      :id="'max_' + props.index"
-                      v-model="validation.max"
-                      label="Máximo"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-
+          <div v-if="validation.is_field_custom">
+            <v-row>
+              <!-- default_value -->
+              <v-col v-if="showDefaultValue" cols="12" sm="12" md="12">
+                <v-combobox
+                  :id="'default_value_' + props.index"
+                  v-model="validation.default_value"
+                  :label="defaultValueLabel"
+                  :items="validation.options ? validation.options : []"
+                  :multiple="isMultiSelect"
+                  :chips="isMultiSelect"
+                  :closable-chips="isMultiSelect"
+                ></v-combobox>
+              </v-col>
+            </v-row>
+            <v-row>
+              <!-- placeholder -->
+              <v-col cols="6" sm="6" md="6">
+                <v-text-field
+                  :id="'placeholder_' + props.index"
+                  v-model="validation.placeholder"
+                  :rules="constants.textRules"
+                  label="Placeholder"
+                ></v-text-field>
+              </v-col>
+              <!-- label -->
+              <v-col cols="6" sm="6" md="6">
+                <v-text-field
+                  :id="'label_' + props.index"
+                  v-model="validation.label"
+                  :rules="constants.labelRules"
+                  label="Nome do campo"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <!-- min -->
+              <v-col
+                :cols="showMax ? 6 : 12"
+                :sm="showMax ? 6 : 12"
+                :md="showMax ? 6 : 12"
+              >
+                <v-text-field
+                  :id="'min_' + props.index"
+                  v-model="validation.min"
+                  label="Minimo"
+                ></v-text-field>
+              </v-col>
+              <!-- max -->
+              <v-col v-if="showMax" cols="6" sm="6" md="6">
+                <v-text-field
+                  :id="'max_' + props.index"
+                  v-model="validation.max"
+                  :rules="maxRules"
+                  label="Máximo"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </div>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue-darken-1" variant="text" @click="cancelEdit"
@@ -220,20 +208,29 @@ const fieldTypeItems = [
   { label: 'Opções', value: 'SELECT' },
   { label: 'Multiplas Opções', value: 'MULTISELECT' },
   { label: 'Área de Texto', value: 'TEXTAREA' },
-  // { label: 'Rádio', value: 'RADIO' },
-  // { label: 'Checkbox', value: 'CHECKBOX' },
   { label: 'Data', value: 'DATE' },
-  // { label: 'Data e Hora', value: 'DATETIME' },
-  // { label: 'Horas', value: 'TIME' },
-  // { label: 'Ano', value: 'YEAR' },
-  // { label: 'Mês', value: 'MONTH' },
-  // { label: 'Dia', value: 'DAY' },
   { label: 'Email', value: 'EMAIL' },
 ];
 const form = ref();
+
+const maxRules = [
+  (value: string) => {
+    if (value == '' || value == null) {
+      return true;
+    } else {
+      if (value < validation.value.min) {
+        return 'Máximo tem de ser maior que o mínimo';
+      } else {
+        return true;
+      }
+    }
+  },
+];
+
 const emit = defineEmits();
 const save = async () => {
   const { valid } = await form.value.validate();
+  console.log(await form.value.validate());
   if (valid) {
     console.log(validation.value);
     emit('save', validation.value, props.index);
@@ -250,16 +247,30 @@ const showDbFields = computed(() => {
 });
 
 const showDateFields = computed(() => {
+  console.log(validation.value.field_type === 'DATE' ? true : false);
   return validation.value.field_type === 'DATE' ? true : false;
 });
 
-const showMin = computed(() => {
-  return validation.value.optional ? false : true;
+const isMultiSelect = computed(() => {
+  return validation.value.field_type === 'MULTISELECT' ? true : false;
 });
 
-const maxFieldSpan = computed(() => {
-  return showMin.value ? 6 : 12;
+const defaultValueLabel = computed(() => {
+  return isMultiSelect.value ? 'Valores por defeito' : 'Valor por defeito';
 });
+
+const showDefaultValue = computed(() => {
+  return (
+    (validation.value.field_type !== 'MULTISELECT' ||
+      (validation.value.field_type === 'MULTISELECT' &&
+        validation.value.options.length > 0)) &&
+    (validation.value.field_type !== 'SELECT' ||
+      (validation.value.field_type === 'SELECT' &&
+        validation.value.options.length > 0))
+  );
+});
+
+const showMax = ref(false);
 
 const showOptions = computed(() => {
   let canShow = false;
@@ -288,24 +299,20 @@ watch(showDateFields, (showDateFields) => {
 });
 
 watch(
-  () => validation.value.optional,
-  (optional) => {
-    if (optional) {
-      validation.value.min = 0;
-    } else {
-      validation.value.min = 1;
-    }
-  }
-);
-
-watch(
   () => validation.value.field_type,
   (field_type) => {
-    if (field_type !== 'SELECT' && field_type !== 'MULTISELECT') {
+    if (['SELECT', 'MULTISELECT'].indexOf(field_type) == -1) {
       validation.value.options = [];
+      validation.value.default_value = [];
     }
-    if (field_type === 'SELECT') {
+    if (['SELECT', 'DATE', 'EMAIL'].indexOf(field_type) > -1) {
       validation.value.max = 1;
+      showMax.value = false;
+    } else if (field_type === 'BOOLEAN') {
+      showMax.value = false;
+    } else {
+      showMax.value = true;
+      validation.value.max = null;
     }
   }
 );
@@ -343,11 +350,9 @@ watch(
         return { label: item.label, value: item.value };
       });
     } else if (db_collection === 'GROUPS') {
-      console.log(constants.groupsFields);
       dbFields.value = constants.groupsFields.map((item) => {
         return { label: item.label, value: item.value };
       });
-      console.log(dbFields.value);
     } else if (db_collection === 'RECORDS') {
       dbFields.value = constants.recordsFields.map((item) => {
         return { label: item.label, value: item.value };
@@ -379,12 +384,11 @@ watch(
     } else {
       validation.value.field_type = '';
     }
-    console.log('db_field_reference', db_field_reference);
   }
 );
 
 onBeforeMount(async () => {
-  console.log('cenas', props.validation)
   validation.value = props.validation;
+  console.log('before mount', validation.value)
 });
 </script>
