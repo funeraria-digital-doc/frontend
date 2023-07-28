@@ -129,7 +129,7 @@ export async function userCreate(data: any): Promise<ApiResponse<any>> {
     const response = await apiInstance.post('/accounts/create-user/', data);
     return { success: true, data: response.data };
   } catch (e: any) {
-    return { error: e.response };
+    return errorResponse(e);
   }
 }
 
@@ -138,7 +138,7 @@ export async function userDelete(id: any): Promise<ApiResponse<any>> {
     const response = await apiInstance.post('/accounts/remove/' + id + '/');
     return { success: true, data: response.data };
   } catch (e: any) {
-    return { error: e.response };
+    return errorResponse(e);
   }
 }
 
@@ -150,6 +150,6 @@ export async function userEdit(data: any): Promise<ApiResponse<any>> {
     );
     return { success: true, data: response.data };
   } catch (e: any) {
-    return { error: e.response };
+    return errorResponse(e);
   }
 }
