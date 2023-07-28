@@ -19,6 +19,7 @@ export default defineComponent({
 import Page from '../../components/shared/Page/page.vue';
 
 const data = {
+  createAndEditByModal: true,
   headers: constants.headers,
   fields: [
     {

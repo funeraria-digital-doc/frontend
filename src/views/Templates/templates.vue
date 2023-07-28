@@ -1,5 +1,5 @@
 <template>
-  <page title="Utilizadores">
+  <page title="Templates">
     <data-table :data="data"></data-table>
   </page>
 </template>
@@ -7,7 +7,7 @@
 import { defineComponent } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import * as constants from './constants';
-import { createUser, editUser, deleteUser, getUsers } from './helper';
+import { getTemplates, deleteTemplate } from './helper';
 export default defineComponent({
   name: 'UsersDatatable',
   components: {
@@ -19,18 +19,14 @@ export default defineComponent({
 import Page from '../../components/shared/Page/page.vue';
 
 const data = {
-  createAndEditByModal: true,
+  createAndEditByModal: false,
+  homeLink: '/templates',
   headers: constants.headers,
   fields: constants.fields,
-  save: createUser,
-  edit: editUser,
-  delete: deleteUser,
-  getData: getUsers,
-  newItemTitle: 'Criar Utilizador',
-  editItemTitle: 'Editar Utilizador',
-  createButtonTitle: 'Criar Utilizador',
-  deleteText: 'Tem a certeza de que quer <br>eliminar este Utilizador?',
+  createButtonTitle: 'Criar Template',
+  deleteText: 'Tem a certeza de que quer <br>eliminar este Template?',
   deleteButtons: { cancel: 'Não', action: 'Sim' },
-  createEditButtons: { cancel: 'Cancelar', action: 'Guardar' },
+  delete: deleteTemplate,
+  getData: getTemplates,
 };
 </script>

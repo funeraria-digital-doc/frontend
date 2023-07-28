@@ -1,0 +1,80 @@
+import { groupsList } from '@/api/groups';
+
+export const headers = [
+  { title: 'ID', align: 'start', key: 'id', sortable: true },
+  {
+    title: 'Titulo',
+    align: 'end',
+    key: 'title',
+    sortable: true,
+  },
+  { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
+  { title: 'Ficheiro', align: 'end', key: 'file', sortable: true },
+  { title: 'Validações', align: 'end', key: 'validations', sortable: true },
+  { title: 'Tipo de Envio', align: 'end', key: 'send_type', sortable: true },
+  // { title: 'Destinatário', align: 'end', key: 'send_email_to', sortable: true },
+  // {
+  //   title: 'Destinatário cc',
+  //   align: 'end',
+  //   key: 'send_email_to_cc',
+  //   sortable: true,
+  // },
+  // {
+  //   title: 'Destinatário bb',
+  //   align: 'end',
+  //   key: 'send_email_to_bcc',
+  //   sortable: true,
+  // },
+  {
+    title: 'Ações',
+    key: 'actions',
+    sortable: false,
+  },
+];
+
+export const nameRules = [
+  (value: string) => !!value || 'O Nome é Obrigatório.',
+  (value: string) => (value || '').length >= 4 || 'Mínimo 4 caracteres',
+  (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
+];
+
+export const groupRules = [
+  (value: string) => !!value || 'É obrigatório escolher 1 opção.'
+];
+
+export const fieldTypeRules = [
+  (value: string[]) => !!value || 'O Tipo de Campo é Obrigatório.',
+]
+
+async function getGroups() {
+  const resp = await groupsList();
+  if (resp.data) {
+    return resp.data.map((group: any) => {
+      return { label: group.name, value: group.id };
+    });
+  } else {
+    return [];
+  }
+}
+
+export const fields = [
+  {
+    name: 'title',
+    type: 'text-field'
+  },
+  {
+    name: 'group_id',
+    type: 'select',
+    items: await getGroups(),
+  },
+  {
+    name: 'send_type',
+    type: 'select',
+    items: [
+      { label: 'Nenhum', value: 'NONE' },
+      { label: 'Documento', value: 'DOCUMENT' },
+      { label: 'Email', value: 'EMAIL' },
+      { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
+    ],
+  }
+];

@@ -14,7 +14,7 @@ export const headers = [
   { title: 'Staff', align: 'end', key: 'is_staff', sortable: true },
   { title: 'Estado', align: 'end', key: 'status', sortable: true },
   {
-    title: 'Actions',
+    title: 'Ações',
     key: 'actions',
     sortable: false,
   },
