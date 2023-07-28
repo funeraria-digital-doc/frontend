@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="props.editModal" max-width="800px">
+  <v-dialog v-model="editModal" max-width="800px">
     <v-card class="px-4 py-2 mb-4">
       <v-card-title class="text-h5 text-center">Editar validação</v-card-title>
       <v-form ref="form" validate-on="submit" @submit.prevent="save">
@@ -183,24 +183,23 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import {
-  defineComponent,
-  defineProps,
-  defineEmits,
-  onBeforeMount,
-  ref,
-  watch,
-  computed,
-} from 'vue';
+import { defineComponent, ref, watch, computed } from 'vue';
 import * as constants from '../constants';
+
 export default defineComponent({
   name: 'ValidationEditModal',
 });
 </script>
+
 <script lang="ts" setup>
 const props = defineProps(['editModal', 'validation', 'index']);
-let validation = ref({});
-const dbFields = ref([]);
+const emit = defineEmits(['save', 'cancel']);
+
+let validation = ref(props.validation);
+let editModal = ref(props.editModal);
+
+const dbFields = ref<{ label: string; value: string }[]>([]);
+
 const fieldTypeItems = [
   { label: 'Texto', value: 'TEXT' },
   { label: 'Verdadeiro/Falso', value: 'BOOLEAN' },
@@ -227,37 +226,33 @@ const maxRules = [
   },
 ];
 
-const emit = defineEmits();
 const save = async () => {
   const { valid } = await form.value.validate();
-  console.log(await form.value.validate());
+
   if (valid) {
-    console.log(validation.value);
     emit('save', validation.value, props.index);
   } else {
-    console.log('invalid');
+    console.error('Template validation edit invalid');
   }
 };
-const cancelEdit = () => {
-  emit('cancel');
-};
 
-const showDbFields = computed(() => {
-  return validation.value.is_field_custom ? false : true;
-});
+const cancelEdit = () => emit('cancel');
 
-const showDateFields = computed(() => {
-  console.log(validation.value.field_type === 'DATE' ? true : false);
-  return validation.value.field_type === 'DATE' ? true : false;
-});
+const showDbFields = computed(() =>
+  validation.value.is_field_custom ? false : true
+);
 
-const isMultiSelect = computed(() => {
-  return validation.value.field_type === 'MULTISELECT' ? true : false;
-});
+const showDateFields = computed(() =>
+  validation.value.field_type === 'DATE' ? true : false
+);
 
-const defaultValueLabel = computed(() => {
-  return isMultiSelect.value ? 'Valores por defeito' : 'Valor por defeito';
-});
+const isMultiSelect = computed(() =>
+  validation.value.field_type === 'MULTISELECT' ? true : false
+);
+
+const defaultValueLabel = computed(() =>
+  isMultiSelect.value ? 'Valores por defeito' : 'Valor por defeito'
+);
 
 const showDefaultValue = computed(() => {
   return (
@@ -338,7 +333,6 @@ watch(
         });
       }
     }
-    validation.value.field_type = '';
   }
 );
 
@@ -381,14 +375,7 @@ watch(
         (obj) => obj.value === db_field_reference
       );
       validation.value.field_type = item ? item.type : 'TEXT';
-    } else {
-      validation.value.field_type = '';
     }
   }
 );
-
-onBeforeMount(async () => {
-  validation.value = props.validation;
-  console.log('before mount', validation.value)
-});
 </script>

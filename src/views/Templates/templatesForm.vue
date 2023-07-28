@@ -10,7 +10,7 @@
         <v-row>
           <v-col cols="6" sm="6" md="6">
             <v-text-field
-              :id="'title_' + template.title"
+              :id="`title_${template.title}`"
               v-model="template.title"
               label="Título"
               :rules="constants.nameRules"
@@ -18,10 +18,10 @@
           </v-col>
           <v-col cols="6" sm="6" md="6">
             <v-select
-              :id="'group_id_' + template.group_id"
+              :id="`group_id_${template.group_id}`"
               v-model="template.group_id"
               label="Funerária"
-              :items="constants.fields.find((f) => f.name === 'group_id').items"
+              :items="getSelectItems('group_id')"
               item-title="label"
               item-value="value"
               clearable
@@ -32,12 +32,10 @@
         <v-row>
           <v-col cols="6" sm="6" md="6">
             <v-select
-              :id="'send_type_' + template.send_type"
+              :id="`send_type_${template.send_type}`"
               v-model="template.send_type"
               label="Tipo de Envio"
-              :items="
-                constants.fields.find((f) => f.name === 'send_type').items
-              "
+              :items="getSelectItems('send_type')"
               item-title="label"
               item-value="value"
             />
@@ -129,7 +127,7 @@
   </page>
 </template>
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref } from 'vue';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import * as constants from './constants';
 import { getSingleTemplate } from './helper';
@@ -140,6 +138,7 @@ import {
   templateCreate,
   templateEdit,
 } from '@/api/templates';
+import type { Template, TemplateValidation } from './templatesForm.interface';
 export default defineComponent({
   name: 'TemplatesForm',
   components: {
@@ -150,40 +149,40 @@ export default defineComponent({
 <script lang="ts" setup>
 const route = useRoute();
 
-const defaultObj = {
-  name: null,
-  optional: true,
-  field_type: null,
-  is_field_custom: true,
-  options: [],
-  placeholder: '',
-  format: '',
-  is_date_numeric: false,
-  label: '',
+const defaultObj: TemplateValidation = {
   db_collection: '',
   db_field_reference: '',
-  min: 0,
-  max: null,
   default_value: [],
+  format: '',
+  is_date_numeric: false,
+  is_field_custom: true,
+  label: '',
+  min: 0,
+  optional: true,
+  options: [],
+  placeholder: '',
 };
-const template = ref({
-  id: null,
-  title: '',
-  group_id: null,
-  send_type: 'NONE',
-  send_email_to: [],
-  send_email_to_cc: [],
-  send_email_to_bcc: [],
+
+const template = ref<Template>({
   file: '',
+  send_email_to_bcc: [],
+  send_email_to_cc: [],
+  send_email_to: [],
+  send_type: 'NONE',
+  title: '',
   validations: [],
 });
+
 let validationItemEdit = ref();
-const file_temp = ref(null);
+const file_temp = ref();
 const mode = ref('');
 const form = ref();
 const isLoading = ref(true);
 const openCloseModal = ref(false);
-const editIndex = ref(null);
+const editIndex = ref();
+
+const getSelectItems = (name: string) =>
+  constants.fields.find((f) => f.name === name)?.items;
 
 const isEmailOption = computed(() => {
   if (
@@ -215,10 +214,9 @@ async function save() {
     form.value.validations = [];
   }
 
-  await form.value.validate().then((resp) => {
+  await form.value.validate().then((resp: any) => {
     const valid = resp.valid;
-    console.log(resp);
-    console.log('valid', valid);
+
     if (valid) {
       if (mode.value === 'edit') {
         templateEdit(template.value).then((resp) => {
@@ -238,8 +236,7 @@ async function save() {
 }
 
 const handleFileUpload = (file: Blob[]) => {
-  getVariablesFromFile(file[0]).then((resp: any) => {
-    console.log(resp);
+  getVariablesFromFile(file[0] as any).then((resp: any) => {
     if (
       resp &&
       resp.data &&
@@ -249,7 +246,9 @@ const handleFileUpload = (file: Blob[]) => {
       if (file[0]) {
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
-        reader.onload = () => (template.value.file = reader.result);
+        reader.onload = () => {
+          reader.result && (template.value.file = reader.result);
+        };
         reader.onerror = (error) => console.log('error', error);
       } else {
         template.value.file = '';
@@ -264,8 +263,7 @@ const handleFileUpload = (file: Blob[]) => {
 
 const editValidation = (index: number) => {
   validationItemEdit.value = { ...template.value.validations[index] };
-  console.log('antes', template.value.validations[index])
-  console.log('antes1', validationItemEdit.value)
+
   openCloseModal.value = true;
   editIndex.value = index;
 };
@@ -278,13 +276,13 @@ const saveEditValidation = (validation: any, index: number) => {
     ...validation,
   };
   validationItemEdit.value = {};
-  console.log('resultado', template.value.validations[index])
+  console.log('resultado', template.value.validations[index]);
 };
 const cancelEditValidation = () => {
   console.log('cancel edit');
   openCloseModal.value = false;
   editIndex.value = null;
-  validationItemEdit = {};
+  validationItemEdit.value = {};
 };
 
 onBeforeMount(async () => {

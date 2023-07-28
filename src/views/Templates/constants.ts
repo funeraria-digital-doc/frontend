@@ -33,8 +33,8 @@ export const textRules = [
         return 'Mínimo 4 caracteres';
       } else if (value.length > 60) {
         return 'Máximo 60 caracteres';
-      } else{
-        return true
+      } else {
+        return true;
       }
     }
   },

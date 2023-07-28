@@ -1,6 +1,7 @@
 <template>
   <v-footer>
-    {{ new Date().getFullYear() }} — &nbsp;<strong>Funerária Digital Doc ®</strong>
+    {{ new Date().getFullYear() }} — &nbsp;
+    <strong>Funerária Digital Doc ®</strong>
   </v-footer>
 </template>
 

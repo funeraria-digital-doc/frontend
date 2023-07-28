@@ -1,3 +1,4 @@
+import type { Template } from '@/views/Templates/templatesForm.interface';
 import { apiInstance, errorResponse, type ApiResponse } from '.';
 
 export async function templateList(): Promise<ApiResponse<any>> {
@@ -33,37 +34,25 @@ export async function getVariablesFromFile(
       '/template-logic/get-variables-from-file/',
       formData
     );
-    if (response.status == 200) {
-      return { success: true, data: response.data };
-    } else {
-      return { success: false, data: response };
-    }
+
+    return { success: true, data: response.data };
   } catch (e: any) {
-    return { error: e.response };
+    return errorResponse(e);
   }
 }
 
-export async function templateCreate(template: {
-  id: null;
-  title: string;
-  group_id: null;
-  send_type: null;
-  send_email_to: never[];
-  send_email_to_cc: never[];
-  send_email_to_bcc: never[];
-  file: null;
-  validations: {
-    name: null;
-    optional: boolean;
-    field_type: null;
-    is_field_custom: boolean;
-  }[];
-}): Promise<ApiResponse<any>> {
-  const response = await apiInstance.post('/template-logic/upload/', template);
-  if (response.status == 200) {
+export async function templateCreate(
+  template: Template
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post(
+      '/template-logic/upload/',
+      template
+    );
+
     return { success: true, data: response.data };
-  } else {
-    return { success: false, data: response };
+  } catch (e: any) {
+    return errorResponse(e);
   }
 }
 export async function templateDelete(id: string) {
@@ -77,29 +66,17 @@ export async function templateDelete(id: string) {
   }
 }
 
-export async function templateEdit(template: {
-  id: null;
-  title: string;
-  group_id: null;
-  send_type: null;
-  send_email_to: never[];
-  send_email_to_cc: never[];
-  send_email_to_bcc: never[];
-  file: null;
-  validations: {
-    name: null;
-    optional: boolean;
-    field_type: null;
-    is_field_custom: boolean;
-  }[];
-}): Promise<ApiResponse<any>> {
-  const response = await apiInstance.post(
-    '/template-logic/edit/' + template.id + '/',
-    template
-  );
-  if (response.status == 200) {
+export async function templateEdit(
+  template: Template
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post(
+      '/template-logic/edit/' + template.id + '/',
+      template
+    );
+
     return { success: true, data: response.data };
-  } else {
-    return { success: false, data: response };
+  } catch (e: any) {
+    return errorResponse(e);
   }
 }

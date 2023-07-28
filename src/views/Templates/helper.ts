@@ -1,5 +1,4 @@
 import { templateDelete, templateItem, templateList } from '@/api/templates';
-import type { Ref } from 'vue';
 
 export const getTemplates = async (
   loading: { value: boolean },
@@ -70,8 +69,8 @@ export const deleteTemplate = async (
   snack: any
 ) => {
   try {
-    console.log('id', id)
-    console.log('templates', templates.value)
+    console.log('id', id);
+    console.log('templates', templates.value);
     templateDelete(id).then((resp) => {
       if (resp.success) {
         templates.value = templates.value.filter(
