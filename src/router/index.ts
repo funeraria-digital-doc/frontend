@@ -62,7 +62,7 @@ const router = createRouter({
       name: 'templates_edit',
       component: TemplatesForm,
       meta: { requiresAuth: true },
-    }
+    },
   ],
 });
 

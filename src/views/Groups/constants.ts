@@ -19,5 +19,3 @@ export const nameRules = [
   (value: string) => (value || '').length >= 4 || 'Mínimo 4 caracteres',
   (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
 ];
-
-
