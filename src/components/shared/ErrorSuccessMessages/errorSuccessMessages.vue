@@ -36,8 +36,8 @@ function showSnackbar(
   subMessageProp: string,
   isSuccessProp: boolean
 ) {
-  message.value = ''
-  subMessage.value = ''
+  message.value = '';
+  subMessage.value = '';
   if (messageProp) {
     message.value = messageProp;
   }
