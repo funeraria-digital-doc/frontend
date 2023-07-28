@@ -2,11 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home/home.vue';
 import Contacts from '../views/Contacts/contacts.vue';
 import Profile from '../views/Profile/profile.vue';
-import DeathDeclaration from '../views/DeathDeclaration/deathDeclaration.vue';
 import Users from '../views/Users/users.vue';
 import Groups from '../views/Groups/groups.vue';
 import Templates from '../views/Templates/templates.vue';
+import Records from '../views/Records/records.vue';
 import TemplatesForm from '../views/Templates/templatesForm.vue';
+import RecordsForm from '../views/Records/recordsForm.vue';
 import { useUser } from '@/composables/user';
 
 const router = createRouter({
@@ -27,11 +28,6 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
       meta: { requiresAuth: true },
-    },
-    {
-      path: '/death-declaration',
-      name: 'death_declaration',
-      component: DeathDeclaration,
     },
     {
       path: '/users',
@@ -61,6 +57,24 @@ const router = createRouter({
       path: '/templates/:id/edit',
       name: 'templates_edit',
       component: TemplatesForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/records',
+      name: 'records',
+      component: Records,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/records/create',
+      name: 'records_create',
+      component: RecordsForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/records/:id/edit',
+      name: 'records_edit',
+      component: RecordsForm,
       meta: { requiresAuth: true },
     }
   ],

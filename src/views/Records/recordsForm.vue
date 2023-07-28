@@ -22,6 +22,11 @@ import { DeathDeclarationSpouseForm } from './forms/deathDeclarationSpouse.form'
 import { DeathDeclarationDeathForm } from './forms/deathDeclarationDeath.form';
 import { DeathDeclarationFuneralForm } from './forms/deathDeclarationFuneral.form';
 import { DeathDeclarationFamilyMemberForm } from './forms/deathDeclarationFamilyMember.form';
+import { recordCreate, recordEdit } from '@/api/records';
+import router from '@/router';
+import { onBeforeMount, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { getSingleRecord } from './helper';
 
 const fields: DynamicField[] = [
   ...DeathDeclarationDefunctForm,
@@ -38,9 +43,38 @@ const subtitles = [
   { index: 40, text: 'Dados do funeral' },
   { index: 46, text: 'Dados do familiar' },
 ];
+const route = useRoute();
+const mode = ref('')
 
 // TODO finish this
-const onSubmit = (values: any) => console.log(values);
+const onSubmit = (values: any) => {
+  if (mode.value === 'edit') {
+    recordEdit(values).then((resp) => {
+      console.log('resp', resp);
+    });
+  } else if (mode.value === 'create') {
+    recordCreate(values).then((resp) => {
+      console.log('resp', resp);
+      if (resp.success) {
+        router.push('/records');
+      }
+    });
+  }
+};
+
+
+onBeforeMount(async () => {
+  if (route.name === 'records_edit') {
+    getSingleRecord(route.params.id as string).then((resp) => {
+      console.log(resp)
+      //resp && (template.value = resp);
+      //file_temp.value = [new File([template.value.file], 'file')];
+      mode.value = 'edit';
+    });
+  } else if (route.name === 'records_create') {
+    mode.value = 'create';
+  }
+});
 </script>
 
 <style lang="scss">

@@ -68,7 +68,7 @@ export async function templateCreate(template: {
 }
 export async function templateDelete(id: string) {
   try {
-    const response = await apiInstance.delete(
+    const response = await apiInstance.post(
       '/template-logic/remove/' + id + '/'
     );
     return { success: true, data: response.data };

@@ -54,15 +54,11 @@ const { isAuthFromTokenLoaded, authenticateUserFromToken } = useUser();
 
 const sideNavLinks = [
   { title: 'Página inicial', link: '/', icon: 'mdi-home' },
-  {
-    title: 'Declaração de Óbito',
-    link: '/death-declaration',
-    icon: 'mdi-information-variant',
-  },
   { title: 'Contatos', link: '/contacts', icon: 'mdi-information-variant' },
   { title: 'Utilizadores', link: '/users', icon: 'mdi-information-variant' },
   { title: 'Funerárias', link: '/groups', icon: 'mdi-information-variant' },
   { title: 'Templates', link: '/templates', icon: 'mdi-information-variant' },
+  { title: 'Declarações', link: '/records', icon: 'mdi-information-variant' },
 ];
 
 const navigate = (link: string) => {
