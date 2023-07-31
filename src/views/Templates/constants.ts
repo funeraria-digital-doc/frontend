@@ -142,3 +142,8 @@ export const dateFormat = [
   { label: 'Mês/Ano Horas/Minutos', value: 'MONTH_YEAR_HOUR_MINUTE' },
   { label: 'Mês/Ano Horas', value: 'MONTH_YEAR_HOUR' },
 ];
+
+export const BooleanOptions = [
+  { label: 'Sim', value: true, type: 'BOOLEAN' },
+  { label: 'Não', value: false, type: 'BOOLEAN' }
+];

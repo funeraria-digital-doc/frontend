@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="editModal" max-width="800px">
+  <v-dialog persistent v-model="editModal" max-width="800px">
     <v-card class="px-4 py-2 mb-4">
       <v-card-title class="text-h5 text-center">Editar validação</v-card-title>
       <v-form ref="form" validate-on="submit" @submit.prevent="save">
@@ -116,10 +116,14 @@
                   :id="'default_value_' + props.index"
                   v-model="validation.default_value"
                   :label="defaultValueLabel"
-                  :items="validation.options ? validation.options : []"
+                  :items="defaultValueValues"
                   :multiple="isMultiSelect"
                   :chips="isMultiSelect"
                   :closable-chips="isMultiSelect"
+                  :type="isNumberField"
+                  item-title="label"
+                  item-value="value"
+                  :rules="defaultValueRules"
                 ></v-combobox>
               </v-col>
             </v-row>
@@ -153,6 +157,7 @@
                 <v-text-field
                   :id="'min_' + props.index"
                   v-model="validation.min"
+                  type="number"
                   label="Minimo"
                 ></v-text-field>
               </v-col>
@@ -161,6 +166,7 @@
                 <v-text-field
                   :id="'max_' + props.index"
                   v-model="validation.max"
+                  type="number"
                   :rules="maxRules"
                   label="Máximo"
                 ></v-text-field>
@@ -226,6 +232,39 @@ const maxRules = [
   },
 ];
 
+const defaultValueRules = [
+  (value: string) => {
+    if (value == '' || value == null) {
+      return true;
+    } else {
+      if (validation.value.field_type === 'INTEGER') {
+        console.log('---')
+        console.log(parseInt(value))
+        console.log(parseInt(validation.value.max))
+        console.log(parseInt(validation.value.min))
+        if (parseInt(value) >= 0 && parseInt(validation.value.max) >= 0) {
+          if (parseInt(value) > parseInt(validation.value.max)) {
+            return 'Valor por defeito tem de ser inferior ao máximo.';
+          }
+        }
+        console.log(parseInt(value) && parseInt(validation.value.min))
+        if (parseInt(value) >= 0 && parseInt(validation.value.min) >= 0) {
+          console.log(parseInt(validation.value.min) > parseInt(value))
+          if (parseInt(validation.value.min) > parseInt(value)) {
+            return 'Valor por defeito tem de ser superior ao mínimo.';
+          }
+        }
+      }
+      return true;
+      // if (value < validation.value.min) {
+      //   return 'Máximo tem de ser maior que o mínimo.';
+      // } else {
+      //   return true;
+      // }
+    }
+  },
+];
+
 const save = async () => {
   const { valid } = await form.value.validate();
 
@@ -265,7 +304,35 @@ const showDefaultValue = computed(() => {
   );
 });
 
-const showMax = ref(false);
+const isNumberField = computed(() => {
+  return validation.value.field_type === 'INTEGER' ? 'number' : 'text';
+});
+
+const defaultValueValues = computed(() => {
+  if (
+    ['SELECT', 'MULTISELECT'].indexOf(validation.value.field_type) > -1 &&
+    validation.value.options
+  ) {
+    return validation.value.options.map((item: any) => {
+      return { label: item, value: item };
+    });
+  }
+  if (validation.value.field_type === 'BOOLEAN') {
+    console.log(constants.BooleanOptions);
+    return constants.BooleanOptions;
+  }
+  return [];
+});
+
+const showMax = computed(() => {
+  if (['SELECT', 'DATE', 'EMAIL'].indexOf(validation.value.field_type) > -1) {
+    return false;
+  } else if (validation.value.field_type === 'BOOLEAN') {
+    return false;
+  } else {
+    return true;
+  }
+})
 
 const showOptions = computed(() => {
   let canShow = false;
@@ -296,17 +363,15 @@ watch(showDateFields, (showDateFields) => {
 watch(
   () => validation.value.field_type,
   (field_type) => {
+    if (field_type) {
+      validation.value.default_value = [];
+    }
     if (['SELECT', 'MULTISELECT'].indexOf(field_type) == -1) {
       validation.value.options = [];
-      validation.value.default_value = [];
     }
     if (['SELECT', 'DATE', 'EMAIL'].indexOf(field_type) > -1) {
       validation.value.max = 1;
-      showMax.value = false;
-    } else if (field_type === 'BOOLEAN') {
-      showMax.value = false;
     } else {
-      showMax.value = true;
       validation.value.max = null;
     }
   }
@@ -316,9 +381,11 @@ watch(
   () => validation.value.is_field_custom,
   (field_custom) => {
     if (field_custom) {
+      validation.value.field_type = '';
       validation.value.db_collection = '';
       validation.value.db_field_reference = '';
     } else {
+      validation.value.field_type = '';
       if (validation.value.db_collection === 'USERS') {
         dbFields.value = constants.usersFields.map((item) => {
           return { label: item.label, value: item.value };
