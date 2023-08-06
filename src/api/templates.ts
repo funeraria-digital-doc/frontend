@@ -55,6 +55,7 @@ export async function templateCreate(
     return errorResponse(e);
   }
 }
+
 export async function templateDelete(id: string) {
   try {
     const response = await apiInstance.delete(
@@ -73,6 +74,18 @@ export async function templateEdit(
     const response = await apiInstance.post(
       '/template-logic/edit/' + template.id + '/',
       template
+    );
+
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}
+
+export async function downloadTemplateFile(id: any) {
+  try {
+    const response = await apiInstance.get(
+      '/template-logic/' + id + '/download/'
     );
 
     return { success: true, data: response.data };
