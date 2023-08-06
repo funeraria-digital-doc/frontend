@@ -7,7 +7,7 @@
 import { defineComponent } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import * as constants from './constants';
-import { getTemplates, deleteTemplate } from './helper';
+import { getTemplates, deleteTemplate, downloadTemplate } from './helper';
 export default defineComponent({
   name: 'UsersDatatable',
   components: {
@@ -28,5 +28,6 @@ const data = {
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   delete: deleteTemplate,
   getData: getTemplates,
+  fileFields: [{ name: 'file', clickFunction: downloadTemplate }],
 };
 </script>
