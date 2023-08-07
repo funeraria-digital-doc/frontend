@@ -132,7 +132,7 @@ import { useRoute } from 'vue-router';
 import * as constants from './constants';
 import { getSingleTemplate } from './helper';
 import Page from '../../components/shared/Page/page.vue';
-import ValidationEditModal from './components/validationEditModal.vue';
+import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
 import {
   getVariablesFromFile,
   templateCreate,
