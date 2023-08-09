@@ -1,6 +1,6 @@
 <template>
   <page title="Profile">
-    <v-container>
+    <v-container v-if="!isLoading">
       <v-row>
         <div class="profile-picture">
           <label for="profile-input" class="profile-label">
@@ -19,11 +19,19 @@
               @change="handleFileChange"
             />
           </label>
-          <v-btn @click="saveProfileImage" type="button" class="profile-save"
+          <!-- <v-btn @click="saveProfileImage" type="button" class="profile-save"
             >Save</v-btn
-          >
+          > -->
         </div>
       </v-row>
+    </v-container>
+    <v-container v-else class="login_spinner">
+      <v-progress-circular
+        :size="70"
+        :width="7"
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
     </v-container>
     <v-form ref="form" @submit.prevent="onSubmit">
       <v-container>
@@ -59,11 +67,7 @@
       </v-container>
     </v-form>
   </page>
-  <error-success-message
-    :hasMessage="hasMessage"
-    :message="message"
-    :isSuccess="isSuccess"
-  ></error-success-message>
+  <error-success-message ref="snack"></error-success-message>
 </template>
 
 <script lang="ts" setup>
@@ -77,12 +81,11 @@ const { user } = useUser();
 const username = ref(user.name);
 const email = ref(user.email);
 const form = ref();
-const imageUrl = ref(null);
-const image = ref(null);
+const imageUrl = ref();
+const image = ref();
 const isChangePasswordOpen = ref(false);
-const hasMessage = ref(false);
-const isSuccess = ref(false);
-const message = ref('');
+const snack = ref();
+const isLoading = ref(false)
 
 const onOpenChangePassword = () => {
   isChangePasswordOpen.value = true;
@@ -95,8 +98,18 @@ const onCloseChangePassword = () => {
 const handleFileChange = (event: any) => {
   const file = event.target.files[0];
   if (file) {
-    image.value = file;
-    imageUrl.value = URL.createObjectURL(file);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      if (reader.result) {
+        saveProfileImage(reader.result, file);
+      }
+      // reader.result && (imageUrl.value = reader.result) && (image.value = file);
+    };
+    reader.onerror = (error) => {
+      console.log(error);
+      snack.value.showSnackbar('Erro a processar a imagem.', '', false);
+    };
   }
 };
 const fieldRules = [(v: string) => !!v || 'Campo obrigatório'];
@@ -111,39 +124,40 @@ const onSubmit = async () => {
     };
     editProfile(data).then((resp) => {
       if (resp.success) {
-        hasMessage.value = true;
-        message.value = 'success edit profile';
-        isSuccess.value = true;
+        snack.value.showSnackbar('Perfil guardado com sucesso.', '', true);
       } else {
-        hasMessage.value = true;
-        message.value = 'error edit profile';
-        isSuccess.value = false;
+        snack.value.showSnackbar(
+          'Ocorreu um erro a guardar o perfil.\r\n Por favor tente mais tarde.',
+          '',
+          false
+        );
       }
     });
   }
 };
 
-const saveProfileImage = () => {
-  if (image.value) {
-    editProfileImage(image.value).then((resp) => {
+async function saveProfileImage(base64File: string, file: any) {
+  if (base64File) {
+    isLoading.value = true
+    editProfileImage(base64File).then((resp) => {
       if (resp.success) {
-        hasMessage.value = true;
-        message.value = 'success edit profile';
-        isSuccess.value = true;
+        imageUrl.value = base64File;
+        image.value = file;
+        snack.value.showSnackbar('Imagem guardada com sucesso.', '', true);
       } else {
-        hasMessage.value = true;
-        message.value = 'error edit profile';
-        isSuccess.value = false;
+        console.log(resp);
+        snack.value.showSnackbar('Erro a processar a imagem.', '', false);
       }
+      isLoading.value = false
     });
   } else {
     console.error('Save profile image - no image');
   }
-};
+}
 
 const base64ToFile = (base64Data: string) => {
   const filename = username.value + '_picture.jpg';
-  const byteCharacters = atob(base64Data); // Decode the base64 data
+  const byteCharacters = atob(base64Data.replace('data:image/png;base64,', '')); // Decode the base64 data
   const byteArrays = [];
 
   for (let i = 0; i < byteCharacters.length; i++) {
@@ -153,14 +167,19 @@ const base64ToFile = (base64Data: string) => {
   const byteArray = new Uint8Array(byteArrays); // Create a Uint8Array from the byte values
   return new File([byteArray], filename, { type: 'image/jpeg' }); // Create a File object from the Uint8Array
 };
+
 onMounted(() => {
+  isLoading.value = true
   getProfileImage().then((resp) => {
-    if (resp.success) {
-      imageUrl.value = 'data:image/jpeg;base64,' + resp.data.image;
+    if (resp.success && resp.data.image) {
+      imageUrl.value = resp.data.image;
       image.value = base64ToFile(resp.data.image);
+    } else if (resp.success) {
+      console.error('No profile image');
     } else {
       console.error('Get profile image error');
     }
+    isLoading.value = false
   });
 });
 </script>
