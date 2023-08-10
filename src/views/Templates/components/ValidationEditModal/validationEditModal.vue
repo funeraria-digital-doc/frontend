@@ -18,13 +18,14 @@
                 label="Nome da variável"
               ></v-text-field>
             </v-col>
+
             <!-- field_type -->
             <v-col v-if="!showDbFields" cols="6" sm="6" md="6">
               <v-select
                 :id="'field_type_' + props.index"
                 v-model="validation.field_type"
                 label="Tipo de Campo"
-                :items="fieldTypeItems"
+                :items="validationFieldTypeItems"
                 item-title="label"
                 item-value="value"
                 :rules="constants.fieldTypeRules"
@@ -32,16 +33,19 @@
               />
             </v-col>
           </v-row>
+
           <v-row>
             <!-- is_field_custom -->
-            <v-col cols="6" sm="6" md="6">
-              <v-checkbox
-                :id="'is_field_custom_' + props.index"
-                v-model="validation.is_field_custom"
-                label="Campo Personalizado?"
-              />
-            </v-col>
+            <v-checkbox
+              :id="'is_field_custom_' + props.index"
+              class="validation-edit-modal__is-field-custom-chk"
+              v-model="validation.is_field_custom"
+            />
+            <v-label class="validation-edit-modal__is-field-custom-label">
+              Campo Personalizado?
+            </v-label>
           </v-row>
+
           <v-row v-if="showOptions">
             <!-- options -->
             <v-col cols="12" sm="12" md="12">
@@ -56,6 +60,7 @@
               ></v-combobox>
             </v-col>
           </v-row>
+
           <v-row v-if="showDbFields">
             <!-- db_collection -->
             <v-col cols="6" sm="6" md="6">
@@ -85,6 +90,7 @@
               />
             </v-col>
           </v-row>
+
           <v-row v-if="showDateFields">
             <!-- format -->
             <v-col cols="8" sm="8" md="8">
@@ -108,6 +114,7 @@
               />
             </v-col>
           </v-row>
+
           <div v-if="validation.is_field_custom">
             <v-row>
               <!-- default_value -->
@@ -123,7 +130,7 @@
                   :type="isNumberField"
                   item-title="label"
                   item-value="value"
-                  :rules="defaultValueRules"
+                  :rules="defaultValueRules(validation)"
                 ></v-combobox>
               </v-col>
             </v-row>
@@ -167,20 +174,21 @@
                   :id="'max_' + props.index"
                   v-model="validation.max"
                   type="number"
-                  :rules="maxRules"
+                  :rules="maxRules(validation)"
                   label="Máximo"
                 ></v-text-field>
               </v-col>
             </v-row>
           </div>
+
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue-darken-1" variant="text" @click="cancelEdit"
-              >Não</v-btn
-            >
-            <v-btn color="blue-darken-1" variant="text" type="submit"
-              >Sim</v-btn
-            >
+            <v-btn color="blue-darken-1" variant="text" @click="cancelEdit">
+              Não
+            </v-btn>
+            <v-btn color="blue-darken-1" variant="text" type="submit">
+              Sim
+            </v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-container>
@@ -190,7 +198,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from 'vue';
-import * as constants from '../constants';
 
 export default defineComponent({
   name: 'ValidationEditModal',
@@ -198,6 +205,13 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
+import * as constants from '../../constants';
+import {
+  defaultValueRules,
+  maxRules,
+  validationFieldTypeItems,
+} from './validationEditModal.constants';
+
 const props = defineProps(['editModal', 'validation', 'index']);
 const emit = defineEmits(['save', 'cancel']);
 
@@ -206,64 +220,7 @@ let editModal = ref(props.editModal);
 
 const dbFields = ref<{ label: string; value: string }[]>([]);
 
-const fieldTypeItems = [
-  { label: 'Texto', value: 'TEXT' },
-  { label: 'Verdadeiro/Falso', value: 'BOOLEAN' },
-  { label: 'Inteiro', value: 'INTEGER' },
-  { label: 'Opções', value: 'SELECT' },
-  { label: 'Multiplas Opções', value: 'MULTISELECT' },
-  { label: 'Área de Texto', value: 'TEXTAREA' },
-  { label: 'Data', value: 'DATE' },
-  { label: 'Email', value: 'EMAIL' },
-];
 const form = ref();
-
-const maxRules = [
-  (value: string) => {
-    if (value == '' || value == null) {
-      return true;
-    } else {
-      if (value < validation.value.min) {
-        return 'Máximo tem de ser maior que o mínimo';
-      } else {
-        return true;
-      }
-    }
-  },
-];
-
-const defaultValueRules = [
-  (value: string) => {
-    if (value == '' || value == null) {
-      return true;
-    } else {
-      if (validation.value.field_type === 'INTEGER') {
-        console.log('---')
-        console.log(parseInt(value))
-        console.log(parseInt(validation.value.max))
-        console.log(parseInt(validation.value.min))
-        if (parseInt(value) >= 0 && parseInt(validation.value.max) >= 0) {
-          if (parseInt(value) > parseInt(validation.value.max)) {
-            return 'Valor por defeito tem de ser inferior ao máximo.';
-          }
-        }
-        console.log(parseInt(value) && parseInt(validation.value.min))
-        if (parseInt(value) >= 0 && parseInt(validation.value.min) >= 0) {
-          console.log(parseInt(validation.value.min) > parseInt(value))
-          if (parseInt(validation.value.min) > parseInt(value)) {
-            return 'Valor por defeito tem de ser superior ao mínimo.';
-          }
-        }
-      }
-      return true;
-      // if (value < validation.value.min) {
-      //   return 'Máximo tem de ser maior que o mínimo.';
-      // } else {
-      //   return true;
-      // }
-    }
-  },
-];
 
 const save = async () => {
   const { valid } = await form.value.validate();
@@ -293,6 +250,10 @@ const defaultValueLabel = computed(() =>
   isMultiSelect.value ? 'Valores por defeito' : 'Valor por defeito'
 );
 
+const isNumberField = computed(() => {
+  return validation.value.field_type === 'INTEGER' ? 'number' : 'text';
+});
+
 const showDefaultValue = computed(() => {
   return (
     (validation.value.field_type !== 'MULTISELECT' ||
@@ -302,10 +263,6 @@ const showDefaultValue = computed(() => {
       (validation.value.field_type === 'SELECT' &&
         validation.value.options.length > 0))
   );
-});
-
-const isNumberField = computed(() => {
-  return validation.value.field_type === 'INTEGER' ? 'number' : 'text';
 });
 
 const defaultValueValues = computed(() => {
@@ -332,7 +289,7 @@ const showMax = computed(() => {
   } else {
     return true;
   }
-})
+});
 
 const showOptions = computed(() => {
   let canShow = false;
@@ -446,3 +403,15 @@ watch(
   }
 );
 </script>
+
+<style lang="scss">
+.validation-edit-modal {
+  &__is-field-custom-chk {
+    max-width: fit-content;
+  }
+
+  &__is-field-custom-label {
+    margin-top: -1rem;
+  }
+}
+</style>
