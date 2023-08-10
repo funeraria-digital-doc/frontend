@@ -50,7 +50,7 @@ const nameRules = [
   (value: string) => (value || '').length <= 60 || 'Máximo 60 caracteres',
 ];
 const name = ref('');
-const emit = defineEmits();
+const emit = defineEmits(['save', 'edit']);
 
 const handleSave = () => {
   emit('save', name.value, props.index);
