@@ -32,6 +32,7 @@
 </template>
 <script lang="ts">
 import { checkImageTypeAndSize } from '@/utils/imageHelper';
+import { watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 export default defineComponent({
   name: 'PhotoUpload',
@@ -40,7 +41,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 const props = defineProps(['snack', 'saveFunction', 'imageUrl', 'isLoading']);
-const isLoading = ref(props.isLoading)
+const isLoading = ref(props.isLoading);
 const emit = defineEmits(['save']);
 
 const handleSave = (base64File: string, file: any) => {
@@ -82,6 +83,13 @@ async function saveImage(base64File: string, file: any) {
     console.error('Save profile image - no image');
   }
 }
+
+watch(
+  () => props.isLoading,
+  (newValue) => {
+    isLoading.value = newValue;
+  }
+);
 </script>
 
 <style scoped>

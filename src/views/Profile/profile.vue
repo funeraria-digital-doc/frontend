@@ -46,7 +46,7 @@
 
 <script lang="ts" setup>
 import { useUser } from '@/composables/user';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onBeforeMount } from 'vue';
 import Page from '../../components/shared/Page/page.vue';
 import { editProfile, getProfileImage, editProfileImage } from '@/api/users';
 import ChangePasswordModal from '@/components/ChangePasswordModal/changePasswordModal.vue';
@@ -99,6 +99,10 @@ const saveFile = (base64File: string, file: any) => {
   imageUrl.value = base64File;
   image.value = file;
 };
+
+onBeforeMount(() => {
+  isLoading.value = true;
+});
 
 onMounted(() => {
   isLoading.value = true;
