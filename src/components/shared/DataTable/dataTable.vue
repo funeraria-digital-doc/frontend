@@ -11,6 +11,15 @@
     :loading="loading"
     loading-text="A carregar"
   >
+    <template
+      v-for="field in propsData.data.fileFields"
+      :key="field.name"
+      v-slot:[`item.${field.name}`]="{ item }"
+    >
+      <v-btn v-if="item.columns.file" @click="field.clickFunction(item)"
+        >Descarregar</v-btn
+      >
+    </template>
     <template v-slot:top>
       <v-dialog
         v-if="propsData.data.createAndEditByModal"

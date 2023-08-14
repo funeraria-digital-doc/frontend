@@ -1,4 +1,9 @@
-import { templateDelete, templateItem, templateList } from '@/api/templates';
+import {
+  downloadTemplateFile,
+  templateDelete,
+  templateItem,
+  templateList,
+} from '@/api/templates';
 
 export const getTemplates = async (
   loading: { value: boolean },
@@ -20,6 +25,7 @@ export const getTemplates = async (
               template.send_type,
               fields
             ),
+            file: template.file,
           };
         });
       }
@@ -111,3 +117,45 @@ export function getLabel(key: string, type: string, value: any, fields: any) {
   }
   return label;
 }
+
+export function downloadTemplate(template: any) {
+  try {
+    downloadTemplateFile(template.columns.id).then((resp: any) => {
+      if (resp.success) {
+        const file = base64ToFile(resp.data, template.columns.title);
+        const url = window.URL.createObjectURL(new Blob([file]));
+        const link = document.createElement('a');
+        link.href = url;
+        const filename = template.columns.title + '.docx'
+        link.setAttribute('download', filename); 
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.log('error', resp);
+      }
+    });
+  } catch (e: any) {
+    console.log(JSON.stringify(e));
+  }
+}
+
+const base64ToFile = (base64Data: any, title: string) => {
+  const baseString = base64Data.data
+    .replace(
+      'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;',
+      ''
+    )
+    .replace('base64,', '')
+    .trim();
+  const filename = title + '.docx';
+  const byteCharacters = atob(baseString);
+  const byteArrays = [];
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i));
+  }
+  const byteArray = new Uint8Array(byteArrays);
+  return new File([byteArray], filename, {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  });
+};

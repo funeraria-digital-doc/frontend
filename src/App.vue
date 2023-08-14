@@ -36,13 +36,12 @@ import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
 
-
 export default defineComponent({
   name: 'LoginModal',
   components: {
     AppHeader,
     AppFooter,
-    RouterView
+    RouterView,
   },
 });
 </script>
