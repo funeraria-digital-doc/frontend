@@ -1,4 +1,5 @@
 import type { DynamicField } from '@/models/dynamicField.model';
+import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
 
 export const DeathDeclarationSpouseForm: DynamicField[] = [
   {
@@ -10,6 +11,7 @@ export const DeathDeclarationSpouseForm: DynamicField[] = [
     label: 'Nome do cônjuge',
     name: 'spouse_name',
     input: 'text',
+    rules: fieldRules(true, null, 255),
   },
   {
     label: 'Sexo do cônjuge',
@@ -20,6 +22,7 @@ export const DeathDeclarationSpouseForm: DynamicField[] = [
       { label: 'Feminino', value: 'WOMAN' },
       { label: 'Outro', value: 'OTHER' },
     ],
+    rules: fieldRules(true, null, null),
   },
   {
     label: 'Idade do cônjuge',
