@@ -34,18 +34,12 @@ export const defaultValueRules = (validation: any) => [
             return 'Valor por defeito tem de ser inferior ao máximo.';
           }
         }
-        if (parseInt(value) >= 0 && parseInt(validation.min) >= 0) 
+        if (parseInt(value) >= 0 && parseInt(validation.min) >= 0)
           if (parseInt(validation.min) > parseInt(value)) {
             return 'Valor por defeito tem de ser superior ao mínimo.';
           }
-        }
       }
-      return true;
-      // if (value < validation.min) {
-      //   return 'Máximo tem de ser maior que o mínimo.';
-      // } else {
-      //   return true;
-      // }
     }
+    return true;
   },
 ];
