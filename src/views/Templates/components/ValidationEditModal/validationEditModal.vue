@@ -275,7 +275,6 @@ const defaultValueValues = computed(() => {
     });
   }
   if (validation.value.field_type === 'BOOLEAN') {
-    console.log(constants.BooleanOptions);
     return constants.BooleanOptions;
   }
   return [];

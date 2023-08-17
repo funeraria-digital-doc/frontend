@@ -29,29 +29,17 @@ export const defaultValueRules = (validation: any) => [
       return true;
     } else {
       if (validation.field_type === 'INTEGER') {
-        console.log('---');
-        console.log(parseInt(value));
-        console.log(parseInt(validation.max));
-        console.log(parseInt(validation.min));
         if (parseInt(value) >= 0 && parseInt(validation.max) >= 0) {
           if (parseInt(value) > parseInt(validation.max)) {
             return 'Valor por defeito tem de ser inferior ao máximo.';
           }
         }
-        console.log(parseInt(value) && parseInt(validation.min));
-        if (parseInt(value) >= 0 && parseInt(validation.min) >= 0) {
-          console.log(parseInt(validation.min) > parseInt(value));
+        if (parseInt(value) >= 0 && parseInt(validation.min) >= 0)
           if (parseInt(validation.min) > parseInt(value)) {
             return 'Valor por defeito tem de ser superior ao mínimo.';
           }
-        }
       }
-      return true;
-      // if (value < validation.min) {
-      //   return 'Máximo tem de ser maior que o mínimo.';
-      // } else {
-      //   return true;
-      // }
     }
+    return true;
   },
 ];
