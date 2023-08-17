@@ -29,7 +29,6 @@ export const getTemplates = async (
           };
         });
       }
-      console.log(templateData);
       templates.value = templateData;
     } else {
       console.error('erro', resp);
@@ -42,7 +41,6 @@ export const getSingleTemplate = async (id: string, defaultObj: any) => {
   return templateItem(id).then((resp) => {
     if (resp.success) {
       if (resp.data.id) {
-        console.log('send_type', resp.data);
         return {
           id: id,
           title: resp.data.title,
