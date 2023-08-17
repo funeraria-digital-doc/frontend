@@ -46,8 +46,10 @@
               v-model="file_temp"
               label="File input"
               @change="handleFileUpload(file_temp)"
+              @click:clear="handleClearFileClick"
               prepend-icon="mdi-paperclip"
               clearable
+              :disabled="isLoadingFileVars"
             ></v-file-input>
           </v-col>
         </v-row>
@@ -92,7 +94,7 @@
             ></v-combobox>
           </v-col>
         </v-row>
-        <v-row v-if="template.validations.length > 0">
+        <v-row v-if="template.validations.length > 0 && !isLoadingFileVars">
           <v-col cols="12" sm="12" md="12">
             <v-list>
               <v-list-subheader>Validações</v-list-subheader>
@@ -111,11 +113,20 @@
             </v-list>
           </v-col>
         </v-row>
+        <v-container v-if="isLoadingFileVars" class="login_spinner">
+          <v-progress-circular
+            :size="70"
+            :width="7"
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </v-container>
       </v-container>
       <v-btn color="blue-darken-1" variant="text" type="submit">
         Submeter
       </v-btn>
     </v-form>
+    <error-success-message ref="snack"></error-success-message>
     <validation-edit-modal
       v-if="openCloseModal"
       :editModal="openCloseModal"
@@ -133,6 +144,7 @@ import * as constants from './constants';
 import { getSingleTemplate } from './helper';
 import Page from '../../components/shared/Page/page.vue';
 import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
+import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 import {
   getVariablesFromFile,
   templateCreate,
@@ -148,6 +160,7 @@ export default defineComponent({
 </script>
 <script lang="ts" setup>
 const route = useRoute();
+const snack = ref();
 
 const defaultObj: TemplateValidation = {
   db_collection: '',
@@ -178,6 +191,7 @@ const file_temp = ref();
 const mode = ref('');
 const form = ref();
 const isLoading = ref(true);
+const isLoadingFileVars = ref(false);
 const openCloseModal = ref(false);
 const editIndex = ref();
 
@@ -236,29 +250,51 @@ async function save() {
 }
 
 const handleFileUpload = (file: Blob[]) => {
-  getVariablesFromFile(file[0] as any).then((resp: any) => {
-    if (
-      resp &&
-      resp.data &&
-      resp.data.variables &&
-      resp.data.variables.length > 0
-    ) {
-      if (file[0]) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = () => {
-          reader.result && (template.value.file = reader.result);
-        };
-        reader.onerror = (error) => console.log('error', error);
-      } else {
-        template.value.file = '';
-      }
-      let newValidations = resp.data.variables.map((item: any) => {
-        return { ...defaultObj, name: item };
-      });
-      template.value.validations = newValidations ? newValidations : [];
+  if (
+    file[0].type !==
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    file_temp.value = null;
+    if (template.value.validations.length > 0) {
+      template.value.validations = [];
     }
-  });
+    snack.value.showSnackbar('O documento tem de ser do tipo .docx', '', false);
+  } else {
+    isLoadingFileVars.value = true;
+    getVariablesFromFile(file[0] as any).then((resp: any) => {
+      if (
+        resp &&
+        resp.data &&
+        resp.data.variables &&
+        resp.data.variables.length > 0
+      ) {
+        if (file[0]) {
+          const reader = new FileReader();
+          reader.readAsDataURL(file[0]);
+          reader.onload = () => {
+            reader.result && (template.value.file = reader.result);
+          };
+          reader.onerror = () => {
+            handleClearFileClick();
+            snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
+          };
+        } else {
+          template.value.file = '';
+        }
+        let newValidations = resp.data.variables.map((item: any) => {
+          return { ...defaultObj, name: item };
+        });
+        template.value.validations = newValidations ? newValidations : [];
+      }
+      isLoadingFileVars.value = false;
+    });
+  }
+};
+
+const handleClearFileClick = () => {
+  file_temp.value = null;
+  template.value.validations = [];
+  isLoadingFileVars.value = false;
 };
 
 const editValidation = (index: number) => {
@@ -276,10 +312,8 @@ const saveEditValidation = (validation: any, index: number) => {
     ...validation,
   };
   validationItemEdit.value = {};
-  console.log('resultado', template.value.validations[index]);
 };
 const cancelEditValidation = () => {
-  console.log('cancel edit');
   openCloseModal.value = false;
   editIndex.value = null;
   validationItemEdit.value = {};

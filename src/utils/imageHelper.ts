@@ -6,7 +6,7 @@ export function base64ToFile(base64Data: string, username: any) {
     byteCharacters = atob(base64Data.replace('data:image/png;base64,', ''));
   } else {
     filename = username.value + '_picture.jpg';
-    byteCharacters = atob(base64Data.replace('data:image/jpg;base64,', ''));
+    byteCharacters = atob(base64Data.replace('data:image/jpeg;base64,', ''));
   }
   const byteArrays = [];
 
