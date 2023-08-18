@@ -54,6 +54,11 @@ export const fieldTypeRules = [
   (value: string[]) => !!value || 'O Tipo de Campo é Obrigatório.',
 ];
 
+export const requiredFileRule = [
+  (value: Blob[]) =>
+    Object.keys(value).length != 0 || 'O Ficheiro é Obrigatório.',
+];
+
 async function getGroups() {
   const resp = await groupsList();
   if (resp.data) {
@@ -145,5 +150,5 @@ export const dateFormat = [
 
 export const BooleanOptions = [
   { label: 'Sim', value: true, type: 'BOOLEAN' },
-  { label: 'Não', value: false, type: 'BOOLEAN' }
+  { label: 'Não', value: false, type: 'BOOLEAN' },
 ];

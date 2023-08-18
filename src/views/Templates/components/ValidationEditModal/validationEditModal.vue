@@ -255,12 +255,14 @@ const isNumberField = computed(() => {
 });
 
 const showDefaultValue = computed(() => {
+  console.log('validation', validation.value);
   return (
     (validation.value.field_type !== 'MULTISELECT' ||
       (validation.value.field_type === 'MULTISELECT' &&
         validation.value.options.length > 0)) &&
     (validation.value.field_type !== 'SELECT' ||
       (validation.value.field_type === 'SELECT' &&
+        validation.value.options &&
         validation.value.options.length > 0))
   );
 });

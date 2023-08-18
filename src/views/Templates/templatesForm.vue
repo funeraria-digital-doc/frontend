@@ -1,10 +1,10 @@
 <template>
   <page :title="templatesTitle">
     <v-form
-      v-if="!isLoading"
       ref="form"
       validate-on="submit"
       @submit.prevent="save"
+      :disabled="isLoading"
     >
       <v-container>
         <v-row>
@@ -49,7 +49,8 @@
               @click:clear="handleClearFileClick"
               prepend-icon="mdi-paperclip"
               clearable
-              :disabled="isLoadingFileVars"
+              :disabled="isLoadingFileVars || isLoading"
+              :rules="constants.requiredFileRule"
             ></v-file-input>
           </v-col>
         </v-row>
@@ -96,13 +97,14 @@
         </v-row>
         <v-row v-if="template.validations.length > 0 && !isLoadingFileVars">
           <v-col cols="12" sm="12" md="12">
-            <v-list>
+            <v-list :disabled="isLoading">
               <v-list-subheader>Validações</v-list-subheader>
               <v-list-item
                 v-for="(item, i) in template.validations"
                 :key="i"
                 :value="item"
                 :title="item.name"
+                :class="{ 'error-item': errorIndexes.includes(i) }"
                 color="white"
                 variant="plain"
                 prepend-icon="mdi-arrow-right-bold-circle-outline"
@@ -122,7 +124,12 @@
           ></v-progress-circular>
         </v-container>
       </v-container>
-      <v-btn color="blue-darken-1" variant="text" type="submit">
+      <v-btn
+        color="blue-darken-1"
+        variant="text"
+        type="submit"
+        :disabled="isLoading || isLoadingFileVars"
+      >
         Submeter
       </v-btn>
     </v-form>
@@ -140,8 +147,9 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import router from '@/router';
 import * as constants from './constants';
-import { getSingleTemplate } from './helper';
+import { getSingleTemplate, formatDataBeforeRequest } from './helper';
 import Page from '../../components/shared/Page/page.vue';
 import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
 import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
@@ -161,7 +169,7 @@ export default defineComponent({
 <script lang="ts" setup>
 const route = useRoute();
 const snack = ref();
-
+const errorIndexes = ref([]);
 const defaultObj: TemplateValidation = {
   db_collection: '',
   db_field_reference: '',
@@ -229,23 +237,78 @@ async function save() {
   }
 
   await form.value.validate().then((resp: any) => {
+    errorIndexes.value = [];
     const valid = resp.valid;
 
     if (valid) {
       if (mode.value === 'edit') {
+        isLoading.value = true;
         templateEdit(template.value).then((resp) => {
           console.log('resp', resp);
+          if (resp.success) {
+            router.push('/templates');
+          } else {
+            snack.value.showSnackbar(
+              'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
+              '',
+              false
+            );
+          }
+          isLoading.value = false;
         });
       } else if (mode.value === 'create') {
-        console.log('save create', template.value);
-        templateCreate(template.value).then((resp) => {
+        const formData = formatDataBeforeRequest(template.value, 'create');
+        isLoading.value = true;
+        templateCreate(formData).then((resp) => {
           console.log('resp', resp);
+          if (resp.success) {
+            router.push('/templates');
+          } else {
+            // if (resp.error && resp.error.errors) {
+            //   let errors = '';
+            //   for (var i = 0; i < Object.keys(resp.error.errors).length; i++) {
+            //     const validationKey = Object.keys(resp.error.errors)[i];
+            //     const validationItem = resp.error.errors[validationKey];
+            //     errors += validationKey + ', ';
+            //     for (var t = 0; t < Object.keys(validationItem).length; t++) {
+            //       var valKey = Object.keys(validationItem)[t];
+            //       errorIndexes.value.push(parseInt(valKey));
+            //     }
+            //   }
+            //   console.log(errorIndexes.value)
+            //   if (errors.substring(errors.length - 2) == ', ') {
+            //     snack.value.showSnackbar(
+            //       'Contém erros nos seguintes campos:',
+            //       errors.substring(0, errors.length - 2),
+            //       false
+            //     );
+            //   }
+            // } else {
+            //   snack.value.showSnackbar(
+            //     'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
+            //     '',
+            //     false
+            //   );
+            // }
+            snack.value.showSnackbar(
+              'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
+              '',
+              false
+            );
+          }
+          isLoading.value = false;
         });
       }
+    } else {
+      snack.value.showSnackbar(
+        'Preencha todos os os campos obrigatórios.',
+        '',
+        false
+      );
     }
-    if (template.value.validations.length == 0) {
-      template.value.validations.push({ ...defaultObj });
-    }
+    // if (template.value.validations.length == 0) {
+    //   template.value.validations.push({ ...defaultObj });
+    // }
   });
 }
 
@@ -333,3 +396,9 @@ onBeforeMount(async () => {
   }
 });
 </script>
+
+<style scoped>
+.error-item {
+  background-color: rgba(255, 0, 0, 0.2); /* Example: Light red background */
+}
+</style>
