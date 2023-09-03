@@ -73,8 +73,6 @@ export const deleteTemplate = async (
   snack: any
 ) => {
   try {
-    console.log('id', id);
-    console.log('templates', templates.value);
     templateDelete(id).then((resp) => {
       if (resp.success) {
         templates.value = templates.value.filter(
@@ -160,6 +158,7 @@ const base64ToFile = (base64Data: any, title: string) => {
 
 export const formatDataBeforeRequest = (templateData: any, mode: string) => {
   let formData = {};
+
   if (mode === 'create') {
     for (let i = 0; i < Object.keys(templateData).length; i++) {
       const key = Object.keys(templateData)[i];
@@ -181,7 +180,8 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
                 validation[valKey] = valItem;
               } else if (
                 typeof valItem == 'boolean' ||
-                (typeof valItem == 'string' && valItem !== '')
+                (typeof valItem == 'string' && valItem !== '') ||
+                typeof valItem == 'number'
               ) {
                 validation[valKey] = valItem;
               }
@@ -202,6 +202,48 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
     }
   } else if (mode === 'edit') {
     console.log('edit');
+    for (let i = 0; i < Object.keys(templateData).length; i++) {
+      const key = Object.keys(templateData)[i];
+      const item = templateData[key];
+      if (key === 'validations') {
+        const formValidations = [];
+        for (let v = 0; v < Object.keys(item).length; v++) {
+          const validation = {};
+          const validationKey = Object.keys(item)[v];
+          const validationItem = item[validationKey.toString()];
+          for (let t = 0; t < Object.keys(validationItem).length; t++) {
+            const valKey = Object.keys(validationItem)[t];
+            const valItem = validationItem[valKey];
+            if (valItem != null && valItem != undefined) {
+              if (
+                typeof valItem == 'object' &&
+                Object.keys(valItem).length > 0
+              ) {
+                validation[valKey] = valItem;
+              } else if (
+                typeof valItem == 'boolean' ||
+                (typeof valItem == 'string' && valItem !== '') ||
+                typeof valItem == 'number'
+              ) {
+                validation[valKey] = valItem;
+              }
+            }
+          }
+          if (Object.keys(validation).length > 0) {
+            formValidations.push(validation);
+          }
+        }
+        if (formValidations.length > 0) {
+          formData.validations = formValidations;
+        }
+      } else {
+        if (item !== '') {
+          formData[key] = item;
+        }
+      }
+    }
   }
+  console.log(templateData)
+  console.log('to be sent : ', formData);
   return formData;
 };

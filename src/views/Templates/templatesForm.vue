@@ -14,6 +14,7 @@
               v-model="template.title"
               label="Título"
               :rules="constants.nameRules"
+              :error-messages="errorMessages.title"
             ></v-text-field>
           </v-col>
           <v-col cols="6" sm="6" md="6">
@@ -26,6 +27,7 @@
               item-value="value"
               clearable
               :rules="constants.groupRules"
+              :error-messages="errorMessages.group_id"
             />
           </v-col>
         </v-row>
@@ -38,13 +40,14 @@
               :items="getSelectItems('send_type')"
               item-title="label"
               item-value="value"
+              :error-messages="errorMessages.send_type"
             />
           </v-col>
           <v-col cols="6" sm="6" md="6">
             <v-file-input
               id="template_file"
               v-model="file_temp"
-              label="File input"
+              label="Ficheiro"
               @change="handleFileUpload(file_temp)"
               @click:clear="handleClearFileClick"
               prepend-icon="mdi-paperclip"
@@ -66,6 +69,7 @@
               closable-chips
               hint="escrever email para enviar (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
+              :error-messages="errorMessages.send_email_to"
             ></v-combobox>
           </v-col>
           <v-col cols="4" sm="4" md="4">
@@ -79,6 +83,7 @@
               closable-chips
               hint="escrever email para enviar em cc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
+              :error-messages="errorMessages.send_email_to_cc"
             ></v-combobox>
           </v-col>
           <v-col cols="4" sm="4" md="4">
@@ -92,6 +97,7 @@
               closable-chips
               hint="escrever email para enviar em bcc (Ex: teste@teste.pt) e carregar na tecla enter"
               persistent-hint
+              :error-messages="errorMessages.send_email_to_bcc"
             ></v-combobox>
           </v-col>
         </v-row>
@@ -139,6 +145,7 @@
       :editModal="openCloseModal"
       :index="editIndex"
       :validation="validationItemEdit"
+      :errorMessages="errorMessages.validations"
       @save="saveEditValidation"
       @cancel="cancelEditValidation"
     />
@@ -178,7 +185,8 @@ const defaultObj: TemplateValidation = {
   is_date_numeric: false,
   is_field_custom: true,
   label: '',
-  min: 0,
+  min: 1,
+  max: 1,
   optional: true,
   options: [],
   placeholder: '',
@@ -202,6 +210,17 @@ const isLoading = ref(true);
 const isLoadingFileVars = ref(false);
 const openCloseModal = ref(false);
 const editIndex = ref();
+const errorMessages = ref({
+  title: '',
+  group_id: '',
+  send_type: '',
+  send_email_to_bcc: '',
+  send_email_to_cc: '',
+  send_email_to: '',
+  validations: {},
+});
+
+const defaultErrorMessages = {};
 
 const getSelectItems = (name: string) =>
   constants.fields.find((f) => f.name === name)?.items;
@@ -228,6 +247,38 @@ const templatesTitle = computed(() => {
   return '';
 });
 
+function checkErrors(error: any){
+  if (error && error.errors) {
+    let errors = '';
+    for (var i = 0; i < Object.keys(error.errors).length; i++) {
+      const validationKey = Object.keys(error.errors)[i];
+      const validationItem = error.errors[validationKey];
+      errors += validationKey + ', ';
+      if (validationKey == 'validations') {
+        for (var t = 0; t < Object.keys(validationItem).length; t++) {
+          var valKey = Object.keys(validationItem)[t];
+          errorIndexes.value.push(parseInt(valKey));
+        }
+      }
+      errorMessages.value[validationKey] = validationItem;
+    }
+    if (errors.substring(errors.length - 2) == ', ') {
+      snack.value.showSnackbar(
+        'Contém erros nos seguintes campos:',
+        errors.substring(0, errors.length - 2),
+        false
+      );
+    }
+  } else {
+    errorMessages.value = { ...defaultErrorMessages };
+  }
+  snack.value.showSnackbar(
+    'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
+    '',
+    false
+  );
+}
+
 async function save() {
   if (
     template.value.validations.length == 1 &&
@@ -244,15 +295,10 @@ async function save() {
       if (mode.value === 'edit') {
         isLoading.value = true;
         templateEdit(template.value).then((resp) => {
-          console.log('resp', resp);
           if (resp.success) {
-            router.push('/templates');
+            router.push({ name: 'templates' });
           } else {
-            snack.value.showSnackbar(
-              'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
-              '',
-              false
-            );
+            checkErrors(resp.error);
           }
           isLoading.value = false;
         });
@@ -260,41 +306,10 @@ async function save() {
         const formData = formatDataBeforeRequest(template.value, 'create');
         isLoading.value = true;
         templateCreate(formData).then((resp) => {
-          console.log('resp', resp);
           if (resp.success) {
-            router.push('/templates');
+            router.push({ name: 'templates' });
           } else {
-            // if (resp.error && resp.error.errors) {
-            //   let errors = '';
-            //   for (var i = 0; i < Object.keys(resp.error.errors).length; i++) {
-            //     const validationKey = Object.keys(resp.error.errors)[i];
-            //     const validationItem = resp.error.errors[validationKey];
-            //     errors += validationKey + ', ';
-            //     for (var t = 0; t < Object.keys(validationItem).length; t++) {
-            //       var valKey = Object.keys(validationItem)[t];
-            //       errorIndexes.value.push(parseInt(valKey));
-            //     }
-            //   }
-            //   console.log(errorIndexes.value)
-            //   if (errors.substring(errors.length - 2) == ', ') {
-            //     snack.value.showSnackbar(
-            //       'Contém erros nos seguintes campos:',
-            //       errors.substring(0, errors.length - 2),
-            //       false
-            //     );
-            //   }
-            // } else {
-            //   snack.value.showSnackbar(
-            //     'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
-            //     '',
-            //     false
-            //   );
-            // }
-            snack.value.showSnackbar(
-              'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
-              '',
-              false
-            );
+            checkErrors(resp.error);
           }
           isLoading.value = false;
         });
@@ -306,9 +321,6 @@ async function save() {
         false
       );
     }
-    // if (template.value.validations.length == 0) {
-    //   template.value.validations.push({ ...defaultObj });
-    // }
   });
 }
 
@@ -348,6 +360,9 @@ const handleFileUpload = (file: Blob[]) => {
           return { ...defaultObj, name: item };
         });
         template.value.validations = newValidations ? newValidations : [];
+      } else {
+        handleClearFileClick();
+        snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
       }
       isLoadingFileVars.value = false;
     });
