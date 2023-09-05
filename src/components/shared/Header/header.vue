@@ -70,7 +70,7 @@ const handleHome = () => {
 };
 
 const handleProfile = () => {
-  router.push('profile');
+  router.push({ name: 'profile' });
 };
 
 const accountLinks = [

@@ -15,13 +15,20 @@ export type Failable<T, E> =
   | { success: false; error: E };
 
 export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
+let token = getLocalStorage(TOKEN_KEY);
 
-const token = getLocalStorage(TOKEN_KEY);
-
-export const apiInstance = axios.create({
+export let apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
   headers: token ? { Authorization: `Token ${token}` } : {},
 });
+
+export function createNewAxiosInstance() {
+  token = getLocalStorage(TOKEN_KEY);
+  apiInstance = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
+    headers: token ? { Authorization: `Token ${token}` } : {},
+  });
+}
 
 export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {
   if (e.response != null) {

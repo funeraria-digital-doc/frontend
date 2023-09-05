@@ -16,6 +16,7 @@
                 v-model="validation.name"
                 :rules="constants.nameRules"
                 label="Nome da variável"
+                :error-messages="errorMessages.title"
               ></v-text-field>
             </v-col>
 
@@ -30,6 +31,7 @@
                 item-value="value"
                 :rules="constants.fieldTypeRules"
                 clearable
+                :error-messages="errorMessages.field_type"
               />
             </v-col>
           </v-row>
@@ -40,6 +42,7 @@
               :id="'is_field_custom_' + props.index"
               class="validation-edit-modal__is-field-custom-chk"
               v-model="validation.is_field_custom"
+              :error-messages="errorMessages.is_field_custom"
             />
             <v-label class="validation-edit-modal__is-field-custom-label">
               Campo Personalizado?
@@ -57,6 +60,10 @@
                 multiple
                 chips
                 closable-chips
+                item-title="label"
+                item-value="value"
+                :return-object="false"
+                :error-messages="errorMessages.options"
               ></v-combobox>
             </v-col>
           </v-row>
@@ -73,6 +80,7 @@
                 item-value="value"
                 clearable
                 :rules="constants.groupRules"
+                :error-messages="errorMessages.db_collection"
               />
             </v-col>
             <!-- db_field_reference -->
@@ -87,6 +95,7 @@
                 item-props="type"
                 clearable
                 :rules="constants.groupRules"
+                :error-messages="errorMessages.db_field_reference"
               />
             </v-col>
           </v-row>
@@ -103,6 +112,7 @@
                 item-value="value"
                 clearable
                 :rules="constants.groupRules"
+                :error-messages="errorMessages.format"
               />
             </v-col>
             <!-- is_date_numeric -->
@@ -111,6 +121,7 @@
                 :id="'is_date_numeric_' + props.index"
                 v-model="validation.is_date_numeric"
                 label="Data por extenso?"
+                :error-messages="errorMessages.is_date_numeric"
               />
             </v-col>
           </v-row>
@@ -127,10 +138,12 @@
                   :multiple="isMultiSelect"
                   :chips="isMultiSelect"
                   :closable-chips="isMultiSelect"
-                  :type="isNumberField"
                   item-title="label"
                   item-value="value"
+                  :return-object="false"
+                  :type="isNumberField"
                   :rules="defaultValueRules(validation)"
+                  :error-messages="errorMessages.default_value"
                 ></v-combobox>
               </v-col>
             </v-row>
@@ -142,6 +155,7 @@
                   v-model="validation.placeholder"
                   :rules="constants.textRules"
                   label="Placeholder"
+                  :error-messages="errorMessages.placeholder"
                 ></v-text-field>
               </v-col>
               <!-- label -->
@@ -151,6 +165,7 @@
                   v-model="validation.label"
                   :rules="constants.labelRules"
                   label="Nome do campo"
+                  :error-messages="errorMessages.label"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -163,19 +178,21 @@
               >
                 <v-text-field
                   :id="'min_' + props.index"
-                  v-model="validation.min"
+                  v-model.number="validation.min"
                   type="number"
                   label="Minimo"
+                  :error-messages="errorMessages.min"
                 ></v-text-field>
               </v-col>
               <!-- max -->
               <v-col v-if="showMax" cols="6" sm="6" md="6">
                 <v-text-field
                   :id="'max_' + props.index"
-                  v-model="validation.max"
+                  v-model.number="validation.max"
                   type="number"
                   :rules="maxRules(validation)"
                   label="Máximo"
+                  :error-messages="errorMessages.max"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -197,7 +214,7 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from 'vue';
+import { defineComponent, ref, watch, computed, onBeforeMount } from 'vue';
 
 export default defineComponent({
   name: 'ValidationEditModal',
@@ -212,11 +229,17 @@ import {
   validationFieldTypeItems,
 } from './validationEditModal.constants';
 
-const props = defineProps(['editModal', 'validation', 'index']);
+const props = defineProps([
+  'editModal',
+  'validation',
+  'index',
+  'errorMessages',
+]);
 const emit = defineEmits(['save', 'cancel']);
 
 let validation = ref(props.validation);
 let editModal = ref(props.editModal);
+let errorMessages = ref();
 
 const dbFields = ref<{ label: string; value: string }[]>([]);
 
@@ -224,7 +247,6 @@ const form = ref();
 
 const save = async () => {
   const { valid } = await form.value.validate();
-
   if (valid) {
     emit('save', validation.value, props.index);
   } else {
@@ -261,6 +283,7 @@ const showDefaultValue = computed(() => {
         validation.value.options.length > 0)) &&
     (validation.value.field_type !== 'SELECT' ||
       (validation.value.field_type === 'SELECT' &&
+        validation.value.options &&
         validation.value.options.length > 0))
   );
 });
@@ -319,6 +342,7 @@ watch(showDateFields, (showDateFields) => {
 watch(
   () => validation.value.field_type,
   (field_type) => {
+    console.log('mudou ' + field_type);
     if (field_type) {
       validation.value.default_value = [];
     }
@@ -333,6 +357,22 @@ watch(
   }
 );
 
+function mapDbFields() {
+  if (validation.value.db_collection === 'USERS') {
+    dbFields.value = constants.usersFields.map((item) => {
+      return { label: item.label, value: item.value };
+    });
+  } else if (validation.value.db_collection === 'GROUPS') {
+    dbFields.value = constants.groupsFields.map((item) => {
+      return { label: item.label, value: item.value };
+    });
+  } else if (validation.value.db_collection === 'RECORDS') {
+    dbFields.value = constants.recordsFields.map((item) => {
+      return { label: item.label, value: item.value };
+    });
+  }
+}
+
 watch(
   () => validation.value.is_field_custom,
   (field_custom) => {
@@ -342,19 +382,7 @@ watch(
       validation.value.db_field_reference = '';
     } else {
       validation.value.field_type = '';
-      if (validation.value.db_collection === 'USERS') {
-        dbFields.value = constants.usersFields.map((item) => {
-          return { label: item.label, value: item.value };
-        });
-      } else if (validation.value.db_collection === 'GROUPS') {
-        dbFields.value = constants.groupsFields.map((item) => {
-          return { label: item.label, value: item.value };
-        });
-      } else if (validation.value.db_collection === 'RECORDS') {
-        dbFields.value = constants.recordsFields.map((item) => {
-          return { label: item.label, value: item.value };
-        });
-      }
+      mapDbFields();
     }
   }
 );
@@ -362,21 +390,12 @@ watch(
 watch(
   () => validation.value.db_collection,
   (db_collection) => {
-    if (db_collection === 'USERS') {
-      dbFields.value = constants.usersFields.map((item) => {
-        return { label: item.label, value: item.value };
-      });
-    } else if (db_collection === 'GROUPS') {
-      dbFields.value = constants.groupsFields.map((item) => {
-        return { label: item.label, value: item.value };
-      });
-    } else if (db_collection === 'RECORDS') {
-      dbFields.value = constants.recordsFields.map((item) => {
-        return { label: item.label, value: item.value };
-      });
+    if (['USERS', 'GROUPS', 'RECORDS'].indexOf(db_collection) > -1) {
+      mapDbFields();
     } else {
       dbFields.value = [];
     }
+    validation.value.db_field_reference = '';
   }
 );
 
@@ -401,6 +420,43 @@ watch(
     }
   }
 );
+
+watch(
+  () => validation.value.options,
+  (options) => {
+    let newDefaultValue = [];
+    validation.value.default_value.map((val: any) => {
+      if (options.indexOf(val) > -1) {
+        newDefaultValue.push(val);
+      }
+    });
+    validation.value.default_value = newDefaultValue;
+  }
+);
+
+onBeforeMount(() => {
+  if (props.errorMessages && props.errorMessages[props.index]) {
+    errorMessages.value = props.errorMessages[props.index];
+  } else {
+    errorMessages.value = {
+      db_collection: '',
+      db_field_reference: '',
+      default_value: '',
+      format: '',
+      is_date_numeric: '',
+      is_field_custom: '',
+      label: '',
+      min: '',
+      max: '',
+      optional: '',
+      options: '',
+      placeholder: '',
+    };
+  }
+  if (validation.value.db_collection != '') {
+    mapDbFields();
+  } 
+});
 </script>
 
 <style lang="scss">

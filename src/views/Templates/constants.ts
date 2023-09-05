@@ -54,6 +54,11 @@ export const fieldTypeRules = [
   (value: string[]) => !!value || 'O Tipo de Campo é Obrigatório.',
 ];
 
+export const requiredFileRule = [
+  (value: Blob[]) =>
+    Object.keys(value).length != 0 || 'O Ficheiro é Obrigatório.',
+];
+
 async function getGroups() {
   const resp = await groupsList();
   if (resp.data) {
@@ -117,33 +122,33 @@ export const dateFormat = [
   { label: 'Horas', value: 'HOURS_ONLY' },
   { label: 'Minutos', value: 'MINUTES_ONLY' },
   { label: 'Segundos', value: 'SECONDS_ONLY' },
-  { label: 'Horas/Minutos/Segundos', value: 'HOURS_MINUTES_SECONDS' },
-  { label: 'Horas/Minutos', value: 'HOURS_MINUTES' },
-  { label: 'Minutos/Segundos', value: 'MINUTES_SECONDS' },
+  { label: 'Horas:Minutos:Segundos', value: 'HOURS_MINUTES_SECONDS' },
+  { label: 'Horas:Minutos', value: 'HOURS_MINUTES' },
+  { label: 'Minutos:Segundos', value: 'MINUTES_SECONDS' },
   { label: 'Dia/Mês/Ano', value: 'DAY_MONTH_YEAR' },
   { label: 'Mês/Ano', value: 'MONTH_YEAR' },
   { label: 'Dia/Mês', value: 'DAY_MONTH' },
   {
-    label: 'Dia/Mês/Ano Horas/Minutos/Segundos',
+    label: 'Dia/Mês/Ano Horas:Minutos:Segundos',
     value: 'DAY_MONTH_YEAR_HOUR_MINUTE_SECOND',
   },
-  { label: 'Dia/Mês/Ano Horas/Minutos', value: 'DAY_MONTH_YEAR_HOUR_MINUTE' },
+  { label: 'Dia/Mês/Ano Horas:Minutos', value: 'DAY_MONTH_YEAR_HOUR_MINUTE' },
   { label: 'Dia/Mês/Ano Horas', value: 'DAY_MONTH_YEAR_HOUR' },
   {
-    label: 'Dia/Mês Horas/Minutos/Segundos',
+    label: 'Dia/Mês Horas:Minutos:Segundos',
     value: 'DAY_MONTH_HOUR_MINUTE_SECOND',
   },
-  { label: 'Dia/Mês Horas/Minutos', value: 'DAY_MONTH_HOUR_MINUTE' },
+  { label: 'Dia/Mês Horas:Minutos', value: 'DAY_MONTH_HOUR_MINUTE' },
   { label: 'Dia/Mês Horas', value: 'DAY_MONTH_HOUR' },
   {
-    label: 'Mês/Ano Horas/Minutos/Segundos',
+    label: 'Mês/Ano Horas:Minutos:Segundos',
     value: 'MONTH_YEAR_HOUR_MINUTE_SECOND',
   },
-  { label: 'Mês/Ano Horas/Minutos', value: 'MONTH_YEAR_HOUR_MINUTE' },
+  { label: 'Mês/Ano Horas:Minutos', value: 'MONTH_YEAR_HOUR_MINUTE' },
   { label: 'Mês/Ano Horas', value: 'MONTH_YEAR_HOUR' },
 ];
 
 export const BooleanOptions = [
   { label: 'Sim', value: true, type: 'BOOLEAN' },
-  { label: 'Não', value: false, type: 'BOOLEAN' }
+  { label: 'Não', value: false, type: 'BOOLEAN' },
 ];
