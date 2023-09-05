@@ -1,3 +1,4 @@
+import { createNewAxiosInstance } from '@/api';
 import { getProfile, loginUser } from '@/api/users';
 import router from '@/router';
 import { TOKEN_KEY } from '@/utils/constants';
@@ -25,6 +26,7 @@ export function useUser() {
     user.email = '';
 
     deleteLocalStorage(TOKEN_KEY);
+    createNewAxiosInstance()
     router.push('/');
   };
 
@@ -38,6 +40,7 @@ export function useUser() {
       if (resp.success) {
         saveLocalStorage(TOKEN_KEY, resp.data.token);
         updateUser(resp.data);
+        createNewAxiosInstance();
       }
       return resp;
     });
