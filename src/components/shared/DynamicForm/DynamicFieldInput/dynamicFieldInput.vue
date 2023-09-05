@@ -3,7 +3,7 @@
     <v-text-field
       v-if="field.input === 'text'"
       :id="field.name"
-      :v-model="field.name"
+      v-model="model"
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
@@ -12,14 +12,14 @@
     <v-checkbox
       v-if="field.input === 'checkbox'"
       :id="field.name"
-      :v-model="field.name"
+      v-model="model"
       :label="field.label"
     />
 
     <v-select
       v-if="field.input === 'select'"
       :id="field.name"
-      :v-model="field.name"
+      v-model="model"
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
@@ -32,26 +32,24 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+<script lang="ts" setup>
+import { ref, watch, type PropType } from 'vue';
 import DatePicker from '../../DatePicker/datePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 
-export default defineComponent({
-  name: 'DynamicFieldInput',
-  props: {
-    field: {
-      type: Object as PropType<DynamicField>,
-      required: true,
-    },
-  },
-  components: {
-    DatePicker,
+const props = defineProps({
+  field: {
+    type: Object as PropType<DynamicField>,
+    required: true,
   },
 });
-</script>
 
-<script lang="ts" setup></script>
+const model = ref(props.field.value);
+
+watch(props, (newProps) => {
+  model.value = newProps.field.value;
+});
+</script>
 
 <style lang="scss">
 .dynamic-field {
