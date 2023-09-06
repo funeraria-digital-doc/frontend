@@ -49,7 +49,7 @@ export const getSingleRecord = async (id: string) => {
 };
 
 export const deleteRecord = async (
-  id: string | number,
+  id: string,
   records: { value: { [x: string]: any } },
   snack: any
 ) => {

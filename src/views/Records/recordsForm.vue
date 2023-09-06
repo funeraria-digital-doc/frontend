@@ -6,11 +6,12 @@
       <dynamic-form
         :fields="fields"
         :subtitles="subtitles"
-        action-btn-label="Submeter"
+        :action-btn-label="submitBtnLabel"
         @on-submit="onSubmit"
       />
     </div>
   </page>
+  <error-success-message ref="snack"></error-success-message>
 </template>
 
 <script lang="ts" setup>
@@ -27,6 +28,7 @@ import router from '@/router';
 import { onBeforeMount, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSingleRecord } from './helper';
+import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 
 const subtitles = [
   { index: 0, text: 'Dados do defunto', hideDivider: true },
@@ -46,6 +48,7 @@ const fields = ref<DynamicField[]>([
 
 const route = useRoute();
 const mode = ref('');
+const snack = ref();
 
 const recordTitle = computed(() => {
   const nameField = fields.value.find((field) => field.name === 'name');
@@ -61,18 +64,27 @@ const recordTitle = computed(() => {
   return '';
 });
 
-// TODO finish this
+const submitBtnLabel = computed(() =>
+  mode.value === 'create' ? 'Criar' : 'Editar'
+);
+
 const onSubmit = (values: any) => {
+  const navigateToRecords = (isValid: any, successMessage: string) => {
+    if (isValid) {
+      router.push('/records');
+      snack.value.showSnackbar(successMessage, '', true);
+    } else {
+      snack.value.showSnackbar('Ocorreu um erro, tente novamente.', '', false);
+    }
+  };
+
   if (mode.value === 'edit') {
-    recordEdit(values).then((resp) => {
-      console.log('resp', resp);
+    recordEdit(route.params.id as string, values).then((resp) => {
+      navigateToRecords(resp.success, 'Declaração criada com sucesso.');
     });
   } else if (mode.value === 'create') {
     recordCreate(values).then((resp) => {
-      console.log('resp', resp);
-      if (resp.success) {
-        router.push('/records');
-      }
+      navigateToRecords(resp.success, 'Declaração editada com sucesso.');
     });
   }
 };
