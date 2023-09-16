@@ -30,6 +30,7 @@ const Templates = () => import('@/views/Templates/templates.vue')
 const Records = () => import('@/views/Records/records.vue')
 const TemplatesForm = () => import('@/views/Templates/templatesForm.vue')
 const RecordsForm = () => import('@/views/Records/recordsForm.vue')
+const Stats = () => import('@/views/Stats/stats.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -98,6 +99,12 @@ const router = createRouter({
       component: RecordsForm,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/stats',
+      name: 'stats',
+      component: Stats,
+      meta: { requiresAuth: true },
+    }
   ],
 });
 
