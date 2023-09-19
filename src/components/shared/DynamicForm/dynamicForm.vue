@@ -57,12 +57,16 @@ const onSubmit = async (input: any) => {
     for (var i = 0; i < props.fields.length; i++) {
       const fieldName = input.target[i].id;
 
-      if (
-        props.fields.find((i) => i.name === fieldName)?.input === 'checkbox'
-      ) {
-        values[fieldName] = input.target[i].checked;
-      } else {
-        values[fieldName] = input.target[i]._value;
+      switch (props.fields.find((i) => i.name === fieldName)?.input) {
+        case 'checkbox':
+          values[fieldName] = input.target[i].checked;
+          break;
+        case 'file':
+          values[fieldName] = input.target[i].files[0];
+          break;
+        default:
+          values[fieldName] = input.target[i].value;
+          break;
       }
     }
 

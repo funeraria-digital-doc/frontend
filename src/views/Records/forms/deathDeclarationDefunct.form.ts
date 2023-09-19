@@ -2,11 +2,11 @@ import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dy
 import type { DynamicField } from '@/models/dynamicField.model';
 
 export const DeathDeclarationDefunctForm: DynamicField[] = [
-  //   {
-  //     label: "Foto",
-  //     name: "photo",
-  //     input: "file",
-  //   },
+  {
+    label: 'Carregar fotografia',
+    name: 'photo',
+    input: 'file',
+  },
   {
     items: [
       { label: 'Inativo', value: 'INACTIVE' },
