@@ -29,6 +29,18 @@
     />
 
     <date-picker v-if="field.input === 'date'" :field="field" />
+
+    <photo-upload
+      v-if="field.input === 'file'"
+      :id="field.name"
+      :label="field.label"
+      :snack="snack"
+      :isLoading="isLoading"
+      :imageUrl="imageUrl"
+      @save="saveFile"
+    />
+
+    <error-success-message ref="snack"></error-success-message>
   </div>
 </template>
 
@@ -36,6 +48,7 @@
 import { ref, watch, type PropType } from 'vue';
 import DatePicker from '../../DatePicker/datePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
+import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 
 const props = defineProps({
   field: {
@@ -46,9 +59,19 @@ const props = defineProps({
 
 const model = ref(props.field.value);
 
+// for image
+const snack = ref();
+const isLoading = ref(false);
+const imageUrl = ref();
+
 watch(props, (newProps) => {
   model.value = newProps.field.value;
 });
+
+const saveFile = (base64File: string, file: any) => {
+  imageUrl.value = base64File;
+  model.value = file;
+};
 </script>
 
 <style lang="scss">
