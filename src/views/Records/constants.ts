@@ -20,17 +20,26 @@ export const fields = [
     items: await getGroups(),
   },
   {
-    name: 'send_type',
+    name: 'gender',
     type: 'select',
     items: [
-      { label: 'Nenhum', value: 'NONE' },
-      { label: 'Documento', value: 'DOCUMENT' },
-      { label: 'Email', value: 'EMAIL' },
-      { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
+      { label: 'Feminino', value: 'WOMAN' },
+      { label: 'Masculino', value: 'MALE' },
+      { label: 'Outro', value: 'OTHER' }
+    ],
+  },
+  {
+    name: 'status',
+    type: 'select',
+    items: [
+      { label: 'Inativo', value: 'INACTIVE' },
+      { label: 'Ativo', value: 'ACTIVE' },
+      { label: 'Pendente', value: 'PENDING' },
+      { label: 'Finalizado', value: 'COMPLETED' },
+      { label: 'Arquivado', value: 'ARCHIVED' },
     ],
   },
 ];
-
 async function getGroups() {
   const resp = await groupsList();
   if (resp.data) {

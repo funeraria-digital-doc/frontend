@@ -11,7 +11,9 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
     items: [
       { label: 'Inativo', value: 'INACTIVE' },
       { label: 'Ativo', value: 'ACTIVE' },
-      { label: 'Suspenso', value: 'SUSPENDED' },
+      { label: 'Pendente', value: 'PENDING' },
+      { label: 'Finalizado', value: 'COMPLETED' },
+      { label: 'Arquivado', value: 'ARCHIVED' },
     ],
     label: 'Estado',
     name: 'status',
