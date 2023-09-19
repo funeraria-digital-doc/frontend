@@ -1,5 +1,5 @@
 <template>
-  <h2>Declarações criadas por dia</h2>
+  <h2>Serviços por dia</h2>
   <v-btn
     v-for="days in [30, 60, 90]"
     color="blue-darken-1"
