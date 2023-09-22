@@ -2,10 +2,10 @@
   <page title="Estatísticas">
     <v-row>
       <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
-        <templates-chart></templates-chart>
+        <records-per-month></records-per-month>
       </v-col>
       <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
-        <records-chart></records-chart>
+        <records-per-day></records-per-day>
       </v-col>
     </v-row>
     <v-row>
@@ -20,15 +20,15 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import TemplatesChart from './components/templatesChart.vue';
-import RecordsChart from './components/recordsChart.vue';
+import RecordsPerMonth from './components/recordsPerMonth.vue';
+import RecordsPerDay from './components/recordsPerDay.vue';
 import DeathsByDistrict from './components/deathsByDistrict.vue';
 import DeathsByUser from './components/deathsByUser.vue';
 export default defineComponent({
   name: 'Stats',
   components: {
-    TemplatesChart,
-    RecordsChart,
+    RecordsPerMonth,
+    RecordsPerDay,
     DeathsByDistrict,
     DeathsByUser
   },

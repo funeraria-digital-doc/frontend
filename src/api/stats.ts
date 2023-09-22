@@ -1,11 +1,11 @@
 import { apiInstance, errorResponse, type ApiResponse } from '.';
 
-export async function getTemplatesPerDay(
-  days: number
+export async function getRecordsPerMonth(
+  months: number
 ): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.get(
-      '/stats/templates-per-day/?days=' + days
+      '/stats/deaths-per-months/?months=' + months
     );
     return { success: true, data: response.data };
   } catch (e: any) {

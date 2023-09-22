@@ -31,7 +31,7 @@ import { defineComponent } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { updateLineChartData } from '../helper';
 export default defineComponent({
-  name: 'RecordsChart',
+  name: 'RecordsPerDay',
   components: {
     apexchart: VueApexCharts,
   },
@@ -107,9 +107,9 @@ const changePerDayDay = (day: number) => {
 };
 
 const getData = async () => {
-  getDeathsPerDay(daysToSearch.value).then((resp) => {
+  await getDeathsPerDay(daysToSearch.value).then((resp) => {
     if (resp.success) {
-      updateLineChartData(resp, options, series);
+      updateLineChartData(resp, options, series, 1);
     } else {
       console.error('erro', resp);
     }

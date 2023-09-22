@@ -1,14 +1,14 @@
 <template>
-  <h2>Templates criados por dia</h2>
+  <h2>Serviços por mês</h2>
   <v-btn
-    v-for="days in [30, 60, 90]"
+    v-for="months in [1, 3, 6]"
     color="blue-darken-1"
     variant="text"
-    @click="changePerDayDay(days)"
-    :key="days"
-    :disabled="daysToSearch == days"
+    @click="changeMonthToSearch(months)"
+    :key="months"
+    :disabled="monthsToSearch == months"
   >
-    Últimos {{ days }} dias
+    {{ months == 1 ? 'Mês corrente' : 'Últimos ' + months + 'meses' }}
   </v-btn>
   <apexchart
     v-if="!isLoading"
@@ -31,7 +31,7 @@ import { defineComponent } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { updateLineChartData } from '../helper';
 export default defineComponent({
-  name: 'TemplatesChart',
+  name: 'RecordsPerMonth',
   components: {
     apexchart: VueApexCharts,
   },
@@ -39,10 +39,10 @@ export default defineComponent({
 </script>
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { getTemplatesPerDay } from '@/api/stats';
+import { getRecordsPerMonth } from '@/api/stats';
 import ptLocale from 'apexcharts/dist/locales/pt.json';
 //Templates Chart
-const daysToSearch = ref(30);
+const monthsToSearch = ref(1);
 const isLoading = ref(false);
 const maxYAxis = ref(0);
 const tickAmount = ref(0);
@@ -71,16 +71,17 @@ const options = ref({
   xaxis: {
     type: 'datetime',
     labels: {
-      format: 'dd MMM',
+      format: 'MMM',
     },
   },
   yaxis: {
     max: maxYAxis,
     tickAmount: tickAmount,
+    min: 0
   },
   tooltip: {
     x: {
-      format: 'dd/MM/yy',
+      format: 'MM/yy',
     },
     theme: 'dark',
     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
@@ -102,16 +103,16 @@ const series = ref([
   },
 ]);
 
-const changePerDayDay = (day: number) => {
-  daysToSearch.value = day;
+const changeMonthToSearch = (day: number) => {
+  monthsToSearch.value = day;
   isLoading.value = true;
   getData();
 };
 
 const getData = async () => {
-  getTemplatesPerDay(daysToSearch.value).then((resp) => {
+  getRecordsPerMonth(monthsToSearch.value).then((resp) => {
     if (resp.success) {
-      updateLineChartData(resp, options, series);
+      updateLineChartData(resp, options, series, 10);
     } else {
       console.error('erro', resp);
     }
