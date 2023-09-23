@@ -2,6 +2,7 @@ import { TOKEN_KEY } from '@/utils/constants';
 import { getLocalStorage } from '@/utils/localStorage';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
+import router from '@/router';
 
 export type ApiError<E = {}> = E & {
   type: string;
@@ -31,7 +32,13 @@ export function createNewAxiosInstance() {
 }
 
 export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {
-  if (e.response != null) {
+  if (
+    e.code === 'ERR_NETWORK' &&
+    router.currentRoute.value.name !== 'service_unavailable' && 
+    router.currentRoute.value.name !== 'not_found'
+  ) {
+    router.push({ name: 'service_unavailable' });
+  } else if (e.response != null) {
     const defaultMessage =
       'The server encountered an internal error and was unable to complete your request.';
     const defaultType = 'Server error';
