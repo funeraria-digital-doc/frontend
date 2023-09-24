@@ -7,6 +7,7 @@
         :fields="fields"
         :subtitles="subtitles"
         :action-btn-label="submitBtnLabel"
+        :errorMessages="errorMessages"
         @on-submit="onSubmit"
       />
     </div>
@@ -27,7 +28,7 @@ import { recordCreate, recordEdit } from '@/api/records';
 import router from '@/router';
 import { onBeforeMount, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { getSingleRecord } from './helper';
+import { checkErrors, getSingleRecord } from './helper';
 import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 
 const subtitles = [
@@ -49,6 +50,10 @@ const fields = ref<DynamicField[]>([
 const route = useRoute();
 const mode = ref('');
 const snack = ref();
+
+const errorIndexes = ref([]);
+const errorMessages = ref({});
+const defaultErrorMessages = {};
 
 const recordTitle = computed(() => {
   const nameField = fields.value.find((field) => field.name === 'name');
@@ -80,16 +85,41 @@ const onSubmit = (values: any) => {
 
   if (mode.value === 'edit') {
     recordEdit(route.params.id as string, values).then((resp) => {
-      navigateToRecords(resp.success, 'Declaração criada com sucesso.');
+      if (resp.success) {
+        navigateToRecords(resp.success, 'Declaração criada com sucesso.');
+      } else {
+        checkErrors(
+          resp.error,
+          errorMessages,
+          errorIndexes,
+          snack,
+          defaultErrorMessages
+        );
+      }
     });
   } else if (mode.value === 'create') {
     recordCreate(values).then((resp) => {
-      navigateToRecords(resp.success, 'Declaração editada com sucesso.');
+      if (resp.success) {
+        navigateToRecords(resp.success, 'Declaração editada com sucesso.');
+      } else {
+        checkErrors(
+          resp.error,
+          errorMessages,
+          errorIndexes,
+          snack,
+          defaultErrorMessages
+        );
+      }
     });
   }
 };
 
 onBeforeMount(async () => {
+  fields.value.map((item: { name: string }) => {
+    if (!errorMessages.value[item.name]) {
+      errorMessages.value[item.name] = '';
+    }
+  });
   if (route.name === 'records_edit') {
     getSingleRecord(route.params.id as string).then((resp) => {
       fields.value = fields.value.map((field) => ({

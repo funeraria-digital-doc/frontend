@@ -7,6 +7,7 @@
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
+      :error-messages="errorMessages[field.name]"
     />
 
     <v-checkbox
@@ -14,6 +15,7 @@
       :id="field.name"
       v-model="model"
       :label="field.label"
+      :error-messages="errorMessages[field.name]"
     />
 
     <v-select
@@ -26,9 +28,14 @@
       :items="field.items"
       item-title="label"
       item-value="value"
+      :error-messages="errorMessages[field.name]"
     />
 
-    <date-picker v-if="field.input === 'date'" :field="field" />
+    <date-picker
+      v-if="field.input === 'date'"
+      :field="field"
+      :error-messages="errorMessages[field.name]"
+    />
 
     <photo-upload
       v-if="field.input === 'file'"
@@ -37,6 +44,7 @@
       :snack="snack"
       :isLoading="isLoading"
       :imageUrl="imageUrl"
+      :error-messages="errorMessages[field.name]"
       @save="saveFile"
     />
 
@@ -54,6 +62,9 @@ const props = defineProps({
   field: {
     type: Object as PropType<DynamicField>,
     required: true,
+  },
+  errorMessages: {
+    type: Object,
   },
 });
 
