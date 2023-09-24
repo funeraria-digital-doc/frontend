@@ -1,7 +1,7 @@
 <template>
-  <v-divider v-if="!subtitle.hideDivider"></v-divider>
+  <!-- <v-divider v-if="!subtitle.hideDivider"></v-divider> -->
 
-  <h6 class="form-subtitle text-h6">{{ subtitle.text }}</h6>
+  <h6 class="form-subtitle text-h6">{{ title }}</h6>
 </template>
 
 <script lang="ts">
@@ -11,8 +11,8 @@ import { defineComponent, type PropType } from 'vue';
 export default defineComponent({
   name: 'FormSubtitle',
   props: {
-    subtitle: {
-      type: Object as PropType<FormSubtitle>,
+    title: {
+      type: String,
       required: true,
     },
   },
