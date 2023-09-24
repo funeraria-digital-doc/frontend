@@ -10,17 +10,17 @@
   <v-container v-else>
     <v-row>
       <div class="profile-picture">
-        <label for="profile-input" class="profile-label">
+        <label :for="photoId" class="profile-label">
           <div class="profile-preview" v-if="props.imageUrl">
             <img :src="props.imageUrl" alt="Profile Preview" />
           </div>
           <div v-else class="profile-placeholder">
             <v-icon class="profile-icon">mdi-camera</v-icon>
-            <span class="profile-text">Upload Image</span>
+            <span class="profile-text">{{ photoLabel }}</span>
           </div>
           <input
             type="file"
-            id="profile-input"
+            :id="photoId"
             class="profile-input"
             accept="image/*"
             @change="handleFileChange"
@@ -40,13 +40,27 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const props = defineProps(['snack', 'saveFunction', 'imageUrl', 'isLoading']);
-const isLoading = ref(props.isLoading);
+// saveFunction - callback to save it on BE
+const props = defineProps([
+  'snack',
+  'saveFunction',
+  'imageUrl',
+  'isLoading',
+  'id',
+  'label',
+]);
+
+// save - callback to save the file object on FE
 const emit = defineEmits(['save']);
+
+const photoId = ref(props.id ?? 'photo-input');
+const photoLabel = ref(props.label ?? 'Carregar foto');
+const isLoading = ref(props.isLoading);
 
 const handleSave = (base64File: string, file: any) => {
   emit('save', base64File, file);
 };
+
 const handleFileChange = (event: any) => {
   const file = event.target.files[0];
   const canUpload = checkImageTypeAndSize(file, props.snack);
@@ -55,9 +69,7 @@ const handleFileChange = (event: any) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
-      if (reader.result) {
-        saveImage(reader.result, file);
-      }
+      reader.result && saveImage(reader.result as string, file);
       // reader.result && (imageUrl.value = reader.result) && (image.value = file);
     };
     reader.onerror = (error) => {
@@ -68,9 +80,11 @@ const handleFileChange = (event: any) => {
 };
 
 async function saveImage(base64File: string, file: any) {
-  if (base64File) {
+  // save photo on BE
+  if (props.saveFunction) {
     isLoading.value = true;
-    props.saveFunction(base64File).then((resp) => {
+
+    props.saveFunction(base64File).then((resp: any) => {
       if (resp.success) {
         handleSave(base64File, file);
         props.snack.showSnackbar('Imagem guardada com sucesso.', '', true);
@@ -80,7 +94,8 @@ async function saveImage(base64File: string, file: any) {
       isLoading.value = false;
     });
   } else {
-    console.error('Save profile image - no image');
+    // save photo on BE by parent component
+    handleSave(base64File, file);
   }
 }
 

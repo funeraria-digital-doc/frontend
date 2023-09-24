@@ -28,10 +28,13 @@ export async function recordCreate(newRecord: any): Promise<ApiResponse<any>> {
   }
 }
 
-export async function recordEdit(editedRecord: any): Promise<ApiResponse<any>> {
+export async function recordEdit(
+  id: string,
+  editedRecord: any
+): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.post(
-      '/records/update/' + editedRecord.id + '/',
+      `/records/update/${id}/`,
       editedRecord
     );
     return { success: true, data: response.data };

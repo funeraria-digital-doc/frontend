@@ -2,11 +2,24 @@ import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dy
 import type { DynamicField } from '@/models/dynamicField.model';
 
 export const DeathDeclarationDefunctForm: DynamicField[] = [
-  //   {
-  //     label: "Foto",
-  //     name: "photo",
-  //     input: "file",
-  //   },
+  {
+    label: 'Carregar fotografia',
+    name: 'photo',
+    input: 'file',
+  },
+  {
+    items: [
+      { label: 'Inativo', value: 'INACTIVE' },
+      { label: 'Ativo', value: 'ACTIVE' },
+      { label: 'Pendente', value: 'PENDING' },
+      { label: 'Finalizado', value: 'COMPLETED' },
+      { label: 'Arquivado', value: 'ARCHIVED' },
+    ],
+    label: 'Estado',
+    name: 'status',
+    rules: fieldRules(true, null, null),
+    input: 'select',
+  },
   {
     label: 'Nome',
     name: 'name',
@@ -34,7 +47,7 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
       { label: 'Divorciado', value: 'DIVORCED' },
       { label: 'Viúvo', value: 'WIDOWER' },
     ],
-    rules: fieldRules(false, null, 64),
+    rules: fieldRules(true, null, 64),
   },
   {
     label: 'Cartão de cidadão',

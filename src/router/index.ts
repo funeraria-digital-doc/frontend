@@ -22,15 +22,16 @@ import { useUser } from '@/composables/user';
 //   () => import('@/views/Records/recordsForm.vue')
 // );
 const Home = () => import('@/views/Home/home.vue');
-const Contacts = () => import('@/views/Contacts/contacts.vue')
-const Profile = () => import('@/views/Profile/profile.vue')
+const Contacts = () => import('@/views/Contacts/contacts.vue');
+const Profile = () => import('@/views/Profile/profile.vue');
 const Users = () => import('@/views/Users/users.vue');
 const Groups = () => import('@/views/Groups/groups.vue');
-const Templates = () => import('@/views/Templates/templates.vue')
-const Records = () => import('@/views/Records/records.vue')
-const TemplatesForm = () => import('@/views/Templates/templatesForm.vue')
-const RecordsForm = () => import('@/views/Records/recordsForm.vue')
+const Templates = () => import('@/views/Templates/templates.vue');
+const Records = () => import('@/views/Records/records.vue');
+const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
+const RecordsForm = () => import('@/views/Records/recordsForm.vue');
 const Stats = () => import('@/views/Stats/stats.vue')
+const ErrorPage = () => import('@/views/Error/errorPage.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -105,6 +106,22 @@ const router = createRouter({
       component: Stats,
       meta: { requiresAuth: true },
     }
+    {
+      path: '/not-found',
+      component: ErrorPage,
+      name: 'not_found',
+      meta: { status: 'not-found' },
+    },
+    {
+      path: '/service-unavailable',
+      component: ErrorPage,
+      name: 'service_unavailable',
+      meta: { status: 'service-unavailable' },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: { name: 'not_found' },
+    },
   ],
 });
 

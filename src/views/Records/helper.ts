@@ -10,21 +10,16 @@ export const getRecords = async (
       let recordsData = [];
       if (resp.data.length > 0) {
         recordsData = resp.data.map((record: any) => {
-          return record;
+          return {
+            id: record.id,
+            name: record.name,
+            family_member_phone: record.family_member_phone,
+            gender: getLabel('gender', 'select', record.gender, fields),
+            status: getLabel('status', 'select', record.status, fields),
+            group_id: getLabel('group_id', 'select', record.group_id, fields),
+            email: record.email,
+          }
         });
-        // templateData = resp.data.map((template: any) => {
-        //   return {
-        //     id: template.id,
-        //     title: template.title,
-        //     group_id: getLabel('group_id', 'select', template.group_id, fields),
-        //     send_type: getLabel(
-        //       'send_type',
-        //       'select',
-        //       template.send_type,
-        //       fields
-        //     ),
-        //   };
-        // });
       }
       records.value = recordsData;
     } else {
@@ -49,7 +44,7 @@ export const getSingleRecord = async (id: string) => {
 };
 
 export const deleteRecord = async (
-  id: string | number,
+  id: string,
   records: { value: { [x: string]: any } },
   snack: any
 ) => {
@@ -76,3 +71,21 @@ export const deleteRecord = async (
     );
   }
 };
+
+export function getLabel(key: string, type: string, value: any, fields: any) {
+  const field = fields.find((f: { name: string }) => f.name === key);
+  let label = null;
+  if (type == 'checkbox') {
+    if (value) {
+      label = field.true_value_label;
+    } else {
+      label = field.false_value_label;
+    }
+  } else if (type == 'select') {
+    const val = field.items.find((i: { value: any }) => i.value === value);
+    if (val && val['label']) {
+      label = val['label'];
+    }
+  }
+  return label;
+}
