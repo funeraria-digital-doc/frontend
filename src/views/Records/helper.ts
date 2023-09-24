@@ -18,7 +18,7 @@ export const getRecords = async (
             status: getLabel('status', 'select', record.status, fields),
             group_id: getLabel('group_id', 'select', record.group_id, fields),
             email: record.email,
-          }
+          };
         });
       }
       records.value = recordsData;
@@ -88,4 +88,42 @@ export function getLabel(key: string, type: string, value: any, fields: any) {
     }
   }
   return label;
+}
+
+export function checkErrors(
+  error: any,
+  errorMessages: any,
+  errorIndexes: any,
+  snack: any,
+  defaultErrorMessages: any
+) {
+  if (error && error.errors) {
+    let errors = '';
+    for (let i = 0; i < Object.keys(error.errors).length; i++) {
+      const validationKey = Object.keys(error.errors)[i];
+      const validationItem = error.errors[validationKey];
+      errors += validationKey + ', ';
+      if (validationKey == 'validations') {
+        for (let t = 0; t < Object.keys(validationItem).length; t++) {
+          const valKey = Object.keys(validationItem)[t];
+          errorIndexes.value.push(parseInt(valKey));
+        }
+      }
+      errorMessages.value[validationKey] = validationItem;
+    }
+    if (errors.substring(errors.length - 2) == ', ') {
+      snack.value.showSnackbar(
+        'Contém erros nos seguintes campos:',
+        errors.substring(0, errors.length - 2),
+        false
+      );
+    }
+  } else {
+    errorMessages.value = { ...defaultErrorMessages };
+  }
+  snack.value.showSnackbar(
+    'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
+    '',
+    false
+  );
 }

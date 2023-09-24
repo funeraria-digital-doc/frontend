@@ -5,7 +5,7 @@
         <form-subtitle v-if="index === subtitle.index" :subtitle="subtitle" />
       </template>
 
-      <dynamic-field-input :field="field" />
+      <dynamic-field-input :field="field" :errorMessages="errorMessages" />
     </div>
 
     <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
@@ -43,6 +43,9 @@ const props = defineProps({
     type: Array as PropType<Array<FormSubtitle>>,
     required: false,
   },
+  errorMessages: {
+    type: Object
+  }
 });
 
 const emit = defineEmits(['on-submit']);
