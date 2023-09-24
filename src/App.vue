@@ -58,6 +58,7 @@ const sideNavLinks = [
   { title: 'Funerárias', link: '/groups', icon: 'mdi-home-modern' },
   { title: 'Templates', link: '/templates', icon: 'mdi-file-multiple' },
   { title: 'Declarações', link: '/records', icon: 'mdi-file-document' },
+  { title: 'Estatisticas', link: '/stats', icon: 'mdi-information-variant' },
 ];
 
 const navigate = (link: string) => {
