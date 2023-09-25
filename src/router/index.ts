@@ -105,7 +105,7 @@ const router = createRouter({
       name: 'stats',
       component: Stats,
       meta: { requiresAuth: true },
-    }
+    },
     {
       path: '/not-found',
       component: ErrorPage,
