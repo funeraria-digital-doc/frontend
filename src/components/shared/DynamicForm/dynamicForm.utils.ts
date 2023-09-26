@@ -1,9 +1,9 @@
 import type { DynamicField } from '@/models/dynamicField.model';
-import type { FormSubtitle } from '@/models/formSubtitle.form';
+import type { FormFieldsGroup } from './dynamicForm.models';
 
-export const checkDuplicateNames = (arr: DynamicField[]) => {
-  arr.map((item) => {
-    const filteredArr = arr.filter((i) => i.name === item.name);
+const checkDuplicateNames = (fields: DynamicField[]) => {
+  fields.forEach((field) => {
+    const filteredArr = fields.filter((i) => i.name === field.name);
 
     if (filteredArr.length > 1) {
       const fieldName = filteredArr.map((f) => f.name);
@@ -15,16 +15,10 @@ export const checkDuplicateNames = (arr: DynamicField[]) => {
   });
 };
 
-export const checkSubtitlesDuplicateIndexes = (arr?: FormSubtitle[]) => {
-  arr?.map((item) => {
-    const filteredArr = arr?.filter((i) => i.index === item.index);
-
-    if (filteredArr.length > 1) {
-      const index = filteredArr.map((f) => f.index);
-
-      console.error(
-        `Dynamic Form - Subtitles with duplicated indexes (index: ${index})`
-      );
-    }
-  });
+export const checkDuplicateNamesFormFields = (
+  formFieldsGroups: FormFieldsGroup[]
+) => {
+  formFieldsGroups.forEach((formFieldsGroup) =>
+    checkDuplicateNames(formFieldsGroup.fields)
+  );
 };
