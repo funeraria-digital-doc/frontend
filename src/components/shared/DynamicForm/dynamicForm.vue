@@ -1,15 +1,27 @@
 <template>
-  <v-form ref="form" @submit.prevent="onSubmit">
-    <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
-      <form-subtitle v-if="fieldsGroup.title" :title="fieldsGroup.title" />
-
-      <div v-for="(field, indexJ) in fieldsGroup.fields" :key="indexJ">
-        <dynamic-field-input :field="field" :errorMessages="errorMessages" />
+  <v-expansion-panels style="width: 100%;">
+    <v-form ref="form" @submit.prevent="onSubmit">
+      <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
+        <v-expansion-panel >
+          <v-expansion-panel-title>
+            <template v-slot:default="{ expanded }">
+              {{ fieldsGroup.title }}
+            </template>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <div v-for="(field, indexJ) in fieldsGroup.fields" :key="indexJ">
+              <dynamic-field-input
+                :field="field"
+                :errorMessages="errorMessages"
+              />
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
       </div>
-    </div>
 
-    <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
-  </v-form>
+      <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
+    </v-form>
+  </v-expansion-panels>
 </template>
 
 <script lang="ts">
