@@ -1,15 +1,27 @@
 <template>
-  <v-form ref="form" @submit.prevent="onSubmit">
-    <div v-for="(field, index) in fields" :key="field.name">
-      <template v-for="subtitle in subtitles" :key="subtitle.index">
-        <form-subtitle v-if="index === subtitle.index" :subtitle="subtitle" />
-      </template>
+  <v-expansion-panels style="width: 100%;">
+    <v-form ref="form" @submit.prevent="onSubmit">
+      <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
+        <v-expansion-panel >
+          <v-expansion-panel-title>
+            <template v-slot:default="{ expanded }">
+              {{ fieldsGroup.title }}
+            </template>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <div v-for="(field, indexJ) in fieldsGroup.fields" :key="indexJ">
+              <dynamic-field-input
+                :field="field"
+                :errorMessages="errorMessages"
+              />
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </div>
 
-      <dynamic-field-input :field="field" :errorMessages="errorMessages" />
-    </div>
-
-    <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
-  </v-form>
+      <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
+    </v-form>
+  </v-expansion-panels>
 </template>
 
 <script lang="ts">
@@ -21,31 +33,23 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import type { DynamicField } from '../../../models/dynamicField.model';
 import DynamicFieldInput from './DynamicFieldInput/dynamicFieldInput.vue';
-import {
-  checkDuplicateNames,
-  checkSubtitlesDuplicateIndexes,
-} from './dynamicForm.utils';
+import type { FormFieldsGroup } from './dynamicForm.models';
+import { checkDuplicateNamesFormFields } from './dynamicForm.utils';
 import formSubtitle from './FormSubtitle/formSubtitle.vue';
-import type { FormSubtitle } from '@/models/formSubtitle.form';
 
 const props = defineProps({
-  fields: {
-    type: Array as PropType<Array<DynamicField>>,
+  fieldsGroups: {
+    type: Array as PropType<Array<FormFieldsGroup>>,
     required: true,
   },
   actionBtnLabel: {
     type: String,
     required: true,
   },
-  subtitles: {
-    type: Array as PropType<Array<FormSubtitle>>,
-    required: false,
-  },
   errorMessages: {
-    type: Object
-  }
+    type: Object,
+  },
 });
 
 const emit = defineEmits(['on-submit']);
@@ -56,30 +60,37 @@ const onSubmit = async (input: any) => {
 
   if (valid) {
     const values: any = {};
+    let count = 0;
 
-    for (var i = 0; i < props.fields.length; i++) {
-      const fieldName = input.target[i].id;
+    // form input return the full fields list
+    props.fieldsGroups.forEach((fieldsGroup) => {
+      const fieldsLength = fieldsGroup.fields.length;
 
-      switch (props.fields.find((i) => i.name === fieldName)?.input) {
-        case 'checkbox':
-          values[fieldName] = input.target[i].checked;
-          break;
-        case 'file':
-          values[fieldName] = input.target[i].files[0];
-          break;
-        default:
-          values[fieldName] = input.target[i].value;
-          break;
+      for (var i = count; i < count + fieldsLength; i++) {
+        const fieldName = input.target[i].id;
+
+        switch (fieldsGroup.fields.find((f) => f.name === fieldName)?.input) {
+          case 'checkbox':
+            values[fieldName] = input.target[i].checked;
+            break;
+          case 'file':
+            values[fieldName] = input.target[i].files[0];
+            break;
+          default:
+            values[fieldName] = input.target[i].value;
+            break;
+        }
       }
-    }
+
+      count += fieldsLength;
+    });
 
     emit('on-submit', values);
   }
 };
 
 onMounted(() => {
-  checkDuplicateNames(props.fields);
-  checkSubtitlesDuplicateIndexes(props.subtitles);
+  checkDuplicateNamesFormFields(props.fieldsGroups);
 });
 </script>
 

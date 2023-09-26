@@ -4,8 +4,7 @@
 
     <div class="death-declaration__form">
       <dynamic-form
-        :fields="fields"
-        :subtitles="subtitles"
+        :fieldsGroups="fieldsGroups"
         :action-btn-label="submitBtnLabel"
         :errorMessages="errorMessages"
         @on-submit="onSubmit"
@@ -17,7 +16,6 @@
 
 <script lang="ts" setup>
 import DynamicForm from '../../components/shared/DynamicForm/dynamicForm.vue';
-import type { DynamicField } from '@/models/dynamicField.model';
 import Page from '../../components/shared/Page/page.vue';
 import { DeathDeclarationDefunctForm } from './forms/deathDeclarationDefunct.form';
 import { DeathDeclarationSpouseForm } from './forms/deathDeclarationSpouse.form';
@@ -30,21 +28,34 @@ import { onBeforeMount, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { checkErrors, getSingleRecord } from './helper';
 import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
+import type { FormFieldsGroup } from '@/components/shared/DynamicForm/dynamicForm.models';
 
-const subtitles = [
-  { index: 0, text: 'Dados do defunto', hideDivider: true },
-  { index: 15, text: 'Dados do cônjuge' },
-  { index: 19, text: 'Dados do óbito' },
-  { index: 40, text: 'Dados do funeral' },
-  { index: 46, text: 'Dados do familiar' },
-];
-
-const fields = ref<DynamicField[]>([
-  ...DeathDeclarationDefunctForm,
-  ...DeathDeclarationSpouseForm,
-  ...DeathDeclarationDeathForm,
-  ...DeathDeclarationFuneralForm,
-  ...DeathDeclarationFamilyMemberForm,
+const fieldsGroups = ref<FormFieldsGroup[]>([
+  {
+    title: 'Dados do defunto',
+    isAccordion: true,
+    fields: DeathDeclarationDefunctForm,
+  },
+  {
+    title: 'Dados do cônjuge',
+    isAccordion: true,
+    fields: DeathDeclarationSpouseForm,
+  },
+  {
+    title: 'Dados do óbito',
+    isAccordion: true,
+    fields: DeathDeclarationDeathForm,
+  },
+  {
+    title: 'Dados do funeral',
+    isAccordion: true,
+    fields: DeathDeclarationFuneralForm,
+  },
+  {
+    title: 'Dados do familiar',
+    isAccordion: true,
+    fields: DeathDeclarationFamilyMemberForm,
+  },
 ]);
 
 const route = useRoute();
@@ -52,11 +63,13 @@ const mode = ref('');
 const snack = ref();
 
 const errorIndexes = ref([]);
-const errorMessages = ref({});
+const errorMessages = ref<{ [key: string]: string }>({});
 const defaultErrorMessages = {};
 
 const recordTitle = computed(() => {
-  const nameField = fields.value.find((field) => field.name === 'name');
+  const nameField = fieldsGroups.value[0].fields.find(
+    (field) => field.name === 'name'
+  );
 
   if (mode.value === 'create') {
     return 'Criar Declaração de Óbito';
@@ -115,16 +128,22 @@ const onSubmit = (values: any) => {
 };
 
 onBeforeMount(async () => {
-  fields.value.map((item: { name: string }) => {
-    if (!errorMessages.value[item.name]) {
-      errorMessages.value[item.name] = '';
-    }
-  });
+  fieldsGroups.value.forEach((fieldsGroup) =>
+    fieldsGroup.fields.forEach((field) => {
+      if (!errorMessages.value[field.name]) {
+        errorMessages.value[field.name] = '';
+      }
+    })
+  );
+
   if (route.name === 'records_edit') {
     getSingleRecord(route.params.id as string).then((resp) => {
-      fields.value = fields.value.map((field) => ({
-        ...field,
-        value: resp[field.name],
+      fieldsGroups.value = fieldsGroups.value.map((fieldsGroup) => ({
+        ...fieldsGroup,
+        fields: fieldsGroup.fields.map((field) => ({
+          ...field,
+          value: resp[field.name],
+        })),
       }));
 
       mode.value = 'edit';
