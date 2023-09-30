@@ -63,17 +63,6 @@ export async function listAllActiveUsers(
   }
 }
 
-export async function getProfile(): Promise<ApiResponse<any>> {
-  try {
-    const response = await apiInstance.get('/accounts/profile/');
-
-    return { success: true, data: response.data };
-  } catch (e: any) {
-    console.error('Get profile error', e);
-    return errorResponse(e);
-  }
-}
-
 export async function editProfile(data: {
   username: { value: any };
   email: { value: any };
