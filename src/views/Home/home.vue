@@ -1,9 +1,12 @@
 <template>
   <page :title="title">
-    <p v-if="isLoggedIn">
-      Plataforma para agilizar e gerir os documentos referentes ao processo de
-      declarar um falecimento.
-    </p>
+    <div v-if="isLoggedIn">
+      <p>
+        Plataforma para agilizar e gerir os documentos referentes ao processo de
+        declarar um falecimento.
+      </p>
+      <home-stats></home-stats>
+    </div>
     <login v-else></login>
   </page>
 </template>
@@ -19,8 +22,9 @@ export default defineComponent({
 
 <script lang="ts" setup>
 import { defineComponent, onBeforeMount, ref } from 'vue';
-import Page from '../../components/shared/Page/page.vue';
 import { useUser } from '@/composables/user';
+import Page from '../../components/shared/Page/page.vue';
+import HomeStats from './components/homeStats.vue';
 import Login from '../../components/shared/Login/login.vue';
 import { watch } from 'vue';
 
@@ -33,8 +37,8 @@ watch(user, () => {
 });
 
 watch(isLoggedIn, () => {
-  getTitle()
-})
+  getTitle();
+});
 
 const getTitle = () => {
   if (!isLoggedIn.value) {
@@ -42,10 +46,15 @@ const getTitle = () => {
   } else {
     title.value = 'Página inicial';
   }
-}
+};
 
 onBeforeMount(() => {
   isLoggedIn.value = isUserAuthenticated();
-  getTitle()
+  getTitle();
 });
 </script>
+<style scoped>
+.spacer-2 {
+  height: 2rem;
+}
+</style>

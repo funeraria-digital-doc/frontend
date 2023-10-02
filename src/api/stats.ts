@@ -47,3 +47,30 @@ export async function getDeathsByUser(days: number): Promise<ApiResponse<any>> {
     return errorResponse(e);
   }
 }
+
+export async function getCurrentMonthStats(): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get('/stats/current-month-services/');
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}
+
+export async function getCurrentYearStats(): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get('/stats/current-year-services/');
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}
+
+export async function getBestMonthStats(): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get('/stats/best-month/');
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}

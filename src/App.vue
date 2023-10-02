@@ -53,12 +53,12 @@ const { isAuthFromTokenLoaded, authenticateUserFromToken } = useUser();
 
 const sideNavLinks = [
   { title: 'Página inicial', link: '/', icon: 'mdi-home' },
-  { title: 'Contatos', link: '/contacts', icon: 'mdi-phone' },
   { title: 'Utilizadores', link: '/users', icon: 'mdi-account-multiple' },
   { title: 'Funerárias', link: '/groups', icon: 'mdi-home-modern' },
   { title: 'Templates', link: '/templates', icon: 'mdi-file-multiple' },
   { title: 'Declarações', link: '/records', icon: 'mdi-file-document' },
-  { title: 'Estatisticas', link: '/stats', icon: 'mdi-information-variant' },
+  { title: 'Estatisticas', link: '/stats', icon: 'mdi-chart-line' },
+  { title: 'Sobre', link: '/about', icon: 'mdi-information-variant' },
 ];
 
 const navigate = (link: string) => {
@@ -77,6 +77,7 @@ onBeforeMount(() => {
   }
 
   &__page {
+    width: fit-content;
     margin: 2rem 10rem;
   }
 }
