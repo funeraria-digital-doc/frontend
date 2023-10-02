@@ -1,25 +1,35 @@
 <template>
-  <v-expansion-panels style="width: 100%;">
-    <v-form ref="form" @submit.prevent="onSubmit">
+  <v-expansion-panels>
+    <v-form ref="form" @submit.prevent="onSubmit" class="dynamic-form__form">
       <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
-        <v-expansion-panel >
+        <v-expansion-panel>
           <v-expansion-panel-title>
-            <template v-slot:default="{ expanded }">
+            <template v-slot:default>
               {{ fieldsGroup.title }}
             </template>
           </v-expansion-panel-title>
-          <v-expansion-panel-text>
-            <div v-for="(field, indexJ) in fieldsGroup.fields" :key="indexJ">
-              <dynamic-field-input
-                :field="field"
-                :errorMessages="errorMessages"
-              />
-            </div>
+          <v-expansion-panel-text class="dynamic-form__panel-text">
+            <v-row no-gutters class="dynamic-form__row">
+              <v-col
+                v-for="(field, indexJ) in fieldsGroup.fields"
+                class="pa-2"
+                :key="indexJ"
+                :cols="12"
+                :sm="sm"
+              >
+                <dynamic-field-input
+                  :field="field"
+                  :errorMessages="errorMessages"
+                />
+              </v-col>
+            </v-row>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </div>
 
-      <v-btn type="submit" class="mt-2">{{ actionBtnLabel }}</v-btn>
+      <v-btn type="submit" class="mt-10" color="primary" size="large">{{
+        actionBtnLabel
+      }}</v-btn>
     </v-form>
   </v-expansion-panels>
 </template>
@@ -36,7 +46,6 @@ export default defineComponent({
 import DynamicFieldInput from './DynamicFieldInput/dynamicFieldInput.vue';
 import type { FormFieldsGroup } from './dynamicForm.models';
 import { checkDuplicateNamesFormFields } from './dynamicForm.utils';
-import formSubtitle from './FormSubtitle/formSubtitle.vue';
 
 const props = defineProps({
   fieldsGroups: {
@@ -46,6 +55,10 @@ const props = defineProps({
   actionBtnLabel: {
     type: String,
     required: true,
+  },
+  sm: {
+    type: Number,
+    default: 12,
   },
   errorMessages: {
     type: Object,
@@ -94,4 +107,14 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.dynamic-form {
+  &__form {
+    width: 100%;
+  }
+
+  &__panel-text {
+    margin-top: 1rem;
+  }
+}
+</style>
