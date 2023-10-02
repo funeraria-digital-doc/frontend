@@ -22,7 +22,6 @@ import { useUser } from '@/composables/user';
 //   () => import('@/views/Records/recordsForm.vue')
 // );
 const Home = () => import('@/views/Home/home.vue');
-const Contacts = () => import('@/views/Contacts/contacts.vue');
 const Profile = () => import('@/views/Profile/profile.vue');
 const Users = () => import('@/views/Users/users.vue');
 const Groups = () => import('@/views/Groups/groups.vue');
@@ -32,6 +31,7 @@ const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
 const RecordsForm = () => import('@/views/Records/recordsForm.vue');
 const Stats = () => import('@/views/Stats/stats.vue')
 const ErrorPage = () => import('@/views/Error/errorPage.vue');
+const About = () => import('@/views/About/about.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,11 +40,6 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
-    },
-    {
-      path: '/contacts',
-      name: 'contacts',
-      component: Contacts,
     },
     {
       path: '/profile',
@@ -105,6 +100,11 @@ const router = createRouter({
       name: 'stats',
       component: Stats,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: About,
     },
     {
       path: '/not-found',
