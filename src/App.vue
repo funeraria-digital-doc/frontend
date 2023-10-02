@@ -77,6 +77,7 @@ onBeforeMount(() => {
   }
 
   &__page {
+    width: fit-content;
     margin: 2rem 10rem;
   }
 }
