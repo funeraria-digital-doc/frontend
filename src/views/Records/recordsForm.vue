@@ -7,6 +7,7 @@
         :fieldsGroups="fieldsGroups"
         :action-btn-label="submitBtnLabel"
         :errorMessages="errorMessages"
+        :sm="4"
         @on-submit="onSubmit"
       />
     </div>
@@ -157,7 +158,7 @@ onBeforeMount(async () => {
 <style lang="scss">
 .death-declaration {
   &__form {
-    max-width: 30rem;
+    width: 100%;
   }
 }
 </style>

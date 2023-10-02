@@ -1,7 +1,9 @@
-<template class="page">
-  <h1 class="page__title text-h6 text-md-h5 text-lg-h4">{{ title }}</h1>
-  <!-- renders wrapped content -->
-  <slot></slot>
+<template>
+  <div class="page">
+    <h1 class="page__title text-h6 text-md-h5 text-lg-h4">{{ title }}</h1>
+    <!-- renders wrapped content -->
+    <slot></slot>
+  </div>
 </template>
 
 <script lang="ts" setup>
