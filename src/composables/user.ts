@@ -1,7 +1,8 @@
 import { createNewAxiosInstance } from '@/api';
-import { getProfile, loginUser } from '@/api/users';
+import { loginUser } from '@/api/users';
 import router from '@/router';
 import { TOKEN_KEY } from '@/utils/constants';
+import jwt_decode from 'jwt-decode';
 import {
   deleteLocalStorage,
   getLocalStorage,
@@ -12,6 +13,8 @@ import { reactive, ref } from 'vue';
 const user = reactive({
   name: '',
   email: '',
+  role: '',
+  expiration_date: 0,
 });
 
 const isAuthFromTokenLoaded = ref(false);
@@ -24,22 +27,27 @@ export function useUser() {
   const logoutUser = () => {
     user.name = '';
     user.email = '';
+    user.role = '';
+    user.expiration_date = 0;
 
     deleteLocalStorage(TOKEN_KEY);
-    createNewAxiosInstance()
+    createNewAxiosInstance();
     router.push('/');
   };
 
-  const updateUser = (data: { name: string; email: string }) => {
-    user.name = data.name;
-    user.email = data.email;
+  const updateUser = (auth: any) => {
+    user.name = auth.name;
+    user.email = auth.email;
+    user.role = auth.role;
+    user.expiration_date = auth.exp;
   };
 
   const authenticateUser = (data: any) => {
     return loginUser(data).then((resp) => {
       if (resp.success) {
-        saveLocalStorage(TOKEN_KEY, resp.data.token);
-        updateUser(resp.data);
+        const auth = jwt_decode(resp.data.access);
+        saveLocalStorage(TOKEN_KEY, resp.data.access);
+        updateUser(auth);
         createNewAxiosInstance();
       }
       return resp;
@@ -50,14 +58,9 @@ export function useUser() {
     const token = getLocalStorage(TOKEN_KEY);
 
     if (token) {
-      getProfile()
-        .then((resp) => {
-          resp.success && updateUser(resp.data);
-          isAuthFromTokenLoaded.value = true;
-        })
-        .catch(() => {
-          isAuthFromTokenLoaded.value = true;
-        });
+      const auth = jwt_decode(token);
+      if (auth.exp * 1000 > new Date().getTime()) updateUser(auth);
+      isAuthFromTokenLoaded.value = true;
     } else {
       isAuthFromTokenLoaded.value = true;
     }
