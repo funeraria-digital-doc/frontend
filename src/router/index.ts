@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useUser } from '@/composables/user';
+import { checkAuth } from '@/utils/authorizations';
+import { NO_AUTH, STAFF, SUPER, USER } from '@/utils/constants';
 
 //import { defineAsyncComponent } from 'vue';
 // const Home = defineAsyncComponent(() => import('@/views/Home/home.vue'));
@@ -29,7 +30,7 @@ const Templates = () => import('@/views/Templates/templates.vue');
 const Records = () => import('@/views/Records/records.vue');
 const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
 const RecordsForm = () => import('@/views/Records/recordsForm.vue');
-const Stats = () => import('@/views/Stats/stats.vue')
+const Stats = () => import('@/views/Stats/stats.vue');
 const ErrorPage = () => import('@/views/Error/errorPage.vue');
 const About = () => import('@/views/About/about.vue');
 
@@ -40,103 +41,103 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
+      meta: { requiresAuth: false, minRole: NO_AUTH },
     },
     {
       path: '/profile',
       name: 'profile',
       component: Profile,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: USER },
     },
     {
       path: '/users',
       name: 'users',
       component: Users,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: STAFF },
     },
     {
       path: '/groups',
       name: 'groups',
       component: Groups,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: SUPER },
     },
     {
       path: '/templates',
       name: 'templates',
       component: Templates,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: SUPER },
     },
     {
       path: '/templates/create',
       name: 'templates_create',
       component: TemplatesForm,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: SUPER },
     },
     {
       path: '/templates/:id/edit',
       name: 'templates_edit',
       component: TemplatesForm,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: SUPER },
     },
     {
       path: '/records',
       name: 'records',
       component: Records,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: USER },
     },
     {
       path: '/records/create',
       name: 'records_create',
       component: RecordsForm,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: USER },
     },
     {
       path: '/records/:id/edit',
       name: 'records_edit',
       component: RecordsForm,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: USER },
     },
     {
       path: '/stats',
       name: 'stats',
       component: Stats,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, minRole: STAFF },
     },
     {
       path: '/about',
       name: 'about',
       component: About,
+      meta: { requiresAuth: false, minRole: NO_AUTH },
     },
     {
       path: '/not-found',
       component: ErrorPage,
       name: 'not_found',
-      meta: { status: 'not-found' },
+      meta: { requiresAuth: false, minRole: NO_AUTH, status: 'not-found' },
     },
     {
       path: '/service-unavailable',
       component: ErrorPage,
       name: 'service_unavailable',
-      meta: { status: 'service-unavailable' },
+      meta: {
+        requiresAuth: false,
+        minRole: NO_AUTH,
+        status: 'service-unavailable',
+      },
     },
     {
       path: '/:pathMatch(.*)*',
       redirect: { name: 'not_found' },
+      meta: { requiresAuth: false, minRole: NO_AUTH },
     },
   ],
 });
 
-router.beforeEach((to) => {
-  const { isUserAuthenticated, isAuthFromTokenLoaded } = useUser();
-
-  if (
-    to.meta.requiresAuth &&
-    !isUserAuthenticated() &&
-    isAuthFromTokenLoaded.value
-  ) {
-    return {
-      path: '/',
-      name: 'home',
-    };
+router.beforeEach(async (to, from, next) => {
+  if (!(await checkAuth(to.meta.minRole, to.meta.requiresAuth))) {
+    next({ name: 'home' });
+  } else {
+    next();
   }
 });
 

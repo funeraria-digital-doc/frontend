@@ -1,7 +1,7 @@
 import { createNewAxiosInstance } from '@/api';
 import { getProfile, loginUser } from '@/api/users';
 import router from '@/router';
-import { TOKEN_KEY } from '@/utils/constants';
+import { NO_AUTH, STAFF, TOKEN_KEY, SUPER, USER } from '@/utils/constants';
 import {
   deleteLocalStorage,
   getLocalStorage,
@@ -12,27 +12,30 @@ import { reactive, ref } from 'vue';
 const user = reactive({
   name: '',
   email: '',
+  role: NO_AUTH,
 });
 
 const isAuthFromTokenLoaded = ref(false);
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.name !== '';
+    return user.role > NO_AUTH;
   };
 
   const logoutUser = () => {
     user.name = '';
     user.email = '';
+    user.role = NO_AUTH;
 
     deleteLocalStorage(TOKEN_KEY);
-    createNewAxiosInstance()
+    createNewAxiosInstance();
     router.push('/');
   };
 
   const updateUser = (data: { name: string; email: string }) => {
     user.name = data.name;
     user.email = data.email;
+    user.role = STAFF;
   };
 
   const authenticateUser = (data: any) => {
@@ -46,14 +49,15 @@ export function useUser() {
     });
   };
 
-  const authenticateUserFromToken = () => {
+  async function authenticateUserFromToken() {
     const token = getLocalStorage(TOKEN_KEY);
-
+    let toReturn = false
     if (token) {
-      getProfile()
+      await getProfile()
         .then((resp) => {
-          resp.success && updateUser(resp.data);
+          updateUser(resp.data);
           isAuthFromTokenLoaded.value = true;
+          toReturn = true
         })
         .catch(() => {
           isAuthFromTokenLoaded.value = true;
@@ -61,7 +65,8 @@ export function useUser() {
     } else {
       isAuthFromTokenLoaded.value = true;
     }
-  };
+    return toReturn
+  }
 
   return {
     user,

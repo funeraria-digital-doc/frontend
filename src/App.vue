@@ -7,7 +7,7 @@
         <v-navigation-drawer permanent>
           <v-list density="compact" nav>
             <v-list-item
-              v-for="(item, index) in sideNavLinks"
+              v-for="(item, index) in sideNavLinksComputed"
               :key="index"
               class="side-nav__link"
               :prepend-icon="item.icon"
@@ -30,11 +30,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount } from 'vue';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
+import { NO_AUTH, STAFF, SUPER, USER } from './utils/constants';
 
 export default defineComponent({
   name: 'LoginModal',
@@ -49,24 +50,64 @@ export default defineComponent({
 <script lang="ts" setup>
 import router from '@/router';
 
-const { isAuthFromTokenLoaded, authenticateUserFromToken } = useUser();
+const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
 
 const sideNavLinks = [
-  { title: 'Página inicial', link: '/', icon: 'mdi-home' },
-  { title: 'Utilizadores', link: '/users', icon: 'mdi-account-multiple' },
-  { title: 'Funerárias', link: '/groups', icon: 'mdi-home-modern' },
-  { title: 'Templates', link: '/templates', icon: 'mdi-file-multiple' },
-  { title: 'Declarações', link: '/records', icon: 'mdi-file-document' },
-  { title: 'Estatisticas', link: '/stats', icon: 'mdi-chart-line' },
-  { title: 'Sobre', link: '/about', icon: 'mdi-information-variant' },
+  { title: 'Página inicial', link: '/', icon: 'mdi-home', role: NO_AUTH },
+  {
+    title: 'Utilizadores',
+    link: '/users',
+    icon: 'mdi-account-multiple',
+    role: STAFF,
+  },
+  {
+    title: 'Funerárias',
+    link: '/groups',
+    icon: 'mdi-home-modern',
+    role: SUPER,
+  },
+  {
+    title: 'Templates',
+    link: '/templates',
+    icon: 'mdi-file-multiple',
+    role: SUPER,
+  },
+  {
+    title: 'Declarações',
+    link: '/records',
+    icon: 'mdi-file-document',
+    role: USER,
+  },
+  {
+    title: 'Estatisticas',
+    link: '/stats',
+    icon: 'mdi-chart-line',
+    role: STAFF,
+  },
+  {
+    title: 'Sobre',
+    link: '/about',
+    icon: 'mdi-information-variant',
+    role: NO_AUTH,
+  },
 ];
+
+const sideNavLinksComputed = ref([]);
 
 const navigate = (link: string) => {
   router.push(link);
 };
 
-onBeforeMount(() => {
-  authenticateUserFromToken();
+onBeforeMount(async () => {
+  await authenticateUserFromToken().then(async (result) => {
+    if (result) {
+      for (const i of sideNavLinks) {
+        if (user.role >= i.role) {
+          sideNavLinksComputed.value.push(i);
+        }
+      }
+    }
+  });
 });
 </script>
 
