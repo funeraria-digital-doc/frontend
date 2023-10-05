@@ -42,7 +42,7 @@
           </v-card-title>
           <v-card-text>
             <v-form ref="form" validate-on="submit" @submit.prevent="save">
-              <v-container v-for="field in propsData.data.fields" :key="field">
+              <v-container v-for="field in fields" :key="field">
                 <v-row>
                   <v-col :cols="field.col" :sm="field.col" :md="field.col">
                     <v-text-field
@@ -156,6 +156,8 @@ import {
 } from 'vue';
 import { VDataTable } from 'vuetify/labs/VDataTable';
 import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
+import { onBeforeMount } from 'vue';
+import { useUser } from '@/composables/user';
 export default defineComponent({
   name: 'GenericDataTable',
   components: {
@@ -166,6 +168,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 const propsData = defineProps(['data']);
+const { user } = useUser();
 /*
 Exemplo de header
 type DataTableHeader = {
@@ -187,7 +190,8 @@ const form = ref();
 const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
-const headers = ref(propsData.data.headers);
+const headers = ref([]);
+const fields = ref([]);
 const itemsPerPageOptions = ref([
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -215,14 +219,9 @@ function editItem(item: any) {
   for (let i = 0; i < Object.keys(item).length; i++) {
     const key = Object.keys(item)[i];
     const value = item[key];
-    const field = propsData.data.fields.find((f: any) => f.name === key);
+    const field = fields.value.find((f: any) => f.name === key);
     if (field) {
-      newItem[key] = getLabelValue(
-        key,
-        field.type,
-        value,
-        propsData.data.fields
-      );
+      newItem[key] = getLabelValue(key, field.type, value, fields.value);
     } else {
       newItem[key] = value;
     }
@@ -271,14 +270,14 @@ async function save() {
             editedIndex.value,
             serverItems,
             snack,
-            propsData.data.fields
+            fields.value
           )
           .then(() => {
             close();
           });
       } else {
         propsData.data
-          .save(editedItem.value, serverItems, snack, propsData.data.fields)
+          .save(editedItem.value, serverItems, snack, fields.value)
           .then(() => {
             close();
           });
@@ -298,10 +297,9 @@ watch(dialogDelete, (val) => {
 });
 
 function setFields() {
-  const fields = propsData.data.fields;
   let newEditedItem = {};
-  for (let i = 0; i < fields.length; i++) {
-    newEditedItem[fields[i].name] = '';
+  for (let i = 0; i < fields.value.length; i++) {
+    newEditedItem[fields.value[i].name] = '';
   }
   editedItem.value = newEditedItem;
   defaultItem.value = newEditedItem;
@@ -338,8 +336,22 @@ function getRedirectLink(mode: string, item: any) {
 }
 
 onMounted(() => {
-  propsData.data.getData(loading, serverItems, propsData.data.fields);
+  console.log(fields.value)
+  propsData.data.getData(loading, serverItems, fields.value);
   setFields();
+});
+
+onBeforeMount(() => {
+  propsData.data.headers.map((item) => {
+    if (user.role >= item.role) {
+      headers.value.push(item);
+    }
+  });
+  propsData.data.fields.map((item) => {
+    if (user.role >= item.role) {
+      fields.value.push(item);
+    }
+  });
 });
 </script>
 

@@ -36,6 +36,7 @@ import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
 import { NO_AUTH, STAFF, SUPER, USER } from './utils/constants';
+import { watch } from 'vue';
 
 export default defineComponent({
   name: 'LoginModal',
@@ -98,16 +99,27 @@ const navigate = (link: string) => {
   router.push(link);
 };
 
-onBeforeMount(async () => {
+async function processSideMenu() {
   await authenticateUserFromToken().then(async (result) => {
     if (result) {
+      sideNavLinksComputed.value = []
       for (const i of sideNavLinks) {
         if (user.role >= i.role) {
           sideNavLinksComputed.value.push(i);
         }
       }
+    } else {
+      sideNavLinksComputed.value = [];
     }
   });
+}
+
+watch(user, async () => {
+  await processSideMenu();
+});
+
+onBeforeMount(async () => {
+  await processSideMenu();
 });
 </script>
 

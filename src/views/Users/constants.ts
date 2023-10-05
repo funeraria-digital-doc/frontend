@@ -1,18 +1,38 @@
 import { groupsList } from '@/api/groups';
+import { STAFF, SUPER } from '@/utils/constants';
 
 export const headers = [
-  { title: 'ID', align: 'start', key: 'id', sortable: true },
+  { title: 'ID', align: 'start', key: 'id', sortable: true, role: STAFF },
   {
     title: 'Nome de utilizador',
     align: 'end',
     key: 'username',
     sortable: true,
+    role: STAFF,
   },
-  { title: 'Email', align: 'end', key: 'email', sortable: true },
-  { title: 'Funeraria', align: 'end', key: 'group', sortable: true },
-  { title: 'Admin', align: 'end', key: 'is_superuser', sortable: true },
-  { title: 'Staff', align: 'end', key: 'is_staff', sortable: true },
-  { title: 'Estado', align: 'end', key: 'status', sortable: true },
+  { title: 'Email', align: 'end', key: 'email', sortable: true, role: STAFF },
+  {
+    title: 'Funeraria',
+    align: 'end',
+    key: 'group',
+    sortable: true,
+    role: SUPER,
+  },
+  {
+    title: 'Admin',
+    align: 'end',
+    key: 'is_superuser',
+    sortable: true,
+    role: SUPER,
+  },
+  {
+    title: 'Staff',
+    align: 'end',
+    key: 'is_staff',
+    sortable: true,
+    role: STAFF,
+  },
+  { title: 'Estado', align: 'end', key: 'status', sortable: true, role: STAFF },
   {
     title: 'Ações',
     key: 'actions',
@@ -53,6 +73,7 @@ export const fields = [
     label: 'Nome de utilizador',
     rules: nameRules,
     col: 12,
+    role: STAFF
   },
   {
     name: 'email',
@@ -60,6 +81,7 @@ export const fields = [
     label: 'Email',
     rules: emailRules,
     col: 12,
+    role: STAFF
   },
   {
     name: 'group',
@@ -68,6 +90,7 @@ export const fields = [
     rules: [],
     col: 12,
     items: await getGroups(),
+    role: SUPER
   },
   {
     name: 'status',
@@ -88,6 +111,7 @@ export const fields = [
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
+    role: SUPER
   },
   {
     name: 'is_staff',
@@ -96,5 +120,6 @@ export const fields = [
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
+    role: SUPER
   },
 ];

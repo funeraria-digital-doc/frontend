@@ -8,6 +8,7 @@ export const getUsers = async (
   listAllUsers().then((resp) => {
     if (resp.success) {
       const usersData = resp.data.users.map((user: any) => {
+        console.log(fields);
         return {
           id: user.id,
           username: user.username,
@@ -176,16 +177,18 @@ export const deleteUser = async (
 export function getLabel(key: string, type: string, value: any, fields: any) {
   const field = fields.find((f: { name: string }) => f.name === key);
   let label = null;
-  if (type == 'checkbox') {
-    if (value) {
-      label = field.true_value_label;
-    } else {
-      label = field.false_value_label;
-    }
-  } else if (type == 'select') {
-    const val = field.items.find((i: { value: any }) => i.value === value);
-    if (val && val['label']) {
-      label = val['label'];
+  if (field) {
+    if (type == 'checkbox') {
+      if (value) {
+        label = field.true_value_label;
+      } else {
+        label = field.false_value_label;
+      }
+    } else if (type == 'select') {
+      const val = field.items.find((i: { value: any }) => i.value === value);
+      if (val && val['label']) {
+        label = val['label'];
+      }
     }
   }
   return label;
