@@ -1,7 +1,8 @@
 import { createNewAxiosInstance } from '@/api';
-import { getProfile, loginUser } from '@/api/users';
+import { loginUser } from '@/api/users';
 import router from '@/router';
-import { NO_AUTH, STAFF, TOKEN_KEY, SUPER, USER } from '@/utils/constants';
+import { NO_AUTH, TOKEN_KEY } from '@/utils/constants';
+import jwt_decode from 'jwt-decode';
 import {
   deleteLocalStorage,
   getLocalStorage,
@@ -13,6 +14,7 @@ const user = reactive({
   name: '',
   email: '',
   role: NO_AUTH,
+  expiration_date: 0,
 });
 
 const isAuthFromTokenLoaded = ref(false);
@@ -26,23 +28,26 @@ export function useUser() {
     user.name = '';
     user.email = '';
     user.role = NO_AUTH;
+    user.expiration_date = 0;
 
     deleteLocalStorage(TOKEN_KEY);
     createNewAxiosInstance();
     router.push('/');
   };
 
-  const updateUser = (data: { name: string; email: string }) => {
-    user.name = data.name;
-    user.email = data.email;
-    user.role = STAFF;
+  const updateUser = (auth: any) => {
+    user.name = auth.name;
+    user.email = auth.email;
+    user.role = auth.role;
+    user.expiration_date = auth.exp;
   };
 
   const authenticateUser = (data: any) => {
     return loginUser(data).then((resp) => {
       if (resp.success) {
-        saveLocalStorage(TOKEN_KEY, resp.data.token);
-        updateUser(resp.data);
+        const auth = jwt_decode(resp.data.access);
+        saveLocalStorage(TOKEN_KEY, resp.data.access);
+        updateUser(auth);
         createNewAxiosInstance();
       }
       return resp;
@@ -51,17 +56,11 @@ export function useUser() {
 
   async function authenticateUserFromToken() {
     const token = getLocalStorage(TOKEN_KEY);
-    let toReturn = false
+    const toReturn = false
     if (token) {
-      await getProfile()
-        .then((resp) => {
-          updateUser(resp.data);
-          isAuthFromTokenLoaded.value = true;
-          toReturn = true
-        })
-        .catch(() => {
-          isAuthFromTokenLoaded.value = true;
-        });
+      const auth = jwt_decode(token);
+      if (auth.exp * 1000 > new Date().getTime()) updateUser(auth);
+      isAuthFromTokenLoaded.value = true;
     } else {
       isAuthFromTokenLoaded.value = true;
     }
