@@ -336,22 +336,25 @@ function getRedirectLink(mode: string, item: any) {
 }
 
 onMounted(() => {
-  console.log(fields.value)
   propsData.data.getData(loading, serverItems, fields.value);
   setFields();
 });
 
 onBeforeMount(() => {
   propsData.data.headers.map((item) => {
-    if (user.role >= item.role) {
+    if (item.roles.includes(user.role)) {
       headers.value.push(item);
     }
   });
   propsData.data.fields.map((item) => {
-    if (user.role >= item.role) {
+    if (item.roles.includes(user.role)) {
       fields.value.push(item);
     }
   });
+  console.log('fields');
+  console.log(fields.value);
+  console.log('headers');
+  console.log(headers.value);
 });
 </script>
 

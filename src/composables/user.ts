@@ -1,7 +1,7 @@
 import { createNewAxiosInstance } from '@/api';
 import { loginUser } from '@/api/users';
 import router from '@/router';
-import { NO_AUTH, TOKEN_KEY } from '@/utils/constants';
+import { TOKEN_KEY } from '@/utils/constants';
 import jwt_decode from 'jwt-decode';
 import {
   deleteLocalStorage,
@@ -13,7 +13,7 @@ import { reactive, ref } from 'vue';
 const user = reactive({
   name: '',
   email: '',
-  role: NO_AUTH,
+  role: '',
   expiration_date: 0,
 });
 
@@ -21,13 +21,13 @@ const isAuthFromTokenLoaded = ref(false);
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.role > NO_AUTH;
+    return user.role !== '';
   };
 
   const logoutUser = () => {
     user.name = '';
     user.email = '';
-    user.role = NO_AUTH;
+    user.role = '';
     user.expiration_date = 0;
 
     deleteLocalStorage(TOKEN_KEY);

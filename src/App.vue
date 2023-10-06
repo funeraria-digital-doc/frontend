@@ -9,10 +9,10 @@
             <v-list-item
               v-for="(item, index) in sideNavLinksComputed"
               :key="index"
-              class="side-nav__link"
+              class="side-nav__route_name"
               :prepend-icon="item.icon"
               :title="item.title"
-              @click="() => navigate(item.link)"
+              @click="() => navigate(item.route_name)"
             />
           </v-list>
         </v-navigation-drawer>
@@ -35,8 +35,8 @@ import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
-import { NO_AUTH, STAFF, SUPER, USER } from './utils/constants';
 import { watch } from 'vue';
+import { getAuth } from './authorizations/authorizations';
 
 export default defineComponent({
   name: 'LoginModal',
@@ -54,62 +54,63 @@ import router from '@/router';
 const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
 
 const sideNavLinks = [
-  { title: 'Página inicial', link: '/', icon: 'mdi-home', role: NO_AUTH },
+  {
+    title: 'Página inicial',
+    route_name: 'home',
+    icon: 'mdi-home',
+    roles: getAuth('home'),
+  },
   {
     title: 'Utilizadores',
-    link: '/users',
+    route_name: 'users',
     icon: 'mdi-account-multiple',
-    role: STAFF,
+    roles: getAuth('users'),
   },
   {
     title: 'Funerárias',
-    link: '/groups',
+    route_name: 'groups',
     icon: 'mdi-home-modern',
-    role: SUPER,
+    roles: getAuth('groups'),
   },
   {
     title: 'Templates',
-    link: '/templates',
+    route_name: 'templates',
     icon: 'mdi-file-multiple',
-    role: SUPER,
+    roles: getAuth('templates'),
   },
   {
     title: 'Declarações',
-    link: '/records',
+    route_name: 'records',
     icon: 'mdi-file-document',
-    role: USER,
+    roles: getAuth('records'),
   },
   {
     title: 'Estatisticas',
-    link: '/stats',
+    route_name: 'stats',
     icon: 'mdi-chart-line',
-    role: STAFF,
+    roles: getAuth('stats'),
   },
   {
     title: 'Sobre',
-    link: '/about',
+    route_name: 'about',
     icon: 'mdi-information-variant',
-    role: NO_AUTH,
+    roles: getAuth('about'),
   },
 ];
 
 const sideNavLinksComputed = ref([]);
 
-const navigate = (link: string) => {
-  router.push(link);
+const navigate = (route_name: string) => {
+  router.push({ name: route_name });
 };
 
 async function processSideMenu() {
   await authenticateUserFromToken().then(async (result) => {
-    if (result) {
-      sideNavLinksComputed.value = []
-      for (const i of sideNavLinks) {
-        if (user.role >= i.role) {
-          sideNavLinksComputed.value.push(i);
-        }
+    sideNavLinksComputed.value = [];
+    for (const i of sideNavLinks) {
+      if (i.roles.length == 0 || i.roles.includes(user.role)) {
+        sideNavLinksComputed.value.push(i);
       }
-    } else {
-      sideNavLinksComputed.value = [];
     }
   });
 }

@@ -20,14 +20,14 @@ let token = getLocalStorage(TOKEN_KEY);
 
 export let apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
-  headers: token ? { Authorization: `Token ${token}` } : {},
+  headers: token ? { Authorization: `Bearer ${token}` } : {},
 });
 
 export function createNewAxiosInstance() {
   token = getLocalStorage(TOKEN_KEY);
   apiInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
-    headers: token ? { Authorization: `Token ${token}` } : {},
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 }
 

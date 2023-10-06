@@ -27,8 +27,8 @@ import Page from '../../components/shared/Page/page.vue';
 import HomeStats from './components/homeStats.vue';
 import Login from '../../components/shared/Login/login.vue';
 import { watch } from 'vue';
-import { checkAuth } from '@/utils/authorizations';
-import { STAFF } from '@/utils/constants';
+import { checkAuth } from '@/authorizations/authorizations';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 
 const { isUserAuthenticated, user } = useUser();
 const title = ref('');
@@ -38,8 +38,9 @@ watch(user, () => {
   isLoggedIn.value = isUserAuthenticated();
 });
 
-watch(isLoggedIn, () => {
+watch(isLoggedIn, async () => {
   getTitle();
+  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
 });
 
 const getTitle = () => {
@@ -53,7 +54,7 @@ const getTitle = () => {
 onBeforeMount(async () => {
   isLoggedIn.value = isUserAuthenticated();
   getTitle();
-  hasStats.value = await checkAuth(STAFF, true);
+  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
 });
 </script>
 <style scoped>

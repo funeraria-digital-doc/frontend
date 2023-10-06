@@ -1,42 +1,61 @@
 import { groupsList } from '@/api/groups';
-import { STAFF, SUPER } from '@/utils/constants';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 
 export const headers = [
-  { title: 'ID', align: 'start', key: 'id', sortable: true, role: STAFF },
+  {
+    title: 'ID',
+    align: 'start',
+    key: 'id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
   {
     title: 'Nome de utilizador',
     align: 'end',
     key: 'username',
     sortable: true,
-    role: STAFF,
+    roles: AUTH_PERMISSIONS.STAFF,
   },
-  { title: 'Email', align: 'end', key: 'email', sortable: true, role: STAFF },
+  {
+    title: 'Email',
+    align: 'end',
+    key: 'email',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
   {
     title: 'Funeraria',
     align: 'end',
     key: 'group',
     sortable: true,
-    role: SUPER,
+    roles: AUTH_PERMISSIONS.SUPER,
   },
   {
     title: 'Admin',
     align: 'end',
     key: 'is_superuser',
     sortable: true,
-    role: SUPER,
+    roles: AUTH_PERMISSIONS.SUPER,
   },
   {
     title: 'Staff',
     align: 'end',
     key: 'is_staff',
     sortable: true,
-    role: STAFF,
+    roles: AUTH_PERMISSIONS.STAFF,
   },
-  { title: 'Estado', align: 'end', key: 'status', sortable: true, role: STAFF },
+  {
+    title: 'Estado',
+    align: 'end',
+    key: 'status',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
   {
     title: 'Ações',
     key: 'actions',
     sortable: false,
+    roles: AUTH_PERMISSIONS.STAFF,
   },
 ];
 
@@ -73,7 +92,7 @@ export const fields = [
     label: 'Nome de utilizador',
     rules: nameRules,
     col: 12,
-    role: STAFF
+    roles: AUTH_PERMISSIONS.STAFF,
   },
   {
     name: 'email',
@@ -81,7 +100,7 @@ export const fields = [
     label: 'Email',
     rules: emailRules,
     col: 12,
-    role: STAFF
+    roles: AUTH_PERMISSIONS.STAFF,
   },
   {
     name: 'group',
@@ -90,7 +109,7 @@ export const fields = [
     rules: [],
     col: 12,
     items: await getGroups(),
-    role: SUPER
+    roles: AUTH_PERMISSIONS.SUPER,
   },
   {
     name: 'status',
@@ -103,6 +122,7 @@ export const fields = [
       { label: 'Ativo', value: '2' },
       { label: 'Suspenso', value: '3' },
     ],
+    roles: AUTH_PERMISSIONS.STAFF
   },
   {
     name: 'is_superuser',
@@ -111,7 +131,7 @@ export const fields = [
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
-    role: SUPER
+    roles: AUTH_PERMISSIONS.SUPER,
   },
   {
     name: 'is_staff',
@@ -120,6 +140,6 @@ export const fields = [
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
-    role: SUPER
+    roles: AUTH_PERMISSIONS.SUPER,
   },
 ];
