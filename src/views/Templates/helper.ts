@@ -201,7 +201,6 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
       }
     }
   } else if (mode === 'edit') {
-    console.log('edit');
     for (let i = 0; i < Object.keys(templateData).length; i++) {
       const key = Object.keys(templateData)[i];
       const item = templateData[key];
@@ -243,8 +242,6 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
       }
     }
   }
-  console.log(templateData)
-  console.log('to be sent : ', formData);
   return formData;
 };
 

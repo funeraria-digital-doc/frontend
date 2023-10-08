@@ -342,7 +342,6 @@ watch(showDateFields, (showDateFields) => {
 watch(
   () => validation.value.field_type,
   (field_type) => {
-    console.log('mudou ' + field_type);
     if (field_type) {
       validation.value.default_value = [];
     }
