@@ -1,5 +1,5 @@
 <template>
-  <page :title="templatesTitle">
+  <page :title="templatesTitle" back="templates">
     <v-form
       ref="form"
       validate-on="submit"
