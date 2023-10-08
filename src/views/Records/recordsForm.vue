@@ -1,5 +1,5 @@
 <template>
-  <page :title="recordTitle">
+  <page :title="recordTitle" back="records">
     <p class="mb-6">Por favor introduza os seguintes dados.</p>
 
     <div class="death-declaration__form">
