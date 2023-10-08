@@ -247,3 +247,7 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
   console.log('to be sent : ', formData);
   return formData;
 };
+
+export function canAction(){
+  return true
+}

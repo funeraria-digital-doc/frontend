@@ -38,7 +38,7 @@ export const headers = [
     roles: AUTH_PERMISSIONS.SUPER,
   },
   {
-    title: 'Staff',
+    title: 'Gestor',
     align: 'end',
     key: 'is_staff',
     sortable: true,
@@ -93,6 +93,8 @@ export const fields = [
     rules: nameRules,
     col: 12,
     roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.STAFF,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'email',
@@ -101,6 +103,8 @@ export const fields = [
     rules: emailRules,
     col: 12,
     roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.STAFF,
+    editDisplayRole: AUTH_PERMISSIONS.STAFF
   },
   {
     name: 'group',
@@ -110,6 +114,8 @@ export const fields = [
     col: 12,
     items: await getGroups(),
     roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'status',
@@ -122,7 +128,9 @@ export const fields = [
       { label: 'Ativo', value: '2' },
       { label: 'Suspenso', value: '3' },
     ],
-    roles: AUTH_PERMISSIONS.STAFF
+    roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.STAFF
   },
   {
     name: 'is_superuser',
@@ -132,14 +140,18 @@ export const fields = [
     true_value_label: 'Sim',
     false_value_label: 'Não',
     roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'is_staff',
     type: 'checkbox',
-    label: 'Staff',
+    label: 'Gestor',
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
     roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
 ];

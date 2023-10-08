@@ -1,4 +1,5 @@
 import { listAllUsers, userCreate, userDelete, userEdit } from '@/api/users';
+import { useUser } from '@/composables/user';
 
 export const getUsers = async (
   loading: { value: boolean },
@@ -8,7 +9,6 @@ export const getUsers = async (
   listAllUsers().then((resp) => {
     if (resp.success) {
       const usersData = resp.data.users.map((user: any) => {
-        console.log(fields);
         return {
           id: user.id,
           username: user.username,
@@ -192,4 +192,19 @@ export function getLabel(key: string, type: string, value: any, fields: any) {
     }
   }
   return label;
+}
+
+export function canAction(itemRaw: {
+  username: string;
+  email: string;
+  role: string;
+}) {
+  const { user } = useUser();
+  const isSameUser =
+    user.name !== itemRaw.username && user.email !== itemRaw.email;
+  const isRoleLower =
+    (user.role == 'staff' && itemRaw.role == 'user') ||
+    (user.role == 'super' &&
+      (itemRaw.role == 'staff' || itemRaw.role == 'user'));
+  return isSameUser || isRoleLower;
 }

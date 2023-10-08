@@ -1,8 +1,9 @@
 import { TOKEN_KEY } from '@/utils/constants';
-import { getLocalStorage } from '@/utils/localStorage';
+import { deleteLocalStorage, getLocalStorage } from '@/utils/localStorage';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 import router from '@/router';
+import jwt_decode from 'jwt-decode';
 
 export type ApiError<E = {}> = E & {
   type: string;
@@ -16,7 +17,22 @@ export type Failable<T, E> =
   | { success: false; error: E };
 
 export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
-let token = getLocalStorage(TOKEN_KEY);
+
+function getToken() {
+  const tempToken = getLocalStorage(TOKEN_KEY);
+  if (tempToken) {
+    const token = jwt_decode(tempToken);
+    if (token.exp * 1000 > new Date().getTime()) {
+      return tempToken;
+    } else {
+      deleteLocalStorage(TOKEN_KEY);
+      return null;
+    }
+  }
+  return null;
+}
+
+let token = getToken();
 
 export let apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
@@ -24,7 +40,7 @@ export let apiInstance = axios.create({
 });
 
 export function createNewAxiosInstance() {
-  token = getLocalStorage(TOKEN_KEY);
+  token = getToken();
   apiInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -34,7 +50,7 @@ export function createNewAxiosInstance() {
 export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {
   if (
     e.code === 'ERR_NETWORK' &&
-    router.currentRoute.value.name !== 'service_unavailable' && 
+    router.currentRoute.value.name !== 'service_unavailable' &&
     router.currentRoute.value.name !== 'not_found'
   ) {
     router.push({ name: 'service_unavailable' });

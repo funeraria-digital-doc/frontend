@@ -42,37 +42,72 @@
           </v-card-title>
           <v-card-text>
             <v-form ref="form" validate-on="submit" @submit.prevent="save">
-              <v-container v-for="field in fields" :key="field">
-                <v-row>
-                  <v-col :cols="field.col" :sm="field.col" :md="field.col">
-                    <v-text-field
-                      v-if="field.type === 'text-field'"
-                      :id="field.name"
-                      v-model="editedItem[field.name]"
-                      :rules="field.rules"
-                      :label="field.label"
-                    ></v-text-field>
+              <div v-if="mode === 'create'">
+                <v-container v-for="field in createFields" :key="field">
+                  <v-row>
+                    <v-col :cols="field.col" :sm="field.col" :md="field.col">
+                      <v-text-field
+                        v-if="field.type === 'text-field'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :rules="field.rules"
+                        :label="field.label"
+                      ></v-text-field>
 
-                    <v-checkbox
-                      v-if="field.type === 'checkbox'"
-                      :id="field.name"
-                      v-model="editedItem[field.name]"
-                      :label="field.label"
-                    />
-                    <v-select
-                      v-if="field.type === 'select'"
-                      :id="field.name"
-                      v-model="editedItem[field.name]"
-                      :label="field.label"
-                      :rules="field.rules"
-                      :items="field.items"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                    />
-                  </v-col>
-                </v-row>
-              </v-container>
+                      <v-checkbox
+                        v-if="field.type === 'checkbox'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :label="field.label"
+                      />
+                      <v-select
+                        v-if="field.type === 'select'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :label="field.label"
+                        :rules="field.rules"
+                        :items="field.items"
+                        item-title="label"
+                        item-value="value"
+                        clearable
+                      />
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </div>
+              <div v-else>
+                <v-container v-for="field in editFields" :key="field">
+                  <v-row>
+                    <v-col :cols="field.col" :sm="field.col" :md="field.col">
+                      <v-text-field
+                        v-if="field.type === 'text-field'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :rules="field.rules"
+                        :label="field.label"
+                      ></v-text-field>
+
+                      <v-checkbox
+                        v-if="field.type === 'checkbox'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :label="field.label"
+                      />
+                      <v-select
+                        v-if="field.type === 'select'"
+                        :id="field.name"
+                        v-model="editedItem[field.name]"
+                        :label="field.label"
+                        :rules="field.rules"
+                        :items="field.items"
+                        item-title="label"
+                        item-value="value"
+                        clearable
+                      />
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </div>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue-darken-1" variant="text" @click="close">
@@ -126,20 +161,24 @@
       v-if="propsData.data.createAndEditByModal"
       v-slot:item.actions="{ item }"
     >
-      <v-icon size="small" class="me-2" @click="editItem(item.raw)">
-        mdi-pencil
-      </v-icon>
-      <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+      <div v-if="canAction(item.raw)">
+        <v-icon size="small" class="me-2" @click="editItem(item.raw)">
+          mdi-pencil
+        </v-icon>
+        <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+      </div>
     </template>
     <template v-else v-slot:item.actions="{ item }">
-      <v-icon
-        size="small"
-        class="me-2"
-        @click="getRedirectLink('edit', item.raw)"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+      <div v-if="canAction(item.raw)">
+        <v-icon
+          size="small"
+          class="me-2"
+          @click="getRedirectLink('edit', item.raw)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+      </div>
     </template>
   </v-data-table>
   <error-success-message ref="snack"></error-success-message>
@@ -158,6 +197,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable';
 import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 export default defineComponent({
   name: 'GenericDataTable',
   components: {
@@ -191,7 +231,7 @@ const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
-const fields = ref([]);
+const fields = ref(propsData.data.fields);
 const itemsPerPageOptions = ref([
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -206,11 +246,31 @@ const serverItems = ref([]);
 const editedIndex = ref(-1);
 const editedItem = ref({});
 const defaultItem = ref({});
+const mode = computed(() => {
+  return editedIndex.value === -1 ? 'create' : 'edit';
+});
 const formTitle = computed(() => {
   return editedIndex.value === -1
     ? propsData.data.newItemTitle
     : propsData.data.editItemTitle;
 });
+
+const createFields = computed(() => {
+  return fields.value.filter(
+    (i: { createDisplayRole: string | string[] }) =>
+      i.createDisplayRole.includes(user.role) ||
+      i.createDisplayRole == AUTH_PERMISSIONS.NO_AUTH
+  );
+});
+
+const editFields = computed(() => {
+  return fields.value.filter(
+    (i: { editDisplayRole: string | string[] }) =>
+      i.editDisplayRole.includes(user.role) ||
+      i.editDisplayRole == AUTH_PERMISSIONS.NO_AUTH
+  );
+});
+
 const snack = ref(null);
 
 function editItem(item: any) {
@@ -229,7 +289,7 @@ function editItem(item: any) {
   editedItem.value = Object.assign({}, newItem);
   dialog.value = true;
 }
-function deleteItem(item) {
+function deleteItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
@@ -335,26 +395,21 @@ function getRedirectLink(mode: string, item: any) {
   router.push(link);
 }
 
+function canAction(itemRaw: { username: string; email: string; role: string }) {
+  return propsData.data.canAction(itemRaw)
+}
+
 onMounted(() => {
-  propsData.data.getData(loading, serverItems, fields.value);
+  propsData.data.getData(loading, serverItems, fields.value)
   setFields();
 });
 
 onBeforeMount(() => {
-  propsData.data.headers.map((item) => {
+  propsData.data.headers.map((item: { roles: string | string[] }) => {
     if (item.roles.includes(user.role)) {
       headers.value.push(item);
     }
   });
-  propsData.data.fields.map((item) => {
-    if (item.roles.includes(user.role)) {
-      fields.value.push(item);
-    }
-  });
-  console.log('fields');
-  console.log(fields.value);
-  console.log('headers');
-  console.log(headers.value);
 });
 </script>
 

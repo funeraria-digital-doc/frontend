@@ -7,7 +7,7 @@
 import { defineComponent } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import * as constants from './constants';
-import { getRecords, deleteRecord } from './helper';
+import { getRecords, deleteRecord, canAction } from './helper';
 export default defineComponent({
   name: 'RecordsDatatable',
   components: {
@@ -28,5 +28,6 @@ const data = {
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   delete: deleteRecord,
   getData: getRecords,
+  canAction: canAction
 };
 </script>

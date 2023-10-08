@@ -1,13 +1,55 @@
-import { groupsList } from "@/api/groups";
+import { groupsList } from '@/api/groups';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 
 export const headers = [
-  { title: 'Nome', align: 'start', key: 'name', sortable: true },
-  { title: 'Telefone', align: 'end', key: 'family_member_phone', sortable: true },
-  { title: 'Email', align: 'end', key: 'family_member_email', sortable: true },
-  { title: 'Género', align: 'end', key: 'gender', sortable: true },
-  { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
-  { title: 'Estado', align: 'end', key: 'status', sortable: true },
-  { title: 'Ações', key: 'actions', sortable: false },
+  {
+    title: 'Nome',
+    align: 'start',
+    key: 'name',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Telefone',
+    align: 'end',
+    key: 'family_member_phone',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Email',
+    align: 'end',
+    key: 'email',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Género',
+    align: 'end',
+    key: 'gender',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Funerária',
+    align: 'end',
+    key: 'group_id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
+  },
+  {
+    title: 'Estado',
+    align: 'end',
+    key: 'status',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Ações',
+    key: 'actions',
+    sortable: false,
+    roles: AUTH_PERMISSIONS.USER,
+  },
 ];
 export const fields = [
   {
@@ -25,7 +67,7 @@ export const fields = [
     items: [
       { label: 'Feminino', value: 'WOMAN' },
       { label: 'Masculino', value: 'MALE' },
-      { label: 'Outro', value: 'OTHER' }
+      { label: 'Outro', value: 'OTHER' },
     ],
   },
   {
