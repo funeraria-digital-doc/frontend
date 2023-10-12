@@ -1,5 +1,6 @@
 import { groupsList } from '@/api/groups';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import { downloadTemplate } from './helper';
 
 export const headers = [
   {
@@ -116,6 +117,12 @@ export const fields = [
       { label: 'Email', value: 'EMAIL' },
       { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
     ],
+  },
+  {
+    name: 'file',
+    type: 'file',
+    message: 'Descarregar',
+    clickFunction: downloadTemplate,
   },
 ];
 

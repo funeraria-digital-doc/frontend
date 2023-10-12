@@ -33,7 +33,7 @@ const data = {
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   delete: deleteTemplate,
   getData: getTemplates,
-  fileFields: [{ name: 'file', clickFunction: downloadTemplate }],
+  //fileFields: [{ name: 'file', clickFunction: downloadTemplate }],
   canAction: canAction,
 };
 </script>

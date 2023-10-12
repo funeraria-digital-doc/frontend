@@ -12,13 +12,19 @@
     loading-text="A carregar"
   >
     <template
-      v-for="field in propsData.data.fileFields"
+      v-for="(field, key) in fields"
       :key="field.name"
       v-slot:[`item.${field.name}`]="{ item }"
     >
-      <v-btn v-if="item.columns.file" @click="field.clickFunction(item)"
-        >Descarregar</v-btn
+      <v-btn
+        v-if="
+          (item.columns[field.name] && field.type == 'file') ||
+          field.type == 'button'
+        "
+        @click="field.clickFunction(item)"
+        >{{ field.message }}</v-btn
       >
+      <p v-else>{{ item.columns[field.name] }}</p>
     </template>
     <template v-slot:top>
       <v-dialog
@@ -396,11 +402,11 @@ function getRedirectLink(mode: string, item: any) {
 }
 
 function canAction(itemRaw: { username: string; email: string; role: string }) {
-  return propsData.data.canAction(itemRaw)
+  return propsData.data.canAction(itemRaw);
 }
 
 onMounted(() => {
-  propsData.data.getData(loading, serverItems, fields.value)
+  propsData.data.getData(loading, serverItems, fields.value);
   setFields();
 });
 

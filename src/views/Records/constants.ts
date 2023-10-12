@@ -1,5 +1,6 @@
 import { groupsList } from '@/api/groups';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import { generateDocuments } from './helper';
 
 export const headers = [
   {
@@ -45,6 +46,13 @@ export const headers = [
     roles: AUTH_PERMISSIONS.USER,
   },
   {
+    title: 'Gerar Documentos',
+    align: 'end',
+    key: 'generate_documents',
+    sortable: false,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
     title: 'Ações',
     key: 'actions',
     sortable: false,
@@ -80,6 +88,12 @@ export const fields = [
       { label: 'Finalizado', value: 'COMPLETED' },
       { label: 'Arquivado', value: 'ARCHIVED' },
     ],
+  },
+  {
+    name: 'generate_documents',
+    type: 'button',
+    message: 'Gerar Documentos',
+    clickFunction: generateDocuments,
   },
 ];
 async function getGroups() {

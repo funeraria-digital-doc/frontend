@@ -133,3 +133,8 @@ export function checkErrors(
 export function canAction() {
   return true;
 }
+
+export function generateDocuments(){
+  console.log('generating documents')
+  return true
+}
