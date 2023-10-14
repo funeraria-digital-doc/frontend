@@ -21,6 +21,7 @@
           <input
             type="file"
             :id="photoId"
+            :name="id"
             class="profile-input"
             accept="image/*"
             @change="handleFileChange"

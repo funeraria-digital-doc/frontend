@@ -7,7 +7,8 @@
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
-      :error-messages="errorMessages[field.name]"
+      :error-messages="errorMessages"
+      :name="field.name"
     />
 
     <v-checkbox
@@ -15,36 +16,39 @@
       :id="field.name"
       v-model="model"
       :label="field.label"
-      :error-messages="errorMessages[field.name]"
+      :error-messages="errorMessages"
+      :name="field.name"
     />
 
     <v-select
       v-if="field.input === 'select'"
+      :error-messages="errorMessages"
       :id="field.name"
-      v-model="model"
+      :items="field.items"
       :label="field.label"
+      :name="field.name"
       :rules="field.rules"
       :type="field.type"
-      :items="field.items"
       item-title="label"
       item-value="value"
-      :error-messages="errorMessages[field.name]"
+      v-model="model"
     />
 
     <date-picker
       v-if="field.input === 'date'"
+      :error-messages="errorMessages"
       :field="field"
-      :error-messages="errorMessages[field.name]"
+      :name="field.name"
     />
 
     <photo-upload
       v-if="field.input === 'file'"
+      :error-messages="errorMessages"
       :id="field.name"
+      :imageUrl="imageUrl"
+      :isLoading="isLoading"
       :label="field.label"
       :snack="snack"
-      :isLoading="isLoading"
-      :imageUrl="imageUrl"
-      :error-messages="errorMessages[field.name]"
       @save="saveFile"
     />
 
@@ -57,6 +61,7 @@ import { ref, watch, type PropType } from 'vue';
 import DatePicker from '../../DatePicker/datePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
+import ErrorSuccessMessage from '../../ErrorSuccessMessages/errorSuccessMessages.vue';
 
 const props = defineProps({
   field: {
@@ -64,7 +69,8 @@ const props = defineProps({
     required: true,
   },
   errorMessages: {
-    type: Object,
+    type: String,
+    required: false,
   },
 });
 
