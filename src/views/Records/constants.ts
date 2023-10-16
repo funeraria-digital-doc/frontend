@@ -59,7 +59,7 @@ export const headers = [
     roles: AUTH_PERMISSIONS.USER,
   },
 ];
-export const fields = [
+export const fields = async (generateDocumentsCallback: Function) => [
   {
     name: 'name',
     type: 'text-field',
@@ -93,7 +93,7 @@ export const fields = [
     name: 'generate_documents',
     type: 'button',
     message: 'Gerar Documentos',
-    clickFunction: generateDocuments,
+    clickFunction: generateDocuments(undefined, generateDocumentsCallback),
   },
 ];
 async function getGroups() {
@@ -106,3 +106,9 @@ async function getGroups() {
     return [];
   }
 }
+
+// export const toSendOptionsItems = [
+//   { label: 'Documento', value: 'DOCUMENT' },
+//   { label: 'Email', value: 'EMAIL' },
+//   { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
+// ]

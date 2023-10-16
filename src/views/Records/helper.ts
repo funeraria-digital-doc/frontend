@@ -73,23 +73,27 @@ export const deleteRecord = async (
 };
 
 export function getLabel(key: string, type: string, value: any, fields: any) {
-  const field = fields.find((f: { name: string }) => f.name === key);
-  let label = null;
-  if (field) {
-    if (type == 'checkbox') {
-      if (value) {
-        label = field.true_value_label;
-      } else {
-        label = field.false_value_label;
-      }
-    } else if (type == 'select') {
-      const val = field.items.find((i: { value: any }) => i.value === value);
-      if (val && val['label']) {
-        label = val['label'];
+  fields().then((val: any[]) => {
+    const field = val.find((f: { name: string }) => f.name === key);
+    let label = null;
+    if (field) {
+      if (type == 'checkbox') {
+        if (value) {
+          label = field.true_value_label;
+        } else {
+          label = field.false_value_label;
+        }
+      } else if (type == 'select') {
+        console.log(field)
+        const val = field.items.find((i: { value: any }) => i.value === value);
+        if (val && val['label']) {
+          label = val['label'];
+        }
       }
     }
-  }
-  return label;
+    return label;
+  })
+  
 }
 
 export function checkErrors(
@@ -134,7 +138,10 @@ export function canAction() {
   return true;
 }
 
-export function generateDocuments(){
+export function generateDocuments(record: any, callback: Function){
   console.log('generating documents')
-  return true
+  console.log(record)
+  callback(record)
 }
+
+
