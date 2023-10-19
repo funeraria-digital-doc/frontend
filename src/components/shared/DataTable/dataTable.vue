@@ -213,7 +213,12 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const propsData = defineProps(['data']);
+const propsData = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
+});
 const { user } = useUser();
 /*
 Exemplo de header
