@@ -1,4 +1,3 @@
-import { groupsList } from '@/api/groups';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 import { generateDocuments } from './helper';
 
@@ -93,12 +92,8 @@ export const fields = (generateDocumentsCallback: Function) => [
     name: 'generate_documents',
     type: 'button',
     message: 'Gerar Documentos',
-    clickFunction: (item: any) => generateDocuments(item, generateDocumentsCallback),
+    clickFunction: (item: any) =>
+      generateDocuments(item, generateDocumentsCallback),
   },
 ];
 
-// export const toSendOptionsItems = [
-//   { label: 'Documento', value: 'DOCUMENT' },
-//   { label: 'Email', value: 'EMAIL' },
-//   { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
-// ]

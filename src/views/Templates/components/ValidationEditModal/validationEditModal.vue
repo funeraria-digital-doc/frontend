@@ -423,13 +423,19 @@ watch(
 watch(
   () => validation.value.options,
   (options) => {
-    let newDefaultValue = [];
-    validation.value.default_value.map((val: any) => {
-      if (options.indexOf(val) > -1) {
-        newDefaultValue.push(val);
-      }
-    });
-    validation.value.default_value = newDefaultValue;
+    if (
+      validation.value &&
+      validation.value.default_value &&
+      validation.value.default_value.length > 0
+    ) {
+      let newDefaultValue = [];
+      validation.value.default_value.map((val: any) => {
+        if (options.indexOf(val) > -1) {
+          newDefaultValue.push(val);
+        }
+      });
+      validation.value.default_value = newDefaultValue;
+    }
   }
 );
 
@@ -454,7 +460,7 @@ onBeforeMount(() => {
   }
   if (validation.value.db_collection != '') {
     mapDbFields();
-  } 
+  }
 });
 </script>
 

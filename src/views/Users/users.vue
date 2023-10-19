@@ -39,5 +39,8 @@ const data = {
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   createEditButtons: { cancel: 'Cancelar', action: 'Guardar' },
   canAction: canAction,
+  updateVariables: () => {
+    return true;
+  },
 };
 </script>

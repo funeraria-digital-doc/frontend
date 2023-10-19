@@ -1,7 +1,12 @@
 <template>
   <page title="Declarações">
     <data-table :data="data"></data-table>
-    <generate-documents v-if="docId" :document-id="docId"></generate-documents>
+    <generate-documents
+      v-if="docId"
+      :document-id="docId"
+      :modalState="modalState"
+      @close-modal="closeModal"
+    ></generate-documents>
   </page>
 </template>
 <script lang="ts">
@@ -9,7 +14,7 @@ import { defineComponent, onBeforeMount, reactive, ref } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import GenerateDocuments from '../Records/modal/modal.vue';
 import * as constants from './constants';
-import { getRecords, deleteRecord, canAction } from './helper';
+import { getRecords, deleteRecord, canAction, updateVariables } from './helper';
 import { groupsList } from '@/api/groups';
 export default defineComponent({
   name: 'RecordsDatatable',
@@ -22,14 +27,15 @@ export default defineComponent({
 <script lang="ts" setup>
 import Page from '../../components/shared/Page/page.vue';
 const docId = ref();
+const modalState = ref(false);
 
 let data = reactive({
   createAndEditByModal: false,
   homeLink: '/records',
   headers: constants.headers,
   fields: constants.fields((documentId: string) => {
-    console.log(documentId);
     docId.value = documentId;
+    modalState.value = true;
   }),
   createButtonTitle: 'Criar Declaração',
   deleteText: 'Tem a certeza de que quer <br>eliminar esta declaração?',
@@ -37,23 +43,23 @@ let data = reactive({
   delete: deleteRecord,
   getData: getRecords,
   canAction: canAction,
+  updateVariables: updateVariables,
 });
 
-onBeforeMount(() => {
+function closeModal(){
+  modalState.value = false;
+}
+
+onBeforeMount(async () => {
   const parse = (group: any) => ({ label: group.name, value: group.id });
 
-  groupsList().then((resp) => {
-    debugger;
-
+  await groupsList().then((resp) => {
     if (resp.success) {
-      data = {
-        ...data,
-        fields: data.fields.map((field: any) =>
-          field.name === 'group_id'
-            ? { ...field, items: resp.data.map((i: any) => parse(i)) }
-            : field
-        ),
-      };
+      data.fields = data.fields.map((field: any) =>
+        field.name === 'group_id'
+          ? { ...field, items: resp.data.map((i: any) => parse(i)) }
+          : field
+      );
     }
   });
 });

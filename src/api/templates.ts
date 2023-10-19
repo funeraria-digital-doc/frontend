@@ -71,6 +71,22 @@ export async function templateEdit(
   template: Template
 ): Promise<ApiResponse<any>> {
   try {
+    let newTemplateValidations = [];
+    template.validations.map((validation) => {
+      let newValidationItem = {};
+      for (let key in Object.keys(validation)) {
+        if (
+          validation[Object.keys(validation)[key]] ||
+          validation[Object.keys(validation)[key]] !== ''
+        ) {
+          newValidationItem[Object.keys(validation)[key]] =
+            validation[Object.keys(validation)[key]];
+        }
+      }
+      newTemplateValidations.push(newValidationItem);
+    });
+    template = { ...template, validations: newTemplateValidations };
+    console.log(template);
     const response = await apiInstance.post(
       '/template-logic/edit/' + template.id + '/',
       template

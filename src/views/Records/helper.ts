@@ -1,4 +1,5 @@
 import { recordDelete, recordItem, recordsList } from '@/api/records';
+import { getLabel } from '@/utils/datatableHelper';
 
 export const getRecords = async (
   loading: { value: boolean },
@@ -15,9 +16,9 @@ export const getRecords = async (
             name: record.name,
             email: record.email,
             family_member_phone: record.family_member_phone,
-            gender: getLabel('gender', 'select', record.gender, fields),
-            status: getLabel('status', 'select', record.status, fields),
-            group_id: getLabel('group_id', 'select', record.group_id, fields),
+            gender: getLabel('gender', record.gender, fields),
+            status: getLabel('status', record.status, fields),
+            group_id: record.group_id,
           };
         });
       }
@@ -31,12 +32,8 @@ export const getRecords = async (
 
 export const getSingleRecord = async (id: string) => {
   return recordItem(id).then((resp: any) => {
-    if (resp.success) {
-      console.log('send_type', resp.data);
-      if (resp.data.id) {
-        console.log('send_type', resp.data);
-        return resp.data;
-      }
+    if (resp.success && resp.data && resp.data.id) {
+      return resp.data;
     } else {
       console.error('Get template error:', resp);
     }
@@ -71,28 +68,6 @@ export const deleteRecord = async (
     );
   }
 };
-
-export function getLabel(key: string, type: string, value: any, fields: any) {
-  const field = fields.find((f: { name: string }) => f.name === key);
-  let label = null;
-  if (field) {
-    if (type == 'checkbox') {
-      if (value) {
-        label = field.true_value_label;
-      } else {
-        label = field.false_value_label;
-      }
-    } else if (type == 'select') {
-      const val = field.items.find((i: { value: any }) => i.value === value);
-
-      if (val && val['label']) {
-        label = val['label'];
-      }
-    }
-  }
-
-  return label;
-}
 
 export function checkErrors(
   error: any,
@@ -137,7 +112,13 @@ export function canAction() {
 }
 
 export function generateDocuments(record: any, callback: Function) {
-  console.log('generating documents');
-  console.log(record);
   callback(record);
+}
+
+export function updateVariables(serverItems: any[], fields: any) {
+  serverItems.map((item: { group_id: any }) => {
+    if (typeof item.group_id == 'number') {
+      item.group_id = getLabel('group_id', item.group_id, fields);
+    }
+  });
 }

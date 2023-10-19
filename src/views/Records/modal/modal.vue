@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="generateDocuments" max-width="500px">
+  <v-dialog v-model="props.modalState" max-width="500px" persistent>
     <v-card>
       <v-card-title class="mt-3">
         <span class="text-h5 ml-6">Gerar Documentos</span>
@@ -40,6 +40,7 @@
                     :field="validation"
                     :errorMessages="errorMessages"
                   /> -->
+                  {{ console.log(props.documentId) }}
                 <v-col>
                   <v-text-field
                     v-if="validation.input === 'text'"
@@ -106,6 +107,7 @@ import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 //import DynamicFieldInput from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.vue';
 import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
+import { clickDownloadFile } from '@/utils/downloadFile';
 //import * as constants from '../constants.ts';
 export default defineComponent({
   name: 'GenerateDocuments',
@@ -116,7 +118,6 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const generateDocuments = ref(true);
 const form = ref();
 const modalFields = ref({
   to_send_option: '',
@@ -124,10 +125,8 @@ const modalFields = ref({
   validations: {},
 });
 
-const props = defineProps(['documentId'])
-console.log(props.documentId)
-const recordId = ref(1);
-
+const props = defineProps(['documentId', 'modalState']);
+const emit = defineEmits(['close-modal']);
 const errorMessages = ref();
 
 const templates = ref<TemplateInterface[]>([]);
@@ -142,7 +141,7 @@ const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção
 const isTemplateSelected = ref(false);
 
 function confirmClose() {
-  generateDocuments.value = false;
+  emit('close-modal');
   modalFields.value = {
     to_send_option: '',
     template: '',
@@ -151,18 +150,23 @@ function confirmClose() {
 }
 
 function save() {
-  console.log('save');
-  console.log(modalFields.value);
   form.value.validate().then((resp: any) => {
-    console.log(resp);
     if (resp.valid) {
-      generateDocument(recordId.value, modalFields.value).then(() => {
-        if (resp.success) {
-          generateDocuments.value = false;
-        } else {
-          console.log('erro');
+      generateDocument(props.documentId.raw.id, modalFields.value).then(
+        (docResp) => {
+          if (docResp.success) {
+            clickDownloadFile(
+              { data: docResp.data.file },
+              props.documentId.raw.name
+            );
+            emit('close-modal');
+          } else {
+            console.log('errors', docResp);
+          }
         }
-      });
+      );
+    } else {
+      console.log('errors', resp.errors);
     }
   });
 }
@@ -174,6 +178,7 @@ const templateValidations = computed(() => {
       selected = i.validations;
     }
   });
+  console.log('templateValidations', validations.value)
   return selected;
 });
 
@@ -208,7 +213,7 @@ function getValidations(templateValidationsItem: any) {
 onMounted(() => {});
 
 onBeforeMount(async () => {
-  await getTemplates(recordId.value).then((resp) => {
+  await getTemplates(props.documentId.raw.id).then((resp) => {
     if (resp.success) {
       templates.value = [];
       errorMessages.value = {};

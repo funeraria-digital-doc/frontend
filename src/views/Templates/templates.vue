@@ -29,5 +29,8 @@ const data = {
   delete: deleteTemplate,
   getData: getTemplates,
   canAction: canAction,
+  updateVariables: () => {
+    return true;
+  },
 };
 </script>
