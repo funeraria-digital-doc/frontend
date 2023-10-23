@@ -36,23 +36,20 @@
                 v-for="(validation, index) in templateValidations"
                 :key="index"
               >
-                <!-- <dynamic-field-input
-                    :field="validation"
-                    :errorMessages="errorMessages"
-                  /> -->
                 <v-col>
                   <v-text-field
-                    v-if="validation.input === 'text'"
+                    v-if="validation.field_type.toLowerCase() === 'text'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label"
-                    :rules="validation.rules"
-                    :type="validation.type"
+                    :label="validation.label ?? validation.name"
+                    :rules="fieldRules(true, null, 255)"
+                    :type="validation.field_type.toLowerCase()"
                     :error-messages="errorMessages[validation.name]"
+                    :placeholder="validation.placeholder ?? null"
                   />
 
                   <v-checkbox
-                    v-if="validation.input === 'checkbox'"
+                    v-if="validation.field_type.toLowerCase() === 'checkbox'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
                     :label="validation.label"
@@ -60,24 +57,26 @@
                   />
 
                   <v-select
-                    v-if="validation.input === 'select'"
+                    v-if="validation.field_type.toLowerCase() === 'select'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label"
-                    :rules="validation.rules"
-                    :type="validation.type"
-                    :items="validation.items"
+                    :label="validation.label ?? validation.name"
+                    :rules="fieldRules(true, null, 255)"
+                    :type="validation.field_type.toLowerCase()"
+                    :items="validation.options"
                     item-title="label"
                     item-value="value"
                     :error-messages="errorMessages[validation.name]"
+                    :placeholder="validation.placeholder ?? null"
                   />
 
                   <v-text-field
-                    v-if="validation.input === 'date'"
+                    v-if="validation.field_type.toLowerCase() === 'date'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label"
-                    :rules="validation.rules"
+                    :label="validation.label ?? validation.name"
+                    :rules="fieldRules(true, null, 255)"
+                    :placeholder="validation.placeholder ?? null"
                     type="date"
                   />
                 </v-col>
@@ -100,18 +99,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-import { onBeforeMount, onMounted, watch } from 'vue';
+import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
 import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
-//import DynamicFieldInput from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.vue';
 import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
-//import * as constants from '../constants.ts';
 export default defineComponent({
   name: 'GenerateDocuments',
-  components: {
-    //DynamicFieldInput,
-  },
+  components: {},
 });
 </script>
 
@@ -125,8 +119,6 @@ const modalFields = ref({
 });
 
 const props = defineProps(['documentId'])
-console.log(props.documentId)
-const recordId = ref(1);
 
 const errorMessages = ref();
 
@@ -156,7 +148,7 @@ function save() {
   form.value.validate().then((resp: any) => {
     console.log(resp);
     if (resp.valid) {
-      generateDocument(recordId.value, modalFields.value).then(() => {
+      generateDocument(props.documentId.raw.id, modalFields.value).then(() => {
         if (resp.success) {
           generateDocuments.value = false;
         } else {
@@ -185,30 +177,19 @@ watch(
 );
 
 function getValidations(templateValidationsItem: any) {
-  let newValidations: {
-    name: any;
-    label: any;
-    input: any;
-    rules: ((v: string) => string | true)[];
-  }[] = [];
+  let newValidations: any[] = [];
   templateValidationsItem.map((val: any) => {
     errorMessages.value[val.name] = '';
     if (val.is_field_custom) {
-      newValidations.push({
-        name: val.name,
-        label: val.label ? val.label : '',
-        input: val.field_type.toLowerCase(),
-        rules: fieldRules(true, null, 255),
-      });
+      newValidations.push(val);
     }
   });
   return newValidations;
 }
 
-onMounted(() => {});
 
 onBeforeMount(async () => {
-  await getTemplates(recordId.value).then((resp) => {
+  await getTemplates(props.documentId.raw.id).then((resp) => {
     if (resp.success) {
       templates.value = [];
       errorMessages.value = {};
