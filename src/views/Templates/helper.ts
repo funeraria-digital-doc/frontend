@@ -4,6 +4,8 @@ import {
   templateItem,
   templateList,
 } from '@/api/templates';
+import { getLabel } from '@/utils/datatableHelper';
+import { clickDownloadFile } from '@/utils/downloadFile';
 
 export const getTemplates = async (
   loading: { value: boolean },
@@ -18,13 +20,8 @@ export const getTemplates = async (
           return {
             id: template.id,
             title: template.title,
-            group_id: getLabel('group_id', 'select', template.group_id, fields),
-            send_type: getLabel(
-              'send_type',
-              'select',
-              template.send_type,
-              fields
-            ),
+            group_id: getLabel('group_id', template.group_id, fields),
+            send_type: getLabel('send_type', template.send_type, fields),
             file: template.file,
           };
         });
@@ -96,37 +93,11 @@ export const deleteTemplate = async (
   }
 };
 
-export function getLabel(key: string, type: string, value: any, fields: any) {
-  const field = fields.find((f: { name: string }) => f.name === key);
-  let label = null;
-  if (type == 'checkbox') {
-    if (value) {
-      label = field.true_value_label;
-    } else {
-      label = field.false_value_label;
-    }
-  } else if (type == 'select') {
-    const val = field.items.find((i: { value: any }) => i.value === value);
-    if (val && val['label']) {
-      label = val['label'];
-    }
-  }
-  return label;
-}
-
 export function downloadTemplate(template: any) {
   try {
     downloadTemplateFile(template.columns.id).then((resp: any) => {
       if (resp.success) {
-        const file = base64ToFile(resp.data, template.columns.title);
-        const url = window.URL.createObjectURL(new Blob([file]));
-        const link = document.createElement('a');
-        link.href = url;
-        const filename = template.columns.title + '.docx';
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(url);
+        clickDownloadFile(resp.data, template.columns.title)
       } else {
         console.log('error', resp);
       }
@@ -135,26 +106,6 @@ export function downloadTemplate(template: any) {
     console.log(JSON.stringify(e));
   }
 }
-
-const base64ToFile = (base64Data: any, title: string) => {
-  const baseString = base64Data.data
-    .replace(
-      'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;',
-      ''
-    )
-    .replace('base64,', '')
-    .trim();
-  const filename = title + '.docx';
-  const byteCharacters = atob(baseString);
-  const byteArrays = [];
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteArrays.push(byteCharacters.charCodeAt(i));
-  }
-  const byteArray = new Uint8Array(byteArrays);
-  return new File([byteArray], filename, {
-    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  });
-};
 
 export const formatDataBeforeRequest = (templateData: any, mode: string) => {
   let formData = {};

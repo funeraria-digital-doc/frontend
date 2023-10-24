@@ -204,6 +204,7 @@ import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vu
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import { getLabel } from '@/utils/datatableHelper';
 export default defineComponent({
   name: 'GenericDataTable',
   components: {
@@ -290,12 +291,7 @@ function editItem(item: any) {
   for (let i = 0; i < Object.keys(item).length; i++) {
     const key = Object.keys(item)[i];
     const value = item[key];
-    const field = fields.value.find((f: any) => f.name === key);
-    if (field) {
-      newItem[key] = getLabelValue(key, field.type, value, fields.value);
-    } else {
-      newItem[key] = value;
-    }
+    newItem[key] = getLabel(key, value, fields.value);
   }
   editedItem.value = Object.assign({}, newItem);
   dialog.value = true;
@@ -374,26 +370,6 @@ function setFields() {
   }
   editedItem.value = newEditedItem;
   defaultItem.value = newEditedItem;
-}
-
-function getLabelValue(key: string, type: string, label: any, fields: any) {
-  const field = fields.find((f: { name: string }) => f.name === key);
-  let value = null;
-  if (type == 'checkbox') {
-    if (label === field.true_value_label) {
-      value = true;
-    } else {
-      value = false;
-    }
-  } else if (type == 'select') {
-    const val = field.items.find((i: { label: any }) => i.label === label);
-    if (val && val['value']) {
-      value = val['value'];
-    }
-  } else {
-    value = label;
-  }
-  return value;
 }
 
 function getRedirectLink(mode: string, item: any) {

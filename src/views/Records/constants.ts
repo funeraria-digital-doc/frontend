@@ -97,8 +97,3 @@ export const fields = (generateDocumentsCallback: Function) => [
   },
 ];
 
-// export const toSendOptionsItems = [
-//   { label: 'Documento', value: 'DOCUMENT' },
-//   { label: 'Email', value: 'EMAIL' },
-//   { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
-// ]

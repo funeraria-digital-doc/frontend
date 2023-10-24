@@ -2,7 +2,10 @@
   <div>
     <v-toolbar prominent :elevation="8">
       <v-toolbar-title @click="handleHome" id="app-name">
-        Funerária Digital Doc
+        <!-- <img src="./img_3.png" alt="logo" style="width:65px"/> -->
+        <img src="./img_6.png" alt="logo" style="width: 80px" />
+        <p>Funerária Digital Doc</p>
+        <!-- <img src="./img_9.png" alt="logo" style="width:50px"/> -->
       </v-toolbar-title>
 
       <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
@@ -82,5 +85,11 @@ const accountLinks = [
 <style lang="scss">
 #app-name {
   cursor: pointer;
+}
+
+.v-toolbar-title__placeholder {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 </style>

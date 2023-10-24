@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="generateDocuments" max-width="500px">
+  <v-dialog v-model="props.modalState" max-width="500px" persistent>
     <v-card>
       <v-card-title class="mt-3">
         <span class="text-h5 ml-6">Gerar Documentos</span>
@@ -36,6 +36,7 @@
                 v-for="(validation, index) in templateValidations"
                 :key="index"
               >
+                {{ console.log('validation', validation) }}
                 <v-col>
                   <v-text-field
                     v-if="validation.field_type.toLowerCase() === 'text'"
@@ -68,6 +69,24 @@
                     item-value="value"
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
+                  />
+
+                  <v-combobox
+                    v-if="validation.field_type.toLowerCase() === 'multiselect'"
+                    :id="validation.name"
+                    v-model="modalFields.validations[validation.name]"
+                    :label="validation.label ?? validation.name"
+                    :rules="fieldRules(true, null, 255)"
+                    :type="validation.field_type.toLowerCase()"
+                    :items="validation.options"
+                    item-title="label"
+                    item-value="value"
+                    :multiple="true"
+                    :error-messages="errorMessages[validation.name]"
+                    :placeholder="validation.placeholder ?? null"
+                    :chips="true"
+                    :closable-chips="true"
+                    :clearable="true"
                   />
 
                   <v-text-field
@@ -103,6 +122,7 @@ import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
 import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
+import { clickDownloadFile } from '@/utils/downloadFile';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -110,7 +130,6 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const generateDocuments = ref(true);
 const form = ref();
 const modalFields = ref({
   to_send_option: '',
@@ -118,7 +137,8 @@ const modalFields = ref({
   validations: {},
 });
 
-const props = defineProps(['documentId'])
+const props = defineProps(['documentId', 'modalState']);
+const emit = defineEmits(['close-modal']);
 
 const errorMessages = ref();
 
@@ -134,7 +154,7 @@ const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção
 const isTemplateSelected = ref(false);
 
 function confirmClose() {
-  generateDocuments.value = false;
+  emit('close-modal');
   modalFields.value = {
     to_send_option: '',
     template: '',
@@ -143,18 +163,28 @@ function confirmClose() {
 }
 
 function save() {
-  console.log('save');
-  console.log(modalFields.value);
   form.value.validate().then((resp: any) => {
-    console.log(resp);
     if (resp.valid) {
-      generateDocument(props.documentId.raw.id, modalFields.value).then(() => {
-        if (resp.success) {
-          generateDocuments.value = false;
-        } else {
-          console.log('erro');
+      generateDocument(props.documentId.raw.id, modalFields.value).then(
+        (docResp) => {
+          if (docResp.success) {
+            clickDownloadFile(
+              { data: docResp.data.file },
+              props.documentId.raw.name
+            );
+            emit('close-modal');
+            modalFields.value = {
+              to_send_option: '',
+              template: '',
+              validations: {},
+            };
+          } else {
+            console.log('errors', docResp);
+          }
         }
-      });
+      );
+    } else {
+      console.log('errors', resp.errors);
     }
   });
 }
@@ -186,7 +216,6 @@ function getValidations(templateValidationsItem: any) {
   });
   return newValidations;
 }
-
 
 onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {

@@ -1,7 +1,12 @@
 <template>
   <page title="Declarações">
     <data-table v-if="data" :data="data"></data-table>
-    <generate-documents v-if="docId" :document-id="docId"></generate-documents>
+    <generate-documents
+      v-if="docId"
+      :document-id="docId"
+      :modalState="modalState"
+      @close-modal="closeModal"
+    ></generate-documents>
   </page>
 </template>
 <script lang="ts">
@@ -23,8 +28,12 @@ export default defineComponent({
 <script lang="ts" setup>
 import Page from '../../components/shared/Page/page.vue';
 const docId = ref();
-
 const data = ref();
+const modalState = ref(false);
+
+function closeModal(){
+  modalState.value = false;
+}
 
 onBeforeMount(() => {
   const parse = (group: any) => ({ label: group.name, value: group.id });
@@ -36,8 +45,8 @@ onBeforeMount(() => {
         homeLink: '/records',
         headers: constants.headers,
         fields: constants.fields((documentId: string) => {
-          console.log(documentId);
           docId.value = documentId;
+          modalState.value = true;
         }),
         createButtonTitle: 'Criar Declaração',
         deleteText: 'Tem a certeza de que quer <br>eliminar esta declaração?',

@@ -20,7 +20,6 @@ export async function generateDocument(
       `/template-logic/${data.template}/download/${record_id}/`,
       data
     );
-    console.log(response.data)
     return { success: true, data: response.data };
   } catch (e: any) {
     return errorResponse(e);
