@@ -1,20 +1,48 @@
 import { groupsList } from '@/api/groups';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import { downloadTemplate } from './helper';
 
 export const headers = [
-  { title: 'ID', align: 'start', key: 'id', sortable: true },
+  {
+    title: 'ID',
+    align: 'start',
+    key: 'id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
   {
     title: 'Titulo',
     align: 'end',
     key: 'title',
     sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
   },
-  { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
-  { title: 'Ficheiro', align: 'end', key: 'file', sortable: true },
-  { title: 'Tipo de Envio', align: 'end', key: 'send_type', sortable: true },
+  {
+    title: 'Funerária',
+    align: 'end',
+    key: 'group_id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Ficheiro',
+    align: 'end',
+    key: 'file',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Tipo de Envio',
+    align: 'end',
+    key: 'send_type',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
   {
     title: 'Ações',
     key: 'actions',
     sortable: false,
+    roles: AUTH_PERMISSIONS.USER,
   },
 ];
 
@@ -89,6 +117,12 @@ export const fields = [
       { label: 'Email', value: 'EMAIL' },
       { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
     ],
+  },
+  {
+    name: 'file',
+    type: 'file',
+    message: 'Descarregar',
+    clickFunction: downloadTemplate,
   },
 ];
 

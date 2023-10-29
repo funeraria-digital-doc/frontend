@@ -5,7 +5,7 @@
         Plataforma para agilizar e gerir os documentos referentes ao processo de
         declarar um falecimento.
       </p>
-      <home-stats></home-stats>
+      <home-stats v-if="hasStats"></home-stats>
     </div>
     <login v-else></login>
   </page>
@@ -27,17 +27,20 @@ import Page from '../../components/shared/Page/page.vue';
 import HomeStats from './components/homeStats.vue';
 import Login from '../../components/shared/Login/login.vue';
 import { watch } from 'vue';
+import { checkAuth } from '@/authorizations/authorizations';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 
 const { isUserAuthenticated, user } = useUser();
 const title = ref('');
 const isLoggedIn = ref(false);
-
+const hasStats = ref(false);
 watch(user, () => {
   isLoggedIn.value = isUserAuthenticated();
 });
 
-watch(isLoggedIn, () => {
+watch(isLoggedIn, async () => {
   getTitle();
+  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
 });
 
 const getTitle = () => {
@@ -48,9 +51,10 @@ const getTitle = () => {
   }
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   isLoggedIn.value = isUserAuthenticated();
   getTitle();
+  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
 });
 </script>
 <style scoped>
