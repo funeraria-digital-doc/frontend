@@ -1,4 +1,5 @@
 import { groupsList, groupCreate, groupEdit, groupDelete } from '@/api/groups';
+import { useUser } from '@/composables/user';
 
 export const getGroups = async (loading, groups) => {
   groupsList().then((resp) => {
@@ -96,3 +97,7 @@ export const deleteGroup = async (
     );
   }
 };
+
+export function canAction() {
+  return true;
+}

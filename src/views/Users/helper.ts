@@ -1,4 +1,6 @@
 import { listAllUsers, userCreate, userDelete, userEdit } from '@/api/users';
+import { useUser } from '@/composables/user';
+import { getLabel } from '@/utils/datatableHelper';
 
 export const getUsers = async (
   loading: { value: boolean },
@@ -12,15 +14,10 @@ export const getUsers = async (
           id: user.id,
           username: user.username,
           email: user.email,
-          group: getLabel('group', 'select', user.group, fields),
-          is_staff: getLabel('is_staff', 'checkbox', user.is_staff, fields),
-          is_superuser: getLabel(
-            'is_superuser',
-            'checkbox',
-            user.is_superuser,
-            fields
-          ),
-          status: getLabel('status', 'select', user.status, fields),
+          group: getLabel('group', user.group, fields),
+          is_staff: getLabel('is_staff', user.is_staff, fields),
+          is_superuser: getLabel('is_superuser', user.is_superuser, fields),
+          status: getLabel('status', user.status, fields),
         };
       });
       users.value = usersData;
@@ -51,20 +48,14 @@ export const createUser = async (
           id: resp.data.id,
           username: resp.data.username,
           email: resp.data.email,
-          group: getLabel('group', 'select', resp.data.group, fields),
-          is_staff: getLabel(
-            'is_staff',
-            'checkbox',
-            resp.data.is_staff,
-            fields
-          ),
+          group: getLabel('group', resp.data.group, fields),
+          is_staff: getLabel('is_staff', resp.data.is_staff, fields),
           is_superuser: getLabel(
             'is_superuser',
-            'checkbox',
             resp.data.is_superuser,
             fields
           ),
-          status: getLabel('status', 'select', resp.data.status, fields),
+          status: getLabel('status', resp.data.status, fields),
         };
         users.value.push(user);
         snack.value.showSnackbar('Funerária criada com sucesso.', '', true);
@@ -110,20 +101,14 @@ export const editUser = async (
           id: resp.data.id,
           username: resp.data.username,
           email: resp.data.email,
-          group: getLabel('group', 'select', resp.data.group, fields),
-          is_staff: getLabel(
-            'is_staff',
-            'checkbox',
-            resp.data.is_staff,
-            fields
-          ),
+          group: getLabel('group', resp.data.group, fields),
+          is_staff: getLabel('is_staff', resp.data.is_staff, fields),
           is_superuser: getLabel(
             'is_superuser',
-            'checkbox',
             resp.data.is_superuser,
             fields
           ),
-          status: getLabel('status', 'select', resp.data.status, fields),
+          status: getLabel('status', resp.data.status, fields),
         };
         users.value[index] = user;
         snack.value.showSnackbar('Funerária editada com sucesso.', '', true);
@@ -173,20 +158,17 @@ export const deleteUser = async (
   }
 };
 
-export function getLabel(key: string, type: string, value: any, fields: any) {
-  const field = fields.find((f: { name: string }) => f.name === key);
-  let label = null;
-  if (type == 'checkbox') {
-    if (value) {
-      label = field.true_value_label;
-    } else {
-      label = field.false_value_label;
-    }
-  } else if (type == 'select') {
-    const val = field.items.find((i: { value: any }) => i.value === value);
-    if (val && val['label']) {
-      label = val['label'];
-    }
-  }
-  return label;
+export function canAction(itemRaw: {
+  username: string;
+  email: string;
+  role: string;
+}) {
+  const { user } = useUser();
+  const isSameUser =
+    user.name !== itemRaw.username && user.email !== itemRaw.email;
+  const isRoleLower =
+    (user.role == 'staff' && itemRaw.role == 'user') ||
+    (user.role == 'super' &&
+      (itemRaw.role == 'staff' || itemRaw.role == 'user'));
+  return isSameUser || isRoleLower;
 }

@@ -1,16 +1,26 @@
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+
 export const headers = [
-  { title: 'ID', align: 'start', key: 'id', sortable: true },
+  {
+    title: 'ID',
+    align: 'start',
+    key: 'id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
+  },
   {
     title: 'Nome',
     align: 'end',
     key: 'name',
     sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
   },
   {
     title: 'Ações',
     key: 'actions',
     align: 'end',
     sortable: false,
+    roles: AUTH_PERMISSIONS.SUPER,
   },
 ];
 

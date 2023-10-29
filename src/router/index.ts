@@ -1,26 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useUser } from '@/composables/user';
+import { checkAuth, getAuth } from '@/authorizations/authorizations';
 
-//import { defineAsyncComponent } from 'vue';
-// const Home = defineAsyncComponent(() => import('@/views/Home/home.vue'));
-// const Contacts = () => import('@/views/Contacts/contacts.vue')
-// const Profile = defineAsyncComponent(
-//   () => import('@/views/Profile/profile.vue')
-// );
-// const Users = defineAsyncComponent(() => import('@/views/Users/users.vue'));
-// const Groups = defineAsyncComponent(() => import('@/views/Groups/groups.vue'));
-// const Templates = defineAsyncComponent(
-//   () => import('@/views/Templates/templates.vue')
-// );
-// const Records = defineAsyncComponent(
-//   () => import('@/views/Records/records.vue')
-// );
-// const TemplatesForm = defineAsyncComponent(
-//   () => import('@/views/Templates/templatesForm.vue')
-// );
-// const RecordsForm = defineAsyncComponent(
-//   () => import('@/views/Records/recordsForm.vue')
-// );
 const Home = () => import('@/views/Home/home.vue');
 const Profile = () => import('@/views/Profile/profile.vue');
 const Users = () => import('@/views/Users/users.vue');
@@ -29,7 +9,7 @@ const Templates = () => import('@/views/Templates/templates.vue');
 const Records = () => import('@/views/Records/records.vue');
 const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
 const RecordsForm = () => import('@/views/Records/recordsForm.vue');
-const Stats = () => import('@/views/Stats/stats.vue')
+const Stats = () => import('@/views/Stats/stats.vue');
 const ErrorPage = () => import('@/views/Error/errorPage.vue');
 const About = () => import('@/views/About/about.vue');
 
@@ -40,103 +20,103 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
+      meta: { roles: getAuth('home') },
     },
     {
       path: '/profile',
       name: 'profile',
       component: Profile,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('profile') },
     },
     {
       path: '/users',
       name: 'users',
       component: Users,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('users') },
     },
     {
       path: '/groups',
       name: 'groups',
       component: Groups,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('groups') },
     },
     {
       path: '/templates',
       name: 'templates',
       component: Templates,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('templates') },
     },
     {
       path: '/templates/create',
       name: 'templates_create',
       component: TemplatesForm,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('templates_create') },
     },
     {
       path: '/templates/:id/edit',
       name: 'templates_edit',
       component: TemplatesForm,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('templates_edit') },
     },
     {
       path: '/records',
       name: 'records',
       component: Records,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('records') },
     },
     {
       path: '/records/create',
       name: 'records_create',
       component: RecordsForm,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('records_create') },
     },
     {
       path: '/records/:id/edit',
       name: 'records_edit',
       component: RecordsForm,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('records_edit') },
     },
     {
       path: '/stats',
       name: 'stats',
       component: Stats,
-      meta: { requiresAuth: true },
+      meta: { roles: getAuth('stats') },
     },
     {
       path: '/about',
       name: 'about',
       component: About,
+      meta: { roles: getAuth('about') },
     },
     {
       path: '/not-found',
       component: ErrorPage,
       name: 'not_found',
-      meta: { status: 'not-found' },
+      meta: { roles: getAuth('not_found'), status: 'not-found' },
     },
     {
       path: '/service-unavailable',
       component: ErrorPage,
       name: 'service_unavailable',
-      meta: { status: 'service-unavailable' },
+      meta: {
+        roles: getAuth('service_unavailable'),
+        status: 'service-unavailable',
+      },
     },
     {
       path: '/:pathMatch(.*)*',
       redirect: { name: 'not_found' },
+      name: 'others',
+      meta: { roles: getAuth('others') },
     },
   ],
 });
 
-router.beforeEach((to) => {
-  const { isUserAuthenticated, isAuthFromTokenLoaded } = useUser();
-
-  if (
-    to.meta.requiresAuth &&
-    !isUserAuthenticated() &&
-    isAuthFromTokenLoaded.value
-  ) {
-    return {
-      path: '/',
-      name: 'home',
-    };
+router.beforeEach(async (to, from, next) => {
+  if (await checkAuth(to.meta.roles)) {
+    next();
+  } else {
+    next({ name: 'home' });
   }
 });
 

@@ -21,7 +21,7 @@ const isAuthFromTokenLoaded = ref(false);
 
 export function useUser() {
   const isUserAuthenticated = () => {
-    return user.name !== '';
+    return user.role !== '';
   };
 
   const logoutUser = () => {
@@ -54,9 +54,9 @@ export function useUser() {
     });
   };
 
-  const authenticateUserFromToken = () => {
+  async function authenticateUserFromToken() {
     const token = getLocalStorage(TOKEN_KEY);
-
+    const toReturn = false
     if (token) {
       const auth = jwt_decode(token);
       if (auth.exp * 1000 > new Date().getTime()) updateUser(auth);
@@ -64,7 +64,8 @@ export function useUser() {
     } else {
       isAuthFromTokenLoaded.value = true;
     }
-  };
+    return toReturn
+  }
 
   return {
     user,

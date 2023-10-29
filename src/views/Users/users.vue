@@ -7,7 +7,13 @@
 import { defineComponent } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import * as constants from './constants';
-import { createUser, editUser, deleteUser, getUsers } from './helper';
+import {
+  createUser,
+  editUser,
+  deleteUser,
+  getUsers,
+  canAction,
+} from './helper';
 export default defineComponent({
   name: 'UsersDatatable',
   components: {
@@ -32,5 +38,6 @@ const data = {
   deleteText: 'Tem a certeza de que quer <br>eliminar este Utilizador?',
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   createEditButtons: { cancel: 'Cancelar', action: 'Guardar' },
+  canAction: canAction,
 };
 </script>

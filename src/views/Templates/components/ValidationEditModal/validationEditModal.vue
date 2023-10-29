@@ -342,7 +342,6 @@ watch(showDateFields, (showDateFields) => {
 watch(
   () => validation.value.field_type,
   (field_type) => {
-    console.log('mudou ' + field_type);
     if (field_type) {
       validation.value.default_value = [];
     }
@@ -424,13 +423,19 @@ watch(
 watch(
   () => validation.value.options,
   (options) => {
-    let newDefaultValue = [];
-    validation.value.default_value.map((val: any) => {
-      if (options.indexOf(val) > -1) {
-        newDefaultValue.push(val);
-      }
-    });
-    validation.value.default_value = newDefaultValue;
+    if (
+      validation.value &&
+      validation.value.default_value &&
+      validation.value.default_value.length > 0
+    ) {
+      let newDefaultValue = [];
+      validation.value.default_value.map((val: any) => {
+        if (options.indexOf(val) > -1) {
+          newDefaultValue.push(val);
+        }
+      });
+      validation.value.default_value = newDefaultValue;
+    }
   }
 );
 
