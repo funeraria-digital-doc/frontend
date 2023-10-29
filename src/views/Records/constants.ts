@@ -1,15 +1,64 @@
-import { groupsList } from "@/api/groups";
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import { generateDocuments } from './helper';
 
 export const headers = [
-  { title: 'Nome', align: 'start', key: 'name', sortable: true },
-  { title: 'Telefone', align: 'end', key: 'family_member_phone', sortable: true },
-  { title: 'Email', align: 'end', key: 'family_member_email', sortable: true },
-  { title: 'Género', align: 'end', key: 'gender', sortable: true },
-  { title: 'Funerária', align: 'end', key: 'group_id', sortable: true },
-  { title: 'Estado', align: 'end', key: 'status', sortable: true },
-  { title: 'Ações', key: 'actions', sortable: false },
+  {
+    title: 'Nome',
+    align: 'start',
+    key: 'name',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Telefone',
+    align: 'end',
+    key: 'family_member_phone',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Email',
+    align: 'end',
+    key: 'email',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Género',
+    align: 'end',
+    key: 'gender',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Funerária',
+    align: 'end',
+    key: 'group_id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
+  },
+  {
+    title: 'Estado',
+    align: 'end',
+    key: 'status',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Gerar Documentos',
+    align: 'end',
+    key: 'generate_documents',
+    sortable: false,
+    roles: AUTH_PERMISSIONS.USER,
+  },
+  {
+    title: 'Ações',
+    key: 'actions',
+    sortable: false,
+    roles: AUTH_PERMISSIONS.USER,
+  },
 ];
-export const fields = [
+export const fields = (generateDocumentsCallback: Function) => [
   {
     name: 'name',
     type: 'text-field',
@@ -17,7 +66,7 @@ export const fields = [
   {
     name: 'group_id',
     type: 'select',
-    items: await getGroups(),
+    items: [],
   },
   {
     name: 'gender',
@@ -25,7 +74,7 @@ export const fields = [
     items: [
       { label: 'Feminino', value: 'WOMAN' },
       { label: 'Masculino', value: 'MALE' },
-      { label: 'Outro', value: 'OTHER' }
+      { label: 'Outro', value: 'OTHER' },
     ],
   },
   {
@@ -39,14 +88,12 @@ export const fields = [
       { label: 'Arquivado', value: 'ARCHIVED' },
     ],
   },
+  {
+    name: 'generate_documents',
+    type: 'button',
+    message: 'Gerar Documentos',
+    clickFunction: (item: any) =>
+      generateDocuments(item, generateDocumentsCallback),
+  },
 ];
-async function getGroups() {
-  const resp = await groupsList();
-  if (resp.data) {
-    return resp.data.map((group: any) => {
-      return { label: group.name, value: group.id };
-    });
-  } else {
-    return [];
-  }
-}
+

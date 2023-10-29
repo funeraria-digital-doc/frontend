@@ -1,22 +1,61 @@
 import { groupsList } from '@/api/groups';
+import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 
 export const headers = [
-  { title: 'ID', align: 'start', key: 'id', sortable: true },
+  {
+    title: 'ID',
+    align: 'start',
+    key: 'id',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
   {
     title: 'Nome de utilizador',
     align: 'end',
     key: 'username',
     sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
   },
-  { title: 'Email', align: 'end', key: 'email', sortable: true },
-  { title: 'Funeraria', align: 'end', key: 'group', sortable: true },
-  { title: 'Admin', align: 'end', key: 'is_superuser', sortable: true },
-  { title: 'Staff', align: 'end', key: 'is_staff', sortable: true },
-  { title: 'Estado', align: 'end', key: 'status', sortable: true },
+  {
+    title: 'Email',
+    align: 'end',
+    key: 'email',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
+  {
+    title: 'Funeraria',
+    align: 'end',
+    key: 'group',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
+  },
+  {
+    title: 'Admin',
+    align: 'end',
+    key: 'is_superuser',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.SUPER,
+  },
+  {
+    title: 'Gestor',
+    align: 'end',
+    key: 'is_staff',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
+  {
+    title: 'Estado',
+    align: 'end',
+    key: 'status',
+    sortable: true,
+    roles: AUTH_PERMISSIONS.STAFF,
+  },
   {
     title: 'Ações',
     key: 'actions',
     sortable: false,
+    roles: AUTH_PERMISSIONS.STAFF,
   },
 ];
 
@@ -53,6 +92,9 @@ export const fields = [
     label: 'Nome de utilizador',
     rules: nameRules,
     col: 12,
+    roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.STAFF,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'email',
@@ -60,6 +102,9 @@ export const fields = [
     label: 'Email',
     rules: emailRules,
     col: 12,
+    roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.STAFF,
+    editDisplayRole: AUTH_PERMISSIONS.STAFF
   },
   {
     name: 'group',
@@ -68,6 +113,9 @@ export const fields = [
     rules: [],
     col: 12,
     items: await getGroups(),
+    roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'status',
@@ -80,6 +128,9 @@ export const fields = [
       { label: 'Ativo', value: '2' },
       { label: 'Suspenso', value: '3' },
     ],
+    roles: AUTH_PERMISSIONS.STAFF,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.STAFF
   },
   {
     name: 'is_superuser',
@@ -88,13 +139,19 @@ export const fields = [
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
+    roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
   {
     name: 'is_staff',
     type: 'checkbox',
-    label: 'Staff',
+    label: 'Gestor',
     col: 4,
     true_value_label: 'Sim',
     false_value_label: 'Não',
+    roles: AUTH_PERMISSIONS.SUPER,
+    createDisplayRole: AUTH_PERMISSIONS.SUPER,
+    editDisplayRole: AUTH_PERMISSIONS.SUPER
   },
 ];

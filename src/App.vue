@@ -7,12 +7,12 @@
         <v-navigation-drawer permanent>
           <v-list density="compact" nav>
             <v-list-item
-              v-for="(item, index) in sideNavLinks"
+              v-for="(item, index) in sideNavLinksComputed"
               :key="index"
-              class="side-nav__link"
+              class="side-nav__route_name"
               :prepend-icon="item.icon"
               :title="item.title"
-              @click="() => navigate(item.link)"
+              @click="() => navigate(item.route_name)"
             />
           </v-list>
         </v-navigation-drawer>
@@ -30,11 +30,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount } from 'vue';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 import { RouterView } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
+import { watch } from 'vue';
+import { getAuth } from './authorizations/authorizations';
 
 export default defineComponent({
   name: 'LoginModal',
@@ -49,24 +51,76 @@ export default defineComponent({
 <script lang="ts" setup>
 import router from '@/router';
 
-const { isAuthFromTokenLoaded, authenticateUserFromToken } = useUser();
+const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
 
 const sideNavLinks = [
-  { title: 'Página inicial', link: '/', icon: 'mdi-home' },
-  { title: 'Utilizadores', link: '/users', icon: 'mdi-account-multiple' },
-  { title: 'Funerárias', link: '/groups', icon: 'mdi-home-modern' },
-  { title: 'Templates', link: '/templates', icon: 'mdi-file-multiple' },
-  { title: 'Declarações', link: '/records', icon: 'mdi-file-document' },
-  { title: 'Estatisticas', link: '/stats', icon: 'mdi-chart-line' },
-  { title: 'Sobre', link: '/about', icon: 'mdi-information-variant' },
+  {
+    title: 'Página inicial',
+    route_name: 'home',
+    icon: 'mdi-home',
+    roles: getAuth('home'),
+  },
+  {
+    title: 'Utilizadores',
+    route_name: 'users',
+    icon: 'mdi-account-multiple',
+    roles: getAuth('users'),
+  },
+  {
+    title: 'Funerárias',
+    route_name: 'groups',
+    icon: 'mdi-home-modern',
+    roles: getAuth('groups'),
+  },
+  {
+    title: 'Templates',
+    route_name: 'templates',
+    icon: 'mdi-file-multiple',
+    roles: getAuth('templates'),
+  },
+  {
+    title: 'Declarações',
+    route_name: 'records',
+    icon: 'mdi-file-document',
+    roles: getAuth('records'),
+  },
+  {
+    title: 'Estatisticas',
+    route_name: 'stats',
+    icon: 'mdi-chart-line',
+    roles: getAuth('stats'),
+  },
+  {
+    title: 'Sobre',
+    route_name: 'about',
+    icon: 'mdi-information-variant',
+    roles: getAuth('about'),
+  },
 ];
 
-const navigate = (link: string) => {
-  router.push(link);
+const sideNavLinksComputed = ref([]);
+
+const navigate = (route_name: string) => {
+  router.push({ name: route_name });
 };
 
-onBeforeMount(() => {
-  authenticateUserFromToken();
+async function processSideMenu() {
+  await authenticateUserFromToken().then(async (result) => {
+    sideNavLinksComputed.value = [];
+    for (const i of sideNavLinks) {
+      if (i.roles.length == 0 || i.roles.includes(user.role)) {
+        sideNavLinksComputed.value.push(i);
+      }
+    }
+  });
+}
+
+watch(user, async () => {
+  await processSideMenu();
+});
+
+onBeforeMount(async () => {
+  await processSideMenu();
 });
 </script>
 
