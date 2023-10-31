@@ -24,6 +24,7 @@
             :name="id"
             class="profile-input"
             accept="image/*"
+            ref="input"
             @change="handleFileChange"
           />
         </label>
@@ -57,6 +58,7 @@ const emit = defineEmits(['save']);
 const photoId = ref(props.id ?? 'photo-input');
 const photoLabel = ref(props.label ?? 'Carregar foto');
 const isLoading = ref(props.isLoading);
+const input = ref();
 
 const handleSave = (base64File: string, file: any) => {
   emit('save', base64File, file);
@@ -71,7 +73,8 @@ const handleFileChange = (event: any) => {
     reader.readAsDataURL(file);
     reader.onload = () => {
       reader.result && saveImage(reader.result as string, file);
-      // reader.result && (imageUrl.value = reader.result) && (image.value = file);
+
+      input.value && (input.value.attributes.value = reader.result);
     };
     reader.onerror = (error) => {
       console.log(error);

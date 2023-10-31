@@ -72,7 +72,10 @@ const onSubmit = async (input: any) => {
     const data = new FormData(input.target);
 
     [...data.entries()].forEach((entry) => {
-      values[entry[0]] = entry[1];
+      values[entry[0]] =
+        entry[1] instanceof File
+          ? input.target[entry[0]].attributes.value
+          : entry[1];
     });
 
     emit('on-submit', values);

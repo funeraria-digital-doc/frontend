@@ -79,15 +79,15 @@ const model = ref(props.field.value);
 // for image
 const snack = ref();
 const isLoading = ref(false);
-const imageUrl = ref();
+const imageUrl = ref(props.field.value);
 
 watch(props, (newProps) => {
   model.value = newProps.field.value;
+  imageUrl.value = newProps.field.value;
 });
 
-const saveFile = (base64File: string, file: any) => {
+const saveFile = (base64File: string) => {
   imageUrl.value = base64File;
-  model.value = file;
 };
 </script>
 
