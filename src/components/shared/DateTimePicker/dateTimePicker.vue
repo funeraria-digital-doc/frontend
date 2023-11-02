@@ -1,10 +1,10 @@
 <template>
   <v-text-field
     :id="field.name"
-    :v-model="field.name"
     :label="field.label"
     :rules="field.rules"
-    type="date"
+    :v-model="field.name"
+    type="datetime-local"
   />
 </template>
 
@@ -13,7 +13,7 @@ import { defineComponent, type PropType } from 'vue';
 import type { DynamicField } from '../../../models/dynamicField.model';
 
 export default defineComponent({
-  name: 'DatePicker',
+  name: 'DateTimePicker',
   props: {
     field: {
       type: Object as PropType<DynamicField>,
