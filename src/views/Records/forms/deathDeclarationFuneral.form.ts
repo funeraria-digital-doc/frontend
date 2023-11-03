@@ -11,22 +11,22 @@ export const DeathDeclarationFuneralForm: DynamicField[] = [
   {
     label: 'Data do velório',
     name: 'wake_date',
-    input: 'text',
+    input: 'date',
   },
   {
     label: 'Hora do velório',
     name: 'wake_time',
-    input: 'text',
+    input: 'time',
   },
   {
     label: 'Hora do funeral',
     name: 'leaving_mortuary_datetime',
-    input: 'date',
+    input: 'date-time',
   },
   {
     label: 'Data do funeral',
     name: 'funeral_datetime',
-    input: 'date',
+    input: 'date-time',
   },
   {
     label: 'Local do funeral',
