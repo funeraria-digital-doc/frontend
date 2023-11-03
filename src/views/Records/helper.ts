@@ -115,3 +115,65 @@ export function generateDocuments(record: any, callback: Function) {
   console.log('generating documents', record);
   callback(record);
 }
+
+export function getFormat(
+  fieldName: String,
+  templateValidations: any,
+  toPicker: boolean
+) {
+  const selectedVal = templateValidations.find(
+    (templateVal: { name: String }) => {
+      return templateVal.name === fieldName;
+    }
+  );
+  let format = '';
+  if (['DAY', 'DAYS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += toPicker ? 'dd' : 'DD';
+  }
+  if (['MONTH', 'MONTHS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += 'MM';
+  }
+  if (['YEAR', 'YEARS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += 'YYYY';
+  }
+  if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += ' ';
+    }
+    format += 'HH';
+  }
+  if (['MINUTE', 'MINUTES'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+        format += ':';
+      } else {
+        format += ' ';
+      }
+    }
+    format += 'mm';
+  }
+  if (['SECOND', 'SECONDS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      if (
+        ['MINUTE', 'MINUTES', 'HOUR', 'HOURS'].some((sub) =>
+          selectedVal.format.includes(sub)
+        )
+      ) {
+        format += ':';
+      } else {
+        format += ' ';
+      }
+    }
+    format += 'ss';
+  }
+  return format;
+}

@@ -17,6 +17,7 @@
                 item-title="label"
                 item-value="value"
                 clearable
+                disabled
               />
             </v-col>
             <v-col>
@@ -36,13 +37,27 @@
                 v-for="(validation, index) in templateValidations"
                 :key="index"
               >
-                {{ console.log('validation', validation) }}
                 <v-col>
                   <v-text-field
                     v-if="validation.field_type.toLowerCase() === 'text'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label ?? validation.name"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    :rules="fieldRules(true, null, 255)"
+                    :type="validation.field_type.toLowerCase()"
+                    :error-messages="errorMessages[validation.name]"
+                    :placeholder="validation.placeholder ?? null"
+                  />
+
+                  <v-text-field
+                    v-if="validation.field_type.toLowerCase() === 'email'"
+                    :id="validation.name"
+                    v-model="modalFields.validations[validation.name]"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
                     :rules="fieldRules(true, null, 255)"
                     :type="validation.field_type.toLowerCase()"
                     :error-messages="errorMessages[validation.name]"
@@ -61,7 +76,9 @@
                     v-if="validation.field_type.toLowerCase() === 'select'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label ?? validation.name"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
                     :rules="fieldRules(true, null, 255)"
                     :type="validation.field_type.toLowerCase()"
                     :items="validation.options"
@@ -75,7 +92,9 @@
                     v-if="validation.field_type.toLowerCase() === 'multiselect'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label ?? validation.name"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
                     :rules="fieldRules(true, null, 255)"
                     :type="validation.field_type.toLowerCase()"
                     :items="validation.options"
@@ -87,16 +106,59 @@
                     :chips="true"
                     :closable-chips="true"
                     :clearable="true"
+                    :teleport="true"
+                  />
+                  <v-text-field
+                    v-if="
+                      validation.field_type.toLowerCase() === 'date' &&
+                      isDateOrDateTime(validation.name) == 'datetime'
+                    "
+                    type="datetime-local"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    @update:model-value="handleDate($event, validation.name)"
+                    :placeholder="validation.placeholder ?? null"
+                  />
+                  <v-text-field
+                    v-if="
+                      validation.field_type.toLowerCase() === 'date' &&
+                      isDateOrDateTime(validation.name) == 'date'
+                    "
+                    type="date"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    @update:model-value="handleDate($event, validation.name)"
+                    :placeholder="validation.placeholder ?? null"
+                  />
+                  <v-text-field
+                    v-if="
+                      validation.field_type.toLowerCase() === 'date' &&
+                      isDateOrDateTime(validation.name) == 'time'
+                    "
+                    type="time"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    @update:model-value="handleTime($event, validation.name)"
+                    :placeholder="validation.placeholder ?? null"
                   />
 
-                  <v-text-field
-                    v-if="validation.field_type.toLowerCase() === 'date'"
+                  <!-- BOOLEAN -->
+                  <v-select
+                    v-if="validation.field_type.toLowerCase() === 'boolean'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
-                    :label="validation.label ?? validation.name"
-                    :rules="fieldRules(true, null, 255)"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    :type="validation.field_type.toLowerCase()"
+                    :items="booleanOptions"
+                    item-title="label"
+                    item-value="value"
+                    :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
-                    type="date"
                   />
                 </v-col>
               </div>
@@ -123,6 +185,8 @@ import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
 import { clickDownloadFile } from '@/utils/downloadFile';
+import moment from 'moment';
+import { getFormat } from '../helper';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -136,18 +200,20 @@ const modalFields = ref({
   template: '',
   validations: {},
 });
-
 const props = defineProps(['documentId', 'modalState']);
 const emit = defineEmits(['close-modal']);
 
 const errorMessages = ref();
-
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
 const toSendOptionsItems = [
   { label: 'Documento', value: 'DOCUMENT' },
   { label: 'Email', value: 'EMAIL' },
   { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
+];
+const booleanOptions = [
+  { label: 'Sim', value: true },
+  { label: 'Não', value: false },
 ];
 
 const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção.'];
@@ -165,6 +231,7 @@ function confirmClose() {
 function save() {
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
+      console.log('save', modalFields.value);
       generateDocument(props.documentId.raw.id, modalFields.value).then(
         (docResp) => {
           if (docResp.success) {
@@ -189,6 +256,44 @@ function save() {
   });
 }
 
+function isDateOrDateTime(fieldName: String) {
+  const selectedVal = templateValidations.value.find(
+    (templateVal: { name: String }) => {
+      return templateVal.name === fieldName;
+    }
+  );
+  let format = 'datetime';
+  const dateFormats = ['DAY_MONTH_YEAR', 'MONTH_YEAR', 'DAY_MONTH'];
+  const timeFormats = [
+    'HOURS_ONLY',
+    'MINUTES_ONLY',
+    'SECONDS_ONLY',
+    'HOURS_MINUTES_SECONDS',
+    'HOURS_MINUTES',
+    'MINUTES_SECONDS',
+  ];
+  if (dateFormats.includes(selectedVal.format)) {
+    format = 'date';
+  }
+  if (timeFormats.includes(selectedVal.format)) {
+    format = 'time';
+  }
+  return format;
+}
+
+const handleDate = (modelData: Date, fieldName: string) => {
+  const format = getFormat(fieldName, templateValidations.value, false);
+  modalFields.value.validations[fieldName] = moment(modelData).format(format);
+};
+
+const handleTime = (modelData: Date, fieldName: string) => {
+  const format = getFormat(fieldName, templateValidations.value, false);
+  modalFields.value.validations[fieldName] = moment(
+    modelData,
+    'HH:mm:ss'
+  ).format(format);
+};
+
 const templateValidations = computed(() => {
   let selected = {};
   validations.value.map((i: any) => {
@@ -203,6 +308,23 @@ watch(
   () => modalFields.value.template,
   () => {
     isTemplateSelected.value = modalFields.value.template ? true : false;
+    let selectedTemplate = validations.value.find(
+      (validation) => validation.id === modalFields.value.template
+    );
+    console.log('selectedTemplate', selectedTemplate);
+    selectedTemplate?.validations.map((selected) => {
+      console.log('name', selected.name);
+      if (selected.default_value) {
+        modalFields.value.validations[selected.name] = selected.default_value;
+      }
+    });
+    if (selectedTemplate?.send_type) {
+      console.log('selectedTemplate?.send_type', selectedTemplate?.send_type);
+      modalFields.value.to_send_option = selectedTemplate.send_type;
+    }
+    //aqui tenho de por os valores default_value que vem do template
+    console.log('modalFields.value', modalFields.value);
+    console.log('validations.value', validations.value);
   }
 );
 
@@ -220,15 +342,20 @@ function getValidations(templateValidationsItem: any) {
 onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {
     if (resp.success) {
+      console.log('resp', resp.data.data);
+      console.log('props', props.documentId.raw);
       templates.value = [];
       errorMessages.value = {};
-      resp.data.data.map((i: { title: any; id: any; validations: any }) => {
-        templates.value.push({ label: i.title, value: i.id });
-        validations.value.push({
-          id: i.id,
-          validations: getValidations(i.validations),
-        });
-      });
+      resp.data.data.map(
+        (i: { send_type: any; title: any; id: any; validations: any }) => {
+          templates.value.push({ label: i.title, value: i.id });
+          validations.value.push({
+            id: i.id,
+            validations: getValidations(i.validations),
+            send_type: i.send_type,
+          });
+        }
+      );
     } else {
       templates.value = [];
       validations.value = [];
@@ -236,3 +363,8 @@ onBeforeMount(async () => {
   });
 });
 </script>
+<style>
+.dp__input_wrap div {
+  position: unset !important;
+}
+</style>
