@@ -39,6 +39,23 @@
       :error-messages="errorMessages"
       :field="field"
       :name="field.name"
+      v-model="model"
+    />
+
+    <date-time-picker
+      v-if="field.input === 'date-time'"
+      :error-messages="errorMessages"
+      :field="field"
+      :name="field.name"
+      v-model="dateTimeModel"
+    />
+
+    <time-picker
+      v-if="field.input === 'time'"
+      :error-messages="errorMessages"
+      :field="field"
+      :name="field.name"
+      v-model="model"
     />
 
     <photo-upload
@@ -59,9 +76,12 @@
 <script lang="ts" setup>
 import { ref, watch, type PropType } from 'vue';
 import DatePicker from '../../DatePicker/datePicker.vue';
+import DateTimePicker from '../../DateTimePicker/dateTimePicker.vue';
+import TimePicker from '../../TimePicker/timePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 import ErrorSuccessMessage from '../../ErrorSuccessMessages/errorSuccessMessages.vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   field: {
@@ -80,6 +100,11 @@ const model = ref(props.field.value);
 const snack = ref();
 const isLoading = ref(false);
 const imageUrl = ref(props.field.value);
+
+// for datetime
+const dateTimeModel = computed(() =>
+  ((model.value as string) ?? '').replace('Z', '')
+);
 
 watch(props, (newProps) => {
   model.value = newProps.field.value;
