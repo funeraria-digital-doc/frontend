@@ -185,7 +185,7 @@ const defaultObj: TemplateValidation = {
   is_date_numeric: true,
   is_field_custom: false,
   label: '',
-  min: 1,
+  min: 1, 
   max: 1,
   optional: true,
   options: [],
