@@ -154,6 +154,7 @@
                     "
                     :rules="getFieldRules(validation)"
                     @update:model-value="handleDate($event, validation.name)"
+                    :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
 
@@ -169,6 +170,7 @@
                     "
                     :rules="getFieldRules(validation)"
                     @update:model-value="handleDate($event, validation.name)"
+                    :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
 
@@ -184,6 +186,7 @@
                     "
                     :rules="getFieldRules(validation)"
                     @update:model-value="handleTime($event, validation.name)"
+                    :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
 
@@ -397,11 +400,14 @@ function getApiErrors(errors: any) {
     const errorMessageKey = Object.keys(errorMessages.value)[t];
     errorMessages.value[errorMessageKey] = '';
   }
+  console.log('keys_missing', errors.keys_missing)
   if (errors.keys_missing) {
     for (let i = 0; i < errors.keys_missing.length; i++) {
       const key = errors.keys_missing[i];
+      console.log('key - ' + key)
       errorMessages.value[key] = 'Campo obrigatório.';
     }
+    console.log('errorMessages.value', errorMessages.value)
   }
   if (errors.errors) {
     for (let i = 0; i < Object.keys(errors.errors).length; i++) {
