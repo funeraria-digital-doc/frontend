@@ -1,37 +1,33 @@
 <template>
-  <v-expansion-panels>
-    <v-form ref="form" @submit.prevent="onSubmit" class="dynamic-form__form">
-      <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
-        <v-expansion-panel>
-          <v-expansion-panel-title>
-            <template v-slot:default>
-              {{ fieldsGroup.title }}
-            </template>
-          </v-expansion-panel-title>
-          <v-expansion-panel-text class="dynamic-form__panel-text">
-            <v-row no-gutters class="dynamic-form__row">
-              <v-col
-                v-for="(field, indexJ) in fieldsGroup.fields"
-                class="pa-2"
-                :key="indexJ"
-                :cols="12"
-                :sm="sm"
-              >
-                <dynamic-field-input
-                  :field="field"
-                  :errorMessages="errorMessages"
-                />
-              </v-col>
-            </v-row>
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </div>
+  <v-form ref="form" @submit.prevent="onSubmit" class="dynamic-form__form">
+    <div v-for="(fieldsGroup, indexI) in fieldsGroups" :key="indexI">
+      <h6
+        v-if="fieldsGroup.title"
+        class="form-subtitle text-h6 dynamic-form__group-title"
+      >
+        {{ fieldsGroup.title }}
+      </h6>
 
-      <v-btn type="submit" class="mt-10" color="primary" size="large">{{
-        actionBtnLabel
-      }}</v-btn>
-    </v-form>
-  </v-expansion-panels>
+      <v-row no-gutters class="dynamic-form__row">
+        <v-col
+          v-for="(field, indexJ) in fieldsGroup.fields"
+          class="pa-2"
+          :key="indexJ"
+          :cols="12"
+          :sm="fieldsGroup.sm ?? 12"
+        >
+          <dynamic-field-input
+            :field="field"
+            :errorMessages="errorMessage(field.name)"
+          />
+        </v-col>
+      </v-row>
+    </div>
+
+    <v-btn type="submit" class="mt-10" color="primary" size="large">
+      {{ actionBtnLabel }}
+    </v-btn>
+  </v-form>
 </template>
 
 <script lang="ts">
@@ -56,46 +52,30 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  sm: {
-    type: Number,
-    default: 12,
-  },
   errorMessages: {
     type: Object,
   },
 });
 
 const emit = defineEmits(['on-submit']);
+
 const form = ref();
+
+const errorMessage = (fieldName: string) =>
+  (props.errorMessages ?? {})[fieldName];
 
 const onSubmit = async (input: any) => {
   const { valid } = await form.value.validate();
 
   if (valid) {
     const values: any = {};
-    let count = 0;
+    const data = new FormData(input.target);
 
-    // form input return the full fields list
-    props.fieldsGroups.forEach((fieldsGroup) => {
-      const fieldsLength = fieldsGroup.fields.length;
-
-      for (var i = count; i < count + fieldsLength; i++) {
-        const fieldName = input.target[i].id;
-
-        switch (fieldsGroup.fields.find((f) => f.name === fieldName)?.input) {
-          case 'checkbox':
-            values[fieldName] = input.target[i].checked;
-            break;
-          case 'file':
-            values[fieldName] = input.target[i].files[0];
-            break;
-          default:
-            values[fieldName] = input.target[i].value;
-            break;
-        }
-      }
-
-      count += fieldsLength;
+    [...data.entries()].forEach((entry) => {
+      values[entry[0]] =
+        entry[1] instanceof File
+          ? input.target[entry[0]].attributes.value
+          : entry[1];
     });
 
     emit('on-submit', values);
@@ -113,8 +93,9 @@ onMounted(() => {
     width: 100%;
   }
 
-  &__panel-text {
-    margin-top: 1rem;
+  &__group-title {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
 </style>

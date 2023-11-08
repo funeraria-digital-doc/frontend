@@ -1,5 +1,5 @@
 <template>
-  <page :title="templatesTitle">
+  <page :title="templatesTitle" back="templates">
     <v-form
       ref="form"
       validate-on="submit"
@@ -182,10 +182,10 @@ const defaultObj: TemplateValidation = {
   db_field_reference: '',
   default_value: [],
   format: '',
-  is_date_numeric: false,
-  is_field_custom: true,
+  is_date_numeric: true,
+  is_field_custom: false,
   label: '',
-  min: 1,
+  min: 1, 
   max: 1,
   optional: true,
   options: [],

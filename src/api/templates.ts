@@ -58,7 +58,7 @@ export async function templateCreate(
 
 export async function templateDelete(id: string) {
   try {
-    const response = await apiInstance.delete(
+    const response = await apiInstance.post(
       '/template-logic/remove/' + id + '/'
     );
     return { success: true, data: response.data };
@@ -71,10 +71,10 @@ export async function templateEdit(
   template: Template
 ): Promise<ApiResponse<any>> {
   try {
-    let newTemplateValidations = [];
+    const newTemplateValidations: {}[] = [];
     template.validations.map((validation) => {
-      let newValidationItem = {};
-      for (let key in Object.keys(validation)) {
+      const newValidationItem = {};
+      for (const key in Object.keys(validation)) {
         if (
           validation[Object.keys(validation)[key]] ||
           validation[Object.keys(validation)[key]] !== ''

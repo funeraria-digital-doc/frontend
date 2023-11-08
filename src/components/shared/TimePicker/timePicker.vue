@@ -4,7 +4,7 @@
     :v-model="field.name"
     :label="field.label"
     :rules="field.rules"
-    type="date"
+    type="time"
   />
 </template>
 
@@ -13,7 +13,7 @@ import { defineComponent, type PropType } from 'vue';
 import type { DynamicField } from '../../../models/dynamicField.model';
 
 export default defineComponent({
-  name: 'DatePicker',
+  name: 'TimePicker',
   props: {
     field: {
       type: Object as PropType<DynamicField>,

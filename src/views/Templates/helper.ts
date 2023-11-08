@@ -5,7 +5,7 @@ import {
   templateList,
 } from '@/api/templates';
 import { getLabel } from '@/utils/datatableHelper';
-import { base64ToFile, clickDownloadFile } from '@/utils/downloadFile';
+import { clickDownloadFile } from '@/utils/downloadFile';
 
 export const getTemplates = async (
   loading: { value: boolean },
