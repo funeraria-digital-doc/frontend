@@ -17,6 +17,7 @@
                 :rules="constants.nameRules"
                 label="Nome da variável"
                 :error-messages="errorMessages.title"
+                disabled
               ></v-text-field>
             </v-col>
 
@@ -120,9 +121,15 @@
               <v-checkbox
                 :id="'is_date_numeric_' + props.index"
                 v-model="validation.is_date_numeric"
-                label="Data por extenso?"
                 :error-messages="errorMessages.is_date_numeric"
-              />
+              >
+                <template v-slot:label>
+                  <div>
+                    <span>Data Numérica?</span><br>
+                    <span>ex: 20/10/2023</span>
+                  </div>
+                </template>
+              </v-checkbox>
             </v-col>
           </v-row>
 
@@ -261,7 +268,9 @@ const showDbFields = computed(() =>
 );
 
 const showDateFields = computed(() =>
-  validation.value.field_type === 'DATE' ? true : false
+  ['DATE', 'TIME', 'DATETIME'].indexOf(validation.value.field_type) > -1
+    ? true
+    : false
 );
 
 const isMultiSelect = computed(() =>
@@ -460,7 +469,7 @@ onBeforeMount(() => {
   }
   if (validation.value.db_collection != '') {
     mapDbFields();
-  } 
+  }
 });
 </script>
 
