@@ -5,7 +5,12 @@
         <span class="text-h5 ml-6">Gerar Documentos</span>
       </v-card-title>
       <v-card-text>
-        <v-form ref="form" validate-on="submit" @submit.prevent="save">
+        <v-form
+          ref="form"
+          validate-on="submit"
+          @submit.prevent="save"
+          :disabled="isLoading"
+        >
           <v-container>
             <v-col>
               <v-select
@@ -38,40 +43,66 @@
                 :key="index"
               >
                 <v-col>
+                  <!-- TEXT|EMAIL -->
                   <v-text-field
-                    v-if="validation.field_type.toLowerCase() === 'text'"
+                    v-if="
+                      ['text', 'email'].includes(
+                        validation.field_type.toLowerCase()
+                      )
+                    "
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
                     :label="
                       validation.label ? validation.label : validation.name
                     "
-                    :rules="fieldRules(true, null, 255)"
+                    :rules="getFieldRules(validation)"
                     :type="validation.field_type.toLowerCase()"
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
 
-                  <v-text-field
-                    v-if="validation.field_type.toLowerCase() === 'email'"
+                  <!-- TEXTAREA -->
+                  <v-textarea
+                    v-if="
+                      ['textarea'].includes(validation.field_type.toLowerCase())
+                    "
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
                     :label="
                       validation.label ? validation.label : validation.name
                     "
-                    :rules="fieldRules(true, null, 255)"
-                    :type="validation.field_type.toLowerCase()"
+                    clearable
+                    auto-grow
+                    :rules="getFieldRules(validation)"
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
 
+                  <!-- NUMBER -->
+                  <v-text-field
+                    v-if="validation.field_type.toLowerCase() === 'integer'"
+                    :id="validation.name"
+                    v-model="modalFields.validations[validation.name]"
+                    :label="
+                      validation.label ? validation.label : validation.name
+                    "
+                    type="number"
+                    :error-messages="errorMessages[validation.name]"
+                    :placeholder="validation.placeholder ?? null"
+                    :rules="getFieldRules(validation)"
+                  />
+
+                  <!-- CHECKBOX -->
                   <v-checkbox
                     v-if="validation.field_type.toLowerCase() === 'checkbox'"
                     :id="validation.name"
                     v-model="modalFields.validations[validation.name]"
                     :label="validation.label"
                     :error-messages="errorMessages[validation.name]"
+                    :rules="getFieldRules(validation)"
                   />
 
+                  <!-- SELECT -->
                   <v-select
                     v-if="validation.field_type.toLowerCase() === 'select'"
                     :id="validation.name"
@@ -79,15 +110,17 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
-                    :rules="fieldRules(true, null, 255)"
                     :type="validation.field_type.toLowerCase()"
                     :items="validation.options"
                     item-title="label"
                     item-value="value"
+                    clearable
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
+                    :rules="getFieldRules(validation)"
                   />
 
+                  <!-- MULTISELECT -->
                   <v-combobox
                     v-if="validation.field_type.toLowerCase() === 'multiselect'"
                     :id="validation.name"
@@ -95,7 +128,6 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
-                    :rules="fieldRules(true, null, 255)"
                     :type="validation.field_type.toLowerCase()"
                     :items="validation.options"
                     item-title="label"
@@ -107,7 +139,10 @@
                     :closable-chips="true"
                     :clearable="true"
                     :teleport="true"
+                    :rules="getFieldRules(validation)"
                   />
+
+                  <!-- DATETIME -->
                   <v-text-field
                     v-if="
                       validation.field_type.toLowerCase() === 'date' &&
@@ -117,9 +152,12 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
+                    :rules="getFieldRules(validation)"
                     @update:model-value="handleDate($event, validation.name)"
                     :placeholder="validation.placeholder ?? null"
                   />
+
+                  <!-- DATE -->
                   <v-text-field
                     v-if="
                       validation.field_type.toLowerCase() === 'date' &&
@@ -129,9 +167,12 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
+                    :rules="getFieldRules(validation)"
                     @update:model-value="handleDate($event, validation.name)"
                     :placeholder="validation.placeholder ?? null"
                   />
+
+                  <!-- TIME -->
                   <v-text-field
                     v-if="
                       validation.field_type.toLowerCase() === 'date' &&
@@ -141,6 +182,7 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
+                    :rules="getFieldRules(validation)"
                     @update:model-value="handleTime($event, validation.name)"
                     :placeholder="validation.placeholder ?? null"
                   />
@@ -153,10 +195,11 @@
                     :label="
                       validation.label ? validation.label : validation.name
                     "
-                    :type="validation.field_type.toLowerCase()"
                     :items="booleanOptions"
                     item-title="label"
                     item-value="value"
+                    clearable
+                    :rules="getFieldRules(validation)"
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
@@ -183,8 +226,8 @@
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
 import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
-import { fieldRules } from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.utils';
 import { clickDownloadFile } from '@/utils/downloadFile';
+import { getFieldRules } from './modal.helper';
 import moment from 'moment';
 import { getFormat } from '../helper';
 export default defineComponent({
@@ -201,8 +244,8 @@ const modalFields = ref({
   validations: {},
 });
 const props = defineProps(['documentId', 'modalState']);
-const emit = defineEmits(['close-modal']);
-
+const emit = defineEmits(['close-modal', 'snack-messages']);
+const isLoading = ref(false);
 const errorMessages = ref();
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
@@ -229,29 +272,56 @@ function confirmClose() {
 }
 
 function save() {
+  isLoading.value = true;
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
-      console.log('save', modalFields.value);
       generateDocument(props.documentId.raw.id, modalFields.value).then(
         (docResp) => {
+          console.log(docResp)
           if (docResp.success) {
             clickDownloadFile(
               { data: docResp.data.file },
               props.documentId.raw.name
             );
+            emit('snack-messages', [
+              'Documento emitido com sucesso.',
+              '',
+              true,
+            ]);
             emit('close-modal');
             modalFields.value = {
               to_send_option: '',
               template: '',
               validations: {},
             };
+            isLoading.value = false;
           } else {
-            console.log('errors', docResp);
+            if (docResp.error && docResp.error.status.toString()[0] === '4') {
+              emit('snack-messages', [
+                'Formulário preenchido incorretamente.',
+                'Preencha todos os campos em falta',
+                false,
+              ]);
+              getApiErrors(docResp.error);
+              isLoading.value = false;
+            } else {
+              emit('snack-messages', [
+                'Ocorreu um erro. Tente novamente mais tarde.',
+                'Em caso de presistencia, contacte os administradores do sistema',
+                false,
+              ]);
+              isLoading.value = false;
+            }
           }
         }
       );
     } else {
-      console.log('errors', resp.errors);
+      emit('snack-messages', [
+        'Formulário preenchido incorretamente.',
+        'Preencha todos os campos em falta',
+        false,
+      ]);
+      isLoading.value = false;
     }
   });
 }
@@ -311,22 +381,40 @@ watch(
     let selectedTemplate = validations.value.find(
       (validation) => validation.id === modalFields.value.template
     );
-    console.log('selectedTemplate', selectedTemplate);
     selectedTemplate?.validations.map((selected) => {
-      console.log('name', selected.name);
       if (selected.default_value) {
         modalFields.value.validations[selected.name] = selected.default_value;
       }
     });
     if (selectedTemplate?.send_type) {
-      console.log('selectedTemplate?.send_type', selectedTemplate?.send_type);
       modalFields.value.to_send_option = selectedTemplate.send_type;
     }
-    //aqui tenho de por os valores default_value que vem do template
-    console.log('modalFields.value', modalFields.value);
-    console.log('validations.value', validations.value);
   }
 );
+
+function getApiErrors(errors: any) {
+  for (var t = 0; t < Object.keys(errorMessages.value).length; t++) {
+    const errorMessageKey = Object.keys(errorMessages.value)[t];
+    errorMessages.value[errorMessageKey] = '';
+  }
+  if (errors.keys_missing) {
+    for (let i = 0; i < errors.keys_missing.length; i++) {
+      const key = errors.keys_missing[i];
+      errorMessages.value[key] = 'Campo obrigatório.';
+    }
+  }
+  if (errors.errors) {
+    for (let i = 0; i < Object.keys(errors.errors).length; i++) {
+      const key = Object.keys(errors.errors)[i];
+      if (typeof errors.errors[key] === 'object' && errors.errors[key][Object.keys(errors.errors[key])[0]]) {
+        errorMessages.value[key] =
+          errors.errors[key][Object.keys(errors.errors[key])[0]];
+      }else{
+        errorMessages.value[key] = errors.errors[key]
+      }
+    }
+  }
+}
 
 function getValidations(templateValidationsItem: any) {
   let newValidations: any[] = [];
@@ -342,8 +430,6 @@ function getValidations(templateValidationsItem: any) {
 onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {
     if (resp.success) {
-      console.log('resp', resp.data.data);
-      console.log('props', props.documentId.raw);
       templates.value = [];
       errorMessages.value = {};
       resp.data.data.map(
