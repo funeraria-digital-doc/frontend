@@ -115,6 +115,8 @@
                     item-title="label"
                     item-value="value"
                     clearable
+                    no-data-text="Sem Dados."
+                    persistent-placeholder
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                     :rules="getFieldRules(validation)"
