@@ -7,7 +7,8 @@
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
-      :error-messages="errorMessages[field.name]"
+      :error-messages="errorMessages"
+      :name="field.name"
     />
 
     <v-checkbox
@@ -15,36 +16,56 @@
       :id="field.name"
       v-model="model"
       :label="field.label"
-      :error-messages="errorMessages[field.name]"
+      :error-messages="errorMessages"
+      :name="field.name"
     />
 
     <v-select
       v-if="field.input === 'select'"
+      :error-messages="errorMessages"
       :id="field.name"
-      v-model="model"
+      :items="field.items"
       :label="field.label"
+      :name="field.name"
       :rules="field.rules"
       :type="field.type"
-      :items="field.items"
       item-title="label"
       item-value="value"
-      :error-messages="errorMessages[field.name]"
+      v-model="model"
     />
 
     <date-picker
       v-if="field.input === 'date'"
+      :error-messages="errorMessages"
       :field="field"
-      :error-messages="errorMessages[field.name]"
+      :name="field.name"
+      v-model="model"
+    />
+
+    <date-time-picker
+      v-if="field.input === 'date-time'"
+      :error-messages="errorMessages"
+      :field="field"
+      :name="field.name"
+      v-model="dateTimeModel"
+    />
+
+    <time-picker
+      v-if="field.input === 'time'"
+      :error-messages="errorMessages"
+      :field="field"
+      :name="field.name"
+      v-model="model"
     />
 
     <photo-upload
       v-if="field.input === 'file'"
+      :error-messages="errorMessages"
       :id="field.name"
+      :imageUrl="imageUrl"
+      :isLoading="isLoading"
       :label="field.label"
       :snack="snack"
-      :isLoading="isLoading"
-      :imageUrl="imageUrl"
-      :error-messages="errorMessages[field.name]"
       @save="saveFile"
     />
 
@@ -55,8 +76,12 @@
 <script lang="ts" setup>
 import { ref, watch, type PropType } from 'vue';
 import DatePicker from '../../DatePicker/datePicker.vue';
+import DateTimePicker from '../../DateTimePicker/dateTimePicker.vue';
+import TimePicker from '../../TimePicker/timePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
+import ErrorSuccessMessage from '../../ErrorSuccessMessages/errorSuccessMessages.vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   field: {
@@ -64,7 +89,8 @@ const props = defineProps({
     required: true,
   },
   errorMessages: {
-    type: Object,
+    type: String,
+    required: false,
   },
 });
 
@@ -73,15 +99,20 @@ const model = ref(props.field.value);
 // for image
 const snack = ref();
 const isLoading = ref(false);
-const imageUrl = ref();
+const imageUrl = ref(props.field.value);
+
+// for datetime
+const dateTimeModel = computed(() =>
+  ((model.value as string) ?? '').replace('Z', '')
+);
 
 watch(props, (newProps) => {
   model.value = newProps.field.value;
+  imageUrl.value = newProps.field.value;
 });
 
-const saveFile = (base64File: string, file: any) => {
+const saveFile = (base64File: string) => {
   imageUrl.value = base64File;
-  model.value = file;
 };
 </script>
 

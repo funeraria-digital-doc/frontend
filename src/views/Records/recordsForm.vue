@@ -1,5 +1,5 @@
 <template>
-  <page :title="recordTitle">
+  <page :title="recordTitle" back="records">
     <p class="mb-6">Por favor introduza os seguintes dados.</p>
 
     <div class="death-declaration__form">
@@ -7,7 +7,6 @@
         :fieldsGroups="fieldsGroups"
         :action-btn-label="submitBtnLabel"
         :errorMessages="errorMessages"
-        :sm="4"
         @on-submit="onSubmit"
       />
     </div>
@@ -34,28 +33,28 @@ import type { FormFieldsGroup } from '@/components/shared/DynamicForm/dynamicFor
 const fieldsGroups = ref<FormFieldsGroup[]>([
   {
     title: 'Dados do defunto',
-    isAccordion: true,
     fields: DeathDeclarationDefunctForm,
+    sm: 4,
   },
   {
     title: 'Dados do cônjuge',
-    isAccordion: true,
     fields: DeathDeclarationSpouseForm,
+    sm: 4,
   },
   {
     title: 'Dados do óbito',
-    isAccordion: true,
     fields: DeathDeclarationDeathForm,
+    sm: 4,
   },
   {
     title: 'Dados do funeral',
-    isAccordion: true,
     fields: DeathDeclarationFuneralForm,
+    sm: 4,
   },
   {
     title: 'Dados do familiar',
-    isAccordion: true,
     fields: DeathDeclarationFamilyMemberForm,
+    sm: 4,
   },
 ]);
 
