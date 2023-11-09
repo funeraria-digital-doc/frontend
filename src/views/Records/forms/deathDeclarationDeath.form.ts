@@ -10,7 +10,7 @@ export const DeathDeclarationDeathForm: DynamicField[] = [
   {
     label: 'Hora do falecimento',
     name: 'death_time',
-    input: 'date',
+    input: 'time',
   },
   {
     label: 'Morada do falecimento',

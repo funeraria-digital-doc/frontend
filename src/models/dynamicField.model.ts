@@ -8,7 +8,13 @@ export interface DynamicField {
   value?: string | boolean | number;
 }
 
-type DynamicFieldType = 'text' | 'checkbox' | 'select' | 'date';
+type DynamicFieldType =
+  | 'text'
+  | 'checkbox'
+  | 'select'
+  | 'date'
+  | 'date-time'
+  | 'time';
 
 interface SelectOption {
   label: string;

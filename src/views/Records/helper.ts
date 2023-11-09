@@ -18,7 +18,7 @@ export const getRecords = async (
             family_member_phone: record.family_member_phone,
             gender: getLabel('gender', record.gender, fields),
             status: getLabel('status', record.status, fields),
-            group_id: record.group_id,
+            group_id: getLabel('group_id', record.group_id, fields)
           };
         });
       }
@@ -115,10 +115,64 @@ export function generateDocuments(record: any, callback: Function) {
   callback(record);
 }
 
-export function updateVariables(serverItems: any[], fields: any) {
-  serverItems.map((item: { group_id: any }) => {
-    if (typeof item.group_id == 'number') {
-      item.group_id = getLabel('group_id', item.group_id, fields);
+export function getFormat(
+  fieldName: String,
+  templateValidations: any,
+  toPicker: boolean
+) {
+  const selectedVal = templateValidations.find(
+    (templateVal: { name: String }) => {
+      return templateVal.name === fieldName;
     }
-  });
+  );
+  let format = '';
+  if (['DAY', 'DAYS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += toPicker ? 'dd' : 'DD';
+  }
+  if (['MONTH', 'MONTHS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += 'MM';
+  }
+  if (['YEAR', 'YEARS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += '/';
+    }
+    format += 'YYYY';
+  }
+  if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      format += ' ';
+    }
+    format += 'HH';
+  }
+  if (['MINUTE', 'MINUTES'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+        format += ':';
+      } else {
+        format += ' ';
+      }
+    }
+    format += 'mm';
+  }
+  if (['SECOND', 'SECONDS'].some((sub) => selectedVal.format.includes(sub))) {
+    if (format) {
+      if (
+        ['MINUTE', 'MINUTES', 'HOUR', 'HOURS'].some((sub) =>
+          selectedVal.format.includes(sub)
+        )
+      ) {
+        format += ':';
+      } else {
+        format += ' ';
+      }
+    }
+    format += 'ss';
+  }
+  return format;
 }

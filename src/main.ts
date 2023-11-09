@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import '@vuepic/vue-datepicker/dist/main.css' 
 import router from './router';
-
 // Vuetify
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';

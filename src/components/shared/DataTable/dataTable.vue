@@ -214,7 +214,12 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-const propsData = defineProps(['data']);
+const propsData = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
+});
 const { user } = useUser();
 /*
 Exemplo de header
@@ -238,7 +243,7 @@ const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
-const fields = computed(() => propsData.data.fields);
+const fields = ref(propsData.data.fields);
 const itemsPerPageOptions = ref([
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -356,12 +361,6 @@ watch(dialog, (val) => {
 });
 watch(dialogDelete, (val) => {
   val || closeDelete();
-});
-
-watch([serverItems, fields], ([serverItems, fields]) => {
-  if (serverItems) {
-    propsData.data.updateVariables(serverItems, fields);
-  }
 });
 
 function setFields() {
