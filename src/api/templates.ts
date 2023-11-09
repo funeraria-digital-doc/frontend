@@ -71,10 +71,10 @@ export async function templateEdit(
   template: Template
 ): Promise<ApiResponse<any>> {
   try {
-    const newTemplateValidations: {}[] = [];
+    let newTemplateValidations = [];
     template.validations.map((validation) => {
-      const newValidationItem = {};
-      for (const key in Object.keys(validation)) {
+      let newValidationItem = {};
+      for (let key in Object.keys(validation)) {
         if (
           validation[Object.keys(validation)[key]] ||
           validation[Object.keys(validation)[key]] !== ''

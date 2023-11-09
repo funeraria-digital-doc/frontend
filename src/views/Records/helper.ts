@@ -18,7 +18,7 @@ export const getRecords = async (
             family_member_phone: record.family_member_phone,
             gender: getLabel('gender', record.gender, fields),
             status: getLabel('status', record.status, fields),
-            group_id: getLabel('group_id', record.group_id, fields),
+            group_id: getLabel('group_id', record.group_id, fields)
           };
         });
       }
@@ -112,7 +112,6 @@ export function canAction() {
 }
 
 export function generateDocuments(record: any, callback: Function) {
-  console.log('generating documents', record);
   callback(record);
 }
 
