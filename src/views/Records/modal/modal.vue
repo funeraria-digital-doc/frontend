@@ -282,6 +282,7 @@ function save() {
     if (resp.valid) {
       generateDocument(props.documentId.raw.id, modalFields.value).then(
         (docResp) => {
+          console.log(docResp)
           if (docResp.success) {
             clickDownloadFile(
               { data: docResp.data.file },
