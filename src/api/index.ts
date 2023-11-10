@@ -4,6 +4,7 @@ import axios from 'axios';
 import type { AxiosError } from 'axios';
 import router from '@/router';
 import jwt_decode from 'jwt-decode';
+import { useUser } from '@/composables/user';
 
 export type ApiError<E = {}> = E & {
   type: string;
@@ -20,8 +21,10 @@ export type ApiResponse<T, E = {}> = Failable<T, ApiError<E>>;
 
 function getToken() {
   const tempToken = getLocalStorage(TOKEN_KEY);
+
   if (tempToken) {
-    const token = jwt_decode(tempToken);
+    const token: any = jwt_decode(tempToken);
+
     if (token.exp * 1000 > new Date().getTime()) {
       return tempToken;
     } else {
@@ -45,9 +48,25 @@ export function createNewAxiosInstance() {
     baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
+
+  apiInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const errorCode = error.response.status;
+
+      if ([401, 403].includes(errorCode)) {
+        const { logoutUser } = useUser();
+        logoutUser();
+      }
+
+      return Promise.reject(error);
+    }
+  );
 }
 
-export function errorResponse<E = {}>(e: AxiosError): ApiResponse<never, E> {
+export function errorResponse<E = {}>(
+  e: AxiosError
+): ApiResponse<never, E> | void {
   if (
     e.code === 'ERR_NETWORK' &&
     router.currentRoute.value.name !== 'service_unavailable' &&
