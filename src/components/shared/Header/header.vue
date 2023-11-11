@@ -1,13 +1,11 @@
 <template>
-  <div>
-    <v-toolbar prominent :elevation="8">
-      <v-toolbar-title @click="handleHome" id="app-name">
-        <!-- <img src="./img_3.png" alt="logo" style="width:65px"/> -->
-        <img src="./img_6.png" alt="logo" style="width: 80px" />
-        <p>Funerária Digital Doc</p>
-        <!-- <img src="./img_9.png" alt="logo" style="width:50px"/> -->
-      </v-toolbar-title>
+  <v-toolbar prominent :elevation="8" id="toolbar">
+    <div id="toolbar__title" @click="handleHome">
+      <img src="@/assets/logo.png" alt="logo" style="width: 80px" />
+      <h6 class="text-h6">Funerária Digital Doc</h6>
+    </div>
 
+    <div id="toolbar__user-actions">
       <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
         Entrar &nbsp;
         <v-icon>mdi-export</v-icon>
@@ -28,16 +26,16 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-toolbar>
+    </div>
+  </v-toolbar>
 
-    <v-dialog
-      v-model="isLoginModalOpen"
-      width="auto"
-      transition="dialog-top-transition"
-    >
-      <login-modal @close-modal="onCloseLogin" />
-    </v-dialog>
-  </div>
+  <v-dialog
+    v-model="isLoginModalOpen"
+    width="auto"
+    transition="dialog-top-transition"
+  >
+    <login-modal @close-modal="onCloseLogin" />
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -83,13 +81,21 @@ const accountLinks = [
 </script>
 
 <style lang="scss">
-#app-name {
-  cursor: pointer;
-}
-
-.v-toolbar-title__placeholder {
+#toolbar {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  padding-inline: 1rem;
+  color: white;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    cursor: pointer;
+  }
+
+  &__user-actions {
+    margin-left: auto;
+  }
 }
 </style>
