@@ -62,6 +62,9 @@ onBeforeMount(() => {
         delete: deleteRecord,
         getData: getRecords,
         canAction: canAction,
+        multiSort: true,
+        selectCheckbox: false,
+        search: true
       };
 
       tableData.fields = tableData.fields.map((field: any) =>

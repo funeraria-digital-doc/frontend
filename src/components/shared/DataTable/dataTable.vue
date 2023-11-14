@@ -5,14 +5,16 @@
     items-per-page-text="items por página"
     :headers="headers"
     :items="serverItems"
-    item-value="name"
+    item-value="id"
     class="elevation-1 d-flex flex-column"
     density="comfortable"
     :loading="loading"
     loading-text="A carregar"
+    v-model="selected"
     v-model:search="search"
     no-data-text="Nenhum registo disponível"
-    multi-sort
+    :multi-sort="propsData.data.multiSort"
+    :show-select="propsData.data.selectCheckbox"
   >
     <template
       v-for="(field, key) in fields"
@@ -31,6 +33,7 @@
     <template v-slot:top>
       <div class="d-flex">
         <v-text-field
+          v-if="propsData.data.search"
           v-model="search"
           prepend-inner-icon="mdi-magnify"
           density="compact"
@@ -253,6 +256,7 @@ type DataTableHeader = {
 };
 */
 const search = ref('');
+const selected = ref();
 const form = ref();
 const loading = ref(false);
 const dialog = ref(false);
@@ -376,6 +380,10 @@ watch(dialog, (val) => {
 });
 watch(dialogDelete, (val) => {
   val || closeDelete();
+});
+
+watch(selected, (val) => {
+ console.log('val', val)
 });
 
 function setFields() {
