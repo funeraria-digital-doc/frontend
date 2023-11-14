@@ -212,12 +212,8 @@ import {
   getDateType,
   getValidations,
   saveForm,
-  getDatesPlaceholders,
   getDateFormated
 } from './modal.helper';
-
-import { onMounted } from 'vue';
-//import { isDateOrDateTime } from '../../Templates/components/ValidationEditModal/validationEditModal.helper';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -297,8 +293,6 @@ const templateValidations = computed(() => {
   validations.value.map((i: any) => {
     if (i.id == modalFields.value.template) {
       selected = i.validations;
-      //getDatesPlaceholders(selected, modalFields.value.validations);
-      console.log('selected', selected);
     }
   });
   return selected;
@@ -321,10 +315,6 @@ watch(
     }
   }
 );
-
-onMounted(() => {
-  console.log('templateValidations', templateValidations.value);
-});
 
 onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {

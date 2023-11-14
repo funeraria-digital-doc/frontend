@@ -173,24 +173,8 @@
                     !isMultiSelect &&
                     ['DATE', 'DATETIME', 'TIME'].indexOf(
                       validation.field_type
-                    ) >= 0
+                    ) < 0
                   "
-                  :type="getDateType(validation)"
-                  :label="defaultValueLabel"
-                  :rules="getFieldRules(validation)"
-                  @update:model-value="
-                    handleDate(
-                      $event,
-                      validation.name,
-                      validation.field_type === 'TIME' ? true : false
-                    )
-                  "
-                  clearable
-                  :error-messages="errorMessages[validation.name]"
-                  :placeholder="validation.placeholder ?? null"
-                />
-                <v-text-field
-                  v-else
                   :id="'default_value_' + props.index"
                   v-model="validation.default_value"
                   :label="defaultValueLabel"
