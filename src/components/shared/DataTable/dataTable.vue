@@ -10,6 +10,9 @@
     density="comfortable"
     :loading="loading"
     loading-text="A carregar"
+    v-model:search="search"
+    no-data-text="Nenhum registo disponível"
+    multi-sort
   >
     <template
       v-for="(field, key) in fields"
@@ -26,118 +29,132 @@
       <p v-else>{{ item[field.name] }}</p>
     </template>
     <template v-slot:top>
-      <v-dialog
-        v-if="propsData.data.createAndEditByModal"
-        v-model="dialog"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ props }">
+      <div class="d-flex">
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
+          label="Procurar"
+          single-line
+          flat
+          hide-details
+          variant="solo-filled"
+        ></v-text-field>
+        <v-spacer></v-spacer>
+        <v-dialog
+          v-if="propsData.data.createAndEditByModal"
+          v-model="dialog"
+          max-width="500px"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2 d-flex align-self-end"
+              v-bind="props"
+            >
+              {{ propsData.data.createButtonTitle }}
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="mt-3">
+              <span class="text-h5 ml-6">{{ formTitle }}</span>
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="form" validate-on="submit" @submit.prevent="save">
+                <div v-if="mode === 'create'">
+                  <v-container v-for="field in createFields" :key="field">
+                    <v-row>
+                      <v-col :cols="field.col" :sm="field.col" :md="field.col">
+                        <v-text-field
+                          v-if="field.type === 'text-field'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :rules="field.rules"
+                          :label="field.label"
+                        ></v-text-field>
+
+                        <v-checkbox
+                          v-if="field.type === 'checkbox'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :label="field.label"
+                        />
+                        <v-select
+                          v-if="field.type === 'select'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :label="field.label"
+                          :rules="field.rules"
+                          :items="field.items"
+                          item-title="label"
+                          item-value="value"
+                          clearable
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </div>
+                <div v-else>
+                  <v-container v-for="field in editFields" :key="field">
+                    <v-row>
+                      <v-col :cols="field.col" :sm="field.col" :md="field.col">
+                        <v-text-field
+                          v-if="field.type === 'text-field'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :rules="field.rules"
+                          :label="field.label"
+                        ></v-text-field>
+
+                        <v-checkbox
+                          v-if="field.type === 'checkbox'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :label="field.label"
+                        />
+                        <v-select
+                          v-if="field.type === 'select'"
+                          :id="field.name"
+                          v-model="editedItem[field.name]"
+                          :label="field.label"
+                          :rules="field.rules"
+                          :items="field.items"
+                          item-title="label"
+                          item-value="value"
+                          clearable
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </div>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue-darken-1" variant="text" @click="close">
+                    {{ propsData.data.createEditButtons.cancel }}
+                  </v-btn>
+                  <v-btn color="blue-darken-1" variant="text" type="submit">
+                    {{ propsData.data.createEditButtons.action }}
+                  </v-btn>
+                </v-card-actions>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+
+        <div v-else class="d-flex" style="justify-content: end">
           <v-btn
+            type="button"
+            @click="getRedirectLink('create', '')"
             color="primary"
             dark
             class="mb-2 d-flex align-self-end"
-            v-bind="props"
           >
             {{ propsData.data.createButtonTitle }}
           </v-btn>
-        </template>
-        <v-card>
-          <v-card-title class="mt-3">
-            <span class="text-h5 ml-6">{{ formTitle }}</span>
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="form" validate-on="submit" @submit.prevent="save">
-              <div v-if="mode === 'create'">
-                <v-container v-for="field in createFields" :key="field">
-                  <v-row>
-                    <v-col :cols="field.col" :sm="field.col" :md="field.col">
-                      <v-text-field
-                        v-if="field.type === 'text-field'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :rules="field.rules"
-                        :label="field.label"
-                      ></v-text-field>
-
-                      <v-checkbox
-                        v-if="field.type === 'checkbox'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :label="field.label"
-                      />
-                      <v-select
-                        v-if="field.type === 'select'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :label="field.label"
-                        :rules="field.rules"
-                        :items="field.items"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                      />
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </div>
-              <div v-else>
-                <v-container v-for="field in editFields" :key="field">
-                  <v-row>
-                    <v-col :cols="field.col" :sm="field.col" :md="field.col">
-                      <v-text-field
-                        v-if="field.type === 'text-field'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :rules="field.rules"
-                        :label="field.label"
-                      ></v-text-field>
-
-                      <v-checkbox
-                        v-if="field.type === 'checkbox'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :label="field.label"
-                      />
-                      <v-select
-                        v-if="field.type === 'select'"
-                        :id="field.name"
-                        v-model="editedItem[field.name]"
-                        :label="field.label"
-                        :rules="field.rules"
-                        :items="field.items"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                      />
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </div>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" variant="text" @click="close">
-                  {{ propsData.data.createEditButtons.cancel }}
-                </v-btn>
-                <v-btn color="blue-darken-1" variant="text" type="submit">
-                  {{ propsData.data.createEditButtons.action }}
-                </v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-
-      <div v-else class="d-flex" style="justify-content: end">
-        <v-btn
-          type="button"
-          @click="getRedirectLink('create', '')"
-          color="primary"
-          dark
-          class="mb-2 d-flex align-self-end"
-        >
-          {{ propsData.data.createButtonTitle }}
-        </v-btn>
+        </div>
       </div>
+
       <!-- diaalog para delete -->
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
@@ -235,6 +252,7 @@ type DataTableHeader = {
     sort?: DataTableCompareFunction;
 };
 */
+const search = ref('');
 const form = ref();
 const loading = ref(false);
 const dialog = ref(false);
