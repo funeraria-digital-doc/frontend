@@ -280,13 +280,13 @@ function save() {
   isLoading.value = true;
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
-      generateDocument(props.documentId.raw.id, modalFields.value).then(
+      generateDocument(props.documentId.id, modalFields.value).then(
         (docResp) => {
           console.log(docResp)
           if (docResp.success) {
             clickDownloadFile(
               { data: docResp.data.file },
-              props.documentId.raw.name
+              props.documentId.name
             );
             emit('snack-messages', [
               'Documento emitido com sucesso.',
@@ -436,7 +436,7 @@ function getValidations(templateValidationsItem: any) {
 }
 
 onBeforeMount(async () => {
-  await getTemplates(props.documentId.raw.id).then((resp) => {
+  await getTemplates(props.documentId.id).then((resp) => {
     if (resp.success) {
       templates.value = [];
       errorMessages.value = {};

@@ -18,13 +18,12 @@
     >
       <v-btn
         v-if="
-          (item.columns[field.name] && field.type == 'file') ||
-          field.type == 'button'
+          (item[field.name] && field.type == 'file') || field.type == 'button'
         "
         @click="field.clickFunction(item)"
         >{{ field.message }}</v-btn
       >
-      <p v-else>{{ item.columns[field.name] }}</p>
+      <p v-else>{{ item[field.name] }}</p>
     </template>
     <template v-slot:top>
       <v-dialog
@@ -162,28 +161,27 @@
         </v-card>
       </v-dialog>
     </template>
-
     <template
       v-if="propsData.data.createAndEditByModal"
       v-slot:item.actions="{ item }"
     >
-      <div v-if="canAction(item.raw)">
-        <v-icon size="small" class="me-2" @click="editItem(item.raw)">
+      <div v-if="canAction(item)">
+        <v-icon size="small" class="me-2" @click="editItem(item)">
           mdi-pencil
         </v-icon>
-        <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+        <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </div>
     </template>
     <template v-else v-slot:item.actions="{ item }">
-      <div v-if="canAction(item.raw)">
+      <div v-if="canAction(item)">
         <v-icon
           size="small"
           class="me-2"
-          @click="getRedirectLink('edit', item.raw)"
+          @click="getRedirectLink('edit', item)"
         >
           mdi-pencil
         </v-icon>
-        <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+        <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </div>
     </template>
   </v-data-table>
@@ -199,7 +197,6 @@ import {
   watch,
   onMounted,
 } from 'vue';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';

@@ -6,7 +6,7 @@ export const validationFieldTypeItems = [
   { label: 'Multiplas Opções', value: 'MULTISELECT' },
   { label: 'Área de Texto', value: 'TEXTAREA' },
   { label: 'Data', value: 'DATE' },
-  { label: 'Email', value: 'EMAIL' },
+  { label: 'Email', value: 'EMAIL' }
 ];
 
 export const maxRules = (validation: any) => [

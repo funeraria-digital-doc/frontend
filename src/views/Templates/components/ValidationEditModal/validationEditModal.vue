@@ -25,6 +25,7 @@
             <v-col v-if="!showDbFields" cols="6" sm="6" md="6">
               <v-select
                 :id="'field_type_' + props.index"
+                no-data-text="Não existem opções disponíveis"
                 v-model="validation.field_type"
                 label="Tipo de Campo"
                 :items="validationFieldTypeItems"
@@ -75,6 +76,7 @@
               <v-select
                 :id="'db_collection_' + props.index"
                 v-model="validation.db_collection"
+                no-data-text="Não existem opções disponíveis"
                 label="Tabela"
                 :items="constants.dbCollections"
                 item-title="label"
@@ -90,6 +92,7 @@
                 :id="'db_field_reference_' + props.index"
                 v-model="validation.db_field_reference"
                 label="Campo da Tabela"
+                no-data-text="Não existem opções disponíveis"
                 :items="dbFields"
                 item-title="label"
                 item-value="value"
@@ -107,6 +110,7 @@
               <v-select
                 :id="'format_' + props.index"
                 v-model="validation.format"
+                no-data-text="Não existem opções disponíveis"
                 label="Formato da data"
                 :items="constants.dateFormat"
                 item-title="label"
@@ -125,14 +129,13 @@
               >
                 <template v-slot:label>
                   <div>
-                    <span>Data Numérica?</span><br>
+                    <span>Data Numérica?</span><br />
                     <span>ex: 20/10/2023</span>
                   </div>
                 </template>
               </v-checkbox>
             </v-col>
           </v-row>
-
           <div v-if="validation.is_field_custom">
             <v-row>
               <!-- default_value -->
@@ -268,7 +271,9 @@ const showDbFields = computed(() =>
 );
 
 const showDateFields = computed(() =>
-  ['DATE', 'TIME', 'DATETIME'].indexOf(validation.value.field_type) > -1
+  ['DATE', 'TIME', 'DATETIME', 'CURRENTDATE'].indexOf(
+    validation.value.field_type
+  ) > -1
     ? true
     : false
 );
@@ -378,6 +383,10 @@ function mapDbFields() {
     dbFields.value = constants.recordsFields.map((item) => {
       return { label: item.label, value: item.value };
     });
+  } else if (validation.value.db_collection === 'SYSTEM') {
+    dbFields.value = constants.systemFields.map((item) => {
+      return { label: item.label, value: item.value };
+    });
   }
 }
 
@@ -398,7 +407,7 @@ watch(
 watch(
   () => validation.value.db_collection,
   (db_collection) => {
-    if (['USERS', 'GROUPS', 'RECORDS'].indexOf(db_collection) > -1) {
+    if (['USERS', 'GROUPS', 'RECORDS', 'SYSTEM'].indexOf(db_collection) > -1) {
       mapDbFields();
     } else {
       dbFields.value = [];
@@ -422,6 +431,11 @@ watch(
       validation.value.field_type = item ? item.type : 'TEXT';
     } else if (validation.value.db_collection === 'RECORDS') {
       const item = constants.recordsFields.find(
+        (obj) => obj.value === db_field_reference
+      );
+      validation.value.field_type = item ? item.type : 'TEXT';
+    } else if (validation.value.db_collection === 'SYSTEM') {
+      const item = constants.systemFields.find(
         (obj) => obj.value === db_field_reference
       );
       validation.value.field_type = item ? item.type : 'TEXT';

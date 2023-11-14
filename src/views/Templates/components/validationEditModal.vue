@@ -21,6 +21,7 @@
                 v-model="validation.field_type"
                 label="Tipo de Campo"
                 :items="fieldTypeItems"
+                no-data-text="Não existem opções disponíveis"
                 item-title="label"
                 item-value="value"
                 :rules="constants.fieldTypeRules"
@@ -90,7 +91,7 @@ const fieldTypeItems = [
   { label: 'Ano', value: 'YEAR' },
   { label: 'Mês', value: 'MONTH' },
   { label: 'Dia', value: 'DAY' },
-  { label: 'Email', value: 'EMAIL' },
+  { label: 'Email', value: 'EMAIL' }
 ];
 const emit = defineEmits();
 const save = () => {
