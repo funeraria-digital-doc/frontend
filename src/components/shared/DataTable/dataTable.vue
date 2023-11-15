@@ -15,6 +15,7 @@
     no-data-text="Nenhum registo disponível"
     :multi-sort="propsData.data.multiSort"
     :show-select="propsData.data.selectCheckbox"
+    item-selectable="selectable"
   >
     <template
       v-for="(field, key) in fields"
@@ -44,117 +45,137 @@
           variant="solo-filled"
         ></v-text-field>
         <v-spacer></v-spacer>
-        <v-dialog
-          v-if="propsData.data.createAndEditByModal"
-          v-model="dialog"
-          max-width="500px"
-        >
-          <template v-slot:activator="{ props }">
+        <div class="d-flex">
+          <v-btn
+            v-if="canChangeStatus"
+            color="primary"
+            dark
+            class="mb-2 mr-2 d-flex"
+            @click="clickSelect"
+          >
+            Arquivar Selecionados
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-dialog
+            v-if="propsData.data.createAndEditByModal"
+            v-model="dialog"
+            max-width="500px"
+          >
+            <template v-slot:activator="{ props }">
+              <v-btn
+                color="primary"
+                dark
+                class="mb-2 d-flex align-self-end"
+                v-bind="props"
+              >
+                {{ propsData.data.createButtonTitle }}
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="mt-3">
+                <span class="text-h5 ml-6">{{ formTitle }}</span>
+              </v-card-title>
+              <v-card-text>
+                <v-form ref="form" validate-on="submit" @submit.prevent="save">
+                  <div v-if="mode === 'create'">
+                    <v-container v-for="field in createFields" :key="field">
+                      <v-row>
+                        <v-col
+                          :cols="field.col"
+                          :sm="field.col"
+                          :md="field.col"
+                        >
+                          <v-text-field
+                            v-if="field.type === 'text-field'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :rules="field.rules"
+                            :label="field.label"
+                          ></v-text-field>
+
+                          <v-checkbox
+                            v-if="field.type === 'checkbox'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :label="field.label"
+                          />
+                          <v-select
+                            v-if="field.type === 'select'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :label="field.label"
+                            :rules="field.rules"
+                            :items="field.items"
+                            item-title="label"
+                            item-value="value"
+                            clearable
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </div>
+                  <div v-else>
+                    <v-container v-for="field in editFields" :key="field">
+                      <v-row>
+                        <v-col
+                          :cols="field.col"
+                          :sm="field.col"
+                          :md="field.col"
+                        >
+                          <v-text-field
+                            v-if="field.type === 'text-field'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :rules="field.rules"
+                            :label="field.label"
+                          ></v-text-field>
+
+                          <v-checkbox
+                            v-if="field.type === 'checkbox'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :label="field.label"
+                          />
+                          <v-select
+                            v-if="field.type === 'select'"
+                            :id="field.name"
+                            v-model="editedItem[field.name]"
+                            :label="field.label"
+                            :rules="field.rules"
+                            :items="field.items"
+                            item-title="label"
+                            item-value="value"
+                            clearable
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </div>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue-darken-1" variant="text" @click="close">
+                      {{ propsData.data.createEditButtons.cancel }}
+                    </v-btn>
+                    <v-btn color="blue-darken-1" variant="text" type="submit">
+                      {{ propsData.data.createEditButtons.action }}
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+
+          <div v-else class="d-flex" style="justify-content: end">
             <v-btn
+              type="button"
+              @click="getRedirectLink('create', '')"
               color="primary"
               dark
               class="mb-2 d-flex align-self-end"
-              v-bind="props"
             >
               {{ propsData.data.createButtonTitle }}
             </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="mt-3">
-              <span class="text-h5 ml-6">{{ formTitle }}</span>
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="form" validate-on="submit" @submit.prevent="save">
-                <div v-if="mode === 'create'">
-                  <v-container v-for="field in createFields" :key="field">
-                    <v-row>
-                      <v-col :cols="field.col" :sm="field.col" :md="field.col">
-                        <v-text-field
-                          v-if="field.type === 'text-field'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :rules="field.rules"
-                          :label="field.label"
-                        ></v-text-field>
-
-                        <v-checkbox
-                          v-if="field.type === 'checkbox'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :label="field.label"
-                        />
-                        <v-select
-                          v-if="field.type === 'select'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :label="field.label"
-                          :rules="field.rules"
-                          :items="field.items"
-                          item-title="label"
-                          item-value="value"
-                          clearable
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </div>
-                <div v-else>
-                  <v-container v-for="field in editFields" :key="field">
-                    <v-row>
-                      <v-col :cols="field.col" :sm="field.col" :md="field.col">
-                        <v-text-field
-                          v-if="field.type === 'text-field'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :rules="field.rules"
-                          :label="field.label"
-                        ></v-text-field>
-
-                        <v-checkbox
-                          v-if="field.type === 'checkbox'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :label="field.label"
-                        />
-                        <v-select
-                          v-if="field.type === 'select'"
-                          :id="field.name"
-                          v-model="editedItem[field.name]"
-                          :label="field.label"
-                          :rules="field.rules"
-                          :items="field.items"
-                          item-title="label"
-                          item-value="value"
-                          clearable
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </div>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue-darken-1" variant="text" @click="close">
-                    {{ propsData.data.createEditButtons.cancel }}
-                  </v-btn>
-                  <v-btn color="blue-darken-1" variant="text" type="submit">
-                    {{ propsData.data.createEditButtons.action }}
-                  </v-btn>
-                </v-card-actions>
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
-
-        <div v-else class="d-flex" style="justify-content: end">
-          <v-btn
-            type="button"
-            @click="getRedirectLink('create', '')"
-            color="primary"
-            dark
-            class="mb-2 d-flex align-self-end"
-          >
-            {{ propsData.data.createButtonTitle }}
-          </v-btn>
+          </div>
         </div>
       </div>
 
@@ -256,7 +277,7 @@ type DataTableHeader = {
 };
 */
 const search = ref('');
-const selected = ref();
+const selected = ref([]);
 const form = ref();
 const loading = ref(false);
 const dialog = ref(false);
@@ -299,6 +320,12 @@ const editFields = computed(() => {
     (i: { editDisplayRole: string | string[] }) =>
       i.editDisplayRole.includes(user.role) ||
       i.editDisplayRole == AUTH_PERMISSIONS.NO_AUTH
+  );
+});
+
+const canChangeStatus = computed(() => {
+  return (
+    propsData.data.selectCheckbox && selected.value && selected.value.length > 0
   );
 });
 
@@ -382,10 +409,6 @@ watch(dialogDelete, (val) => {
   val || closeDelete();
 });
 
-watch(selected, (val) => {
- console.log('val', val)
-});
-
 function setFields() {
   let newEditedItem = {};
   for (let i = 0; i < fields.value.length; i++) {
@@ -407,6 +430,11 @@ function getRedirectLink(mode: string, item: any) {
 
 function canAction(itemRaw: { username: string; email: string; role: string }) {
   return propsData.data.canAction(itemRaw);
+}
+
+function clickSelect(){
+  propsData.data.selectFunction(loading, selected.value, serverItems, snack)
+  selected.value = []
 }
 
 onMounted(() => {
