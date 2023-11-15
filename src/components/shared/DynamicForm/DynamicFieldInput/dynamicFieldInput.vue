@@ -102,13 +102,17 @@ const isLoading = ref(false);
 const imageUrl = ref(props.field.value);
 
 // for datetime
-const dateTimeModel = computed(() =>
-  ((model.value as string) ?? '').replace('Z', '')
-);
+const dateTimeModel = ref();
 
 watch(props, (newProps) => {
   model.value = newProps.field.value;
   imageUrl.value = newProps.field.value;
+  if (newProps.field.input === 'date-time') {
+    dateTimeModel.value = ((newProps.field.value as string) ?? '').replace(
+      'Z',
+      ''
+    );
+  }
 });
 
 const saveFile = (base64File: string) => {
