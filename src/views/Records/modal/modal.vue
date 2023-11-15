@@ -370,7 +370,7 @@ watch(
 );
 
 onBeforeMount(async () => {
-  await getTemplates(props.documentId.raw.id).then((resp) => {
+  await getTemplates(props.documentId.id).then((resp) => {
     templates.value = [];
     errorMessages.value = {};
 
