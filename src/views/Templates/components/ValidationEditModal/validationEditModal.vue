@@ -141,6 +141,7 @@
               <!-- default_value -->
               <v-col v-if="showDefaultValue" cols="12" sm="12" md="12">
                 <v-combobox
+                  v-if="isMultiSelect"
                   :id="'default_value_' + props.index"
                   v-model="validation.default_value"
                   :label="defaultValueLabel"
@@ -155,6 +156,34 @@
                   :rules="defaultValueRules(validation)"
                   :error-messages="errorMessages.default_value"
                 ></v-combobox>
+                <v-select
+                  v-else-if="
+                    !isMultiSelect &&
+                    ['SELECT', 'BOOLEAN'].indexOf(validation.field_type) >= 0
+                  "
+                  :id="'default_value_' + props.index"
+                  v-model="validation.default_value"
+                  :label="defaultValueLabel"
+                  :items="defaultValueValues"
+                  item-title="label"
+                  item-value="value"
+                  clearable
+                  :rules="defaultValueRules(validation)"
+                  :error-messages="errorMessages.default_value"
+                />
+                <v-text-field
+                  v-else-if="
+                    !isMultiSelect &&
+                    ['DATE', 'DATETIME', 'TIME'].indexOf(
+                      validation.field_type
+                    ) < 0
+                  "
+                  :id="'default_value_' + props.index"
+                  v-model="validation.default_value"
+                  :label="defaultValueLabel"
+                  :rules="defaultValueRules(validation)"
+                  :error-messages="errorMessages.default_value"
+                ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
@@ -225,6 +254,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, watch, computed, onBeforeMount } from 'vue';
+import { isDateOrDateTime } from './validationEditModal.helper';
 
 export default defineComponent({
   name: 'ValidationEditModal',
@@ -238,7 +268,9 @@ import {
   maxRules,
   validationFieldTypeItems,
 } from './validationEditModal.constants';
-
+import { getFieldRules } from '../../../Records/modal/modal.helper';
+import { getFormat } from '../../../Records/helper';
+import moment from 'moment';
 const props = defineProps([
   'editModal',
   'validation',
@@ -254,6 +286,18 @@ let errorMessages = ref();
 const dbFields = ref<{ label: string; value: string }[]>([]);
 
 const form = ref();
+function getDateType(validation) {
+  let type = '';
+  const format = isDateOrDateTime(validation.format);
+  if (format === 'date') {
+    type = 'date';
+  } else if (format === 'datetime') {
+    type = 'datetime-local';
+  } else {
+    type = 'time';
+  }
+  return type;
+}
 
 const save = async () => {
   const { valid } = await form.value.validate();
@@ -298,7 +342,11 @@ const showDefaultValue = computed(() => {
     (validation.value.field_type !== 'SELECT' ||
       (validation.value.field_type === 'SELECT' &&
         validation.value.options &&
-        validation.value.options.length > 0))
+        validation.value.options.length > 0)) &&
+    (['DATE', 'DATETIME', 'FORMAT'].indexOf(validation.value.field_type) < 0 ||
+      (['DATE', 'DATETIME', 'FORMAT'].indexOf(validation.value.field_type) >=
+        0 &&
+        validation.value.format))
   );
 });
 
@@ -312,6 +360,7 @@ const defaultValueValues = computed(() => {
     });
   }
   if (validation.value.field_type === 'BOOLEAN') {
+    console.log(constants.BooleanOptions);
     return constants.BooleanOptions;
   }
   return [];
@@ -356,17 +405,23 @@ watch(showDateFields, (showDateFields) => {
 watch(
   () => validation.value.field_type,
   (field_type) => {
-    if (field_type) {
-      validation.value.default_value = [];
-    }
+    // if (field_type && ['SELECT', 'MULTISELECT'].indexOf(field_type)) {
+    //   validation.value.default_value = [];
+    // }
     if (['SELECT', 'MULTISELECT'].indexOf(field_type) == -1) {
+      //validation.value.options = [];
+      validation.value.options = null;
+      validation.value.default_value = '';
+    } else {
       validation.value.options = [];
+      validation.value.default_value = [];
     }
     if (['SELECT', 'DATE', 'EMAIL'].indexOf(field_type) > -1) {
       validation.value.max = 1;
     } else {
       validation.value.max = null;
     }
+    console.log('validations', validation.value);
   }
 );
 
@@ -461,6 +516,31 @@ watch(
     }
   }
 );
+
+watch(
+  () => validation.value.format,
+  (newFormat, oldFormat) => {
+    if (newFormat != oldFormat || !newFormat) {
+      validation.value.default_value = null;
+    }
+  }
+);
+
+function handleDate(modelData: Date, fieldName: string, isTime: boolean) {
+  //o format vem do campo deste form mas se ainda nao tiver selecionado o format , nao deve aparecer o campo default_value
+  if (validation.value.format && modelData) {
+    const format = getFormat(validation.value.format, false);
+    if (isTime) {
+      validation.value.default_value = moment(modelData).format(format);
+    } else {
+      validation.value.default_value = moment(modelData, 'HH:mm:ss').format(
+        format
+      );
+    }
+  } else {
+    validation.value.default_value = null;
+  }
+}
 
 onBeforeMount(() => {
   if (props.errorMessages && props.errorMessages[props.index]) {
