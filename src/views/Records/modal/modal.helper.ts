@@ -1,10 +1,14 @@
+import { isDateOrDateTime } from '../../Templates/components/ValidationEditModal/validationEditModal.helper';
+import { clickDownloadFile } from '@/utils/downloadFile';
+import { generateDocument } from '@/api/recordTemplates';
+import moment from 'moment';
+import { getFormat } from '../helper';
+
 export function getFieldRules(validation: any) {
   const rules = [];
   if (!validation.optional || validation.min > 0) {
     if (validation.field_type === 'BOOLEAN') {
-      console.log('aqui');
       rules.push((value: any) => {
-        console.log('valor', typeof value);
         return (typeof value === 'boolean' && !!value) || 'Campo Obrigatório.';
       });
     } else {
@@ -12,7 +16,6 @@ export function getFieldRules(validation: any) {
     }
   }
   if (validation.min > 0) {
-    console.log('type: ' + validation.field_type);
     if (['TEXT', 'TEXTAREA'].includes(validation.field_type)) {
       rules.push(
         (value: any) =>
@@ -71,4 +74,177 @@ export function getFieldRules(validation: any) {
     });
   }
   return rules;
+}
+
+export function getDateType(validation: any, templateValidations: any) {
+  let type = '';
+  const selectedVal = templateValidations.find(
+    (templateVal: { name: String }) => {
+      return templateVal.name === validation.name;
+    }
+  );
+  if (isDateOrDateTime(selectedVal.format) === 'date') {
+    type = 'date';
+  } else if (isDateOrDateTime(selectedVal.format) === 'datetime') {
+    type = 'datetime-local';
+  } else {
+    type = 'time';
+  }
+  return type;
+}
+
+export function getValidations(
+  templateValidationsItem: any,
+  errorMessages: any
+) {
+  let newValidations: any[] = [];
+  templateValidationsItem.map((val: any) => {
+    errorMessages.value[val.name] = '';
+    if (val.is_field_custom) {
+      newValidations.push(val);
+    }
+  });
+
+  return newValidations;
+}
+
+export function getApiErrors(errors: any, errorMessages: any) {
+  for (let t = 0; t < Object.keys(errorMessages.value).length; t++) {
+    const errorMessageKey = Object.keys(errorMessages.value)[t];
+    errorMessages.value[errorMessageKey] = '';
+  }
+  console.log('keys_missing', errors.keys_missing);
+  if (errors.keys_missing) {
+    for (let i = 0; i < errors.keys_missing.length; i++) {
+      const key = errors.keys_missing[i];
+      console.log('key - ' + key);
+      errorMessages.value[key] = 'Campo obrigatório.';
+    }
+    console.log('errorMessages.value', errorMessages.value);
+  }
+  if (errors.errors) {
+    for (let i = 0; i < Object.keys(errors.errors).length; i++) {
+      const key = Object.keys(errors.errors)[i];
+      if (
+        typeof errors.errors[key] === 'object' &&
+        errors.errors[key][Object.keys(errors.errors[key])[0]]
+      ) {
+        errorMessages.value[key] =
+          errors.errors[key][Object.keys(errors.errors[key])[0]];
+      } else {
+        errorMessages.value[key] = errors.errors[key];
+      }
+    }
+  }
+}
+
+export function saveForm(
+  isLoading: any,
+  form: any,
+  props: any,
+  modalFields: any,
+  errorMessages: any,
+  emitSnackMessages: Function,
+  emitCloseModal: Function
+) {
+  isLoading.value = true;
+  form.value.validate().then((resp: any) => {
+    if (resp.valid) {
+      generateDocument(props.documentId.raw.id, modalFields.value).then(
+        (docResp) => {
+          console.log(docResp);
+          if (docResp.success) {
+            clickDownloadFile(
+              { data: docResp.data.file },
+              props.documentId.raw.name
+            );
+            emitSnackMessages(['Documento emitido com sucesso.', '', true]);
+            emitCloseModal();
+            modalFields.value = {
+              to_send_option: '',
+              template: '',
+              validations: {},
+            };
+            isLoading.value = false;
+          } else {
+            if (docResp.error && docResp.error.status.toString()[0] === '4') {
+              emitSnackMessages([
+                'Formulário preenchido incorretamente.',
+                'Preencha todos os campos em falta',
+                false,
+              ]);
+              getApiErrors(docResp.error, errorMessages);
+              isLoading.value = false;
+            } else {
+              emitSnackMessages([
+                'Ocorreu um erro. Tente novamente mais tarde.',
+                'Em caso de presistencia, contacte os administradores do sistema',
+                false,
+              ]);
+              isLoading.value = false;
+            }
+          }
+        }
+      );
+    } else {
+      emitSnackMessages([
+        'Formulário preenchido incorretamente.',
+        'Preencha todos os campos em falta',
+        false,
+      ]);
+      isLoading.value = false;
+    }
+  });
+}
+
+export function getDatesPlaceholders(selected: any, validations: any) {
+  console.log('selected', selected);
+  console.log('validations', Object.keys(validations));
+  Object.keys(validations).map((val: any) => {
+    const selectedVar = selected.find((item: any) => item.name === val);
+    console.log('selectedVar', selectedVar);
+    const format =
+      selectedVar.format instanceof Array
+        ? selectedVar.format[0]
+        : selectedVar.format;
+    const default_value =
+      selectedVar.default_value instanceof Array
+        ? selectedVar.default_value[0]
+        : selectedVar.default_value;
+    console.log('format', format);
+    console.log('default_value', default_value);
+    if (
+      ['DATE', 'DATETIME', 'TIME'].indexOf(selectedVar.field_type) >= 0 &&
+      format &&
+      selectedVar.default_value
+    ) {
+      const datee = getDateFormated(
+        format,
+        default_value,
+        isDateOrDateTime(format) === 'time' ? true : false
+      );
+      console.log(datee);
+      console.log('antes', validations[selectedVar.name]);
+      validations[selectedVar.name] = datee;
+      console.log('depois', validations[selectedVar.name]);
+    }
+  });
+}
+
+export function getDateFormated(
+  apiFormat: string,
+  modelData: any,
+  isTime: boolean
+) {
+  const format = getFormat(apiFormat, false);
+  console.log('aquiiiiii', format )
+  console.log('isTime', isTime )
+  console.log('modelData', modelData )
+  let dateFormated;
+  if (isTime) {
+    dateFormated = moment(modelData).format(format);
+  } else {
+    dateFormated = moment(modelData, 'HH:mm:ss').format(format);
+  }
+  return dateFormated;
 }
