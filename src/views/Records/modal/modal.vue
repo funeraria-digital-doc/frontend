@@ -264,6 +264,59 @@ function confirmClose() {
 }
 
 function save() {
+  isLoading.value = true;
+  form.value.validate().then((resp: any) => {
+    if (resp.valid) {
+      generateDocument(props.documentId.id, modalFields.value).then(
+        (docResp) => {
+          console.log(docResp)
+          if (docResp.success) {
+            clickDownloadFile(
+              { data: docResp.data.file },
+              props.documentId.name
+            );
+            emit('snack-messages', [
+              'Documento emitido com sucesso.',
+              '',
+              true,
+            ]);
+            emit('close-modal');
+            modalFields.value = {
+              to_send_option: '',
+              template: '',
+              validations: {},
+            };
+            isLoading.value = false;
+          } else {
+            if (docResp.error && docResp.error.status.toString()[0] === '4') {
+              emit('snack-messages', [
+                'Formulário preenchido incorretamente.',
+                'Preencha todos os campos em falta',
+                false,
+              ]);
+              getApiErrors(docResp.error);
+              isLoading.value = false;
+            } else {
+              emit('snack-messages', [
+                'Ocorreu um erro. Tente novamente mais tarde.',
+                'Em caso de presistencia, contacte os administradores do sistema',
+                false,
+              ]);
+              isLoading.value = false;
+            }
+          }
+        }
+      );
+    } else {
+      emit('snack-messages', [
+        'Formulário preenchido incorretamente.',
+        'Preencha todos os campos em falta',
+        false,
+      ]);
+      isLoading.value = false;
+    }
+  });
+
   saveForm(
     isLoading,
     form,
@@ -320,6 +373,7 @@ onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {
     templates.value = [];
     errorMessages.value = {};
+
     if (resp.success) {
       resp.data.data.map(
         (i: { send_type: any; title: any; id: any; validations: any }) => {
