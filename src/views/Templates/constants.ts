@@ -130,6 +130,7 @@ export const dbCollections = [
   { label: 'Funerárias', value: 'GROUPS' },
   { label: 'Utilizadores', value: 'USERS' },
   { label: 'Declarações', value: 'RECORDS' },
+  { label: 'Sistema', value: 'SYSTEM' },
 ];
 
 export const usersFields = [
@@ -246,6 +247,10 @@ export const recordsFields = [
     value: 'death_declaration_number',
     type: 'TEXT',
   },
+];
+
+export const systemFields = [
+  { label: 'Data Atual', value: 'CURRENT_DATE', type: 'DATE' },
 ];
 
 export const dateFormat = [

@@ -1,4 +1,9 @@
-import { recordDelete, recordItem, recordsList } from '@/api/records';
+import {
+  recordDelete,
+  recordItem,
+  recordsList,
+  recordsUpdateStatus,
+} from '@/api/records';
 import { getLabel } from '@/utils/datatableHelper';
 
 export const getRecords = async (
@@ -19,6 +24,10 @@ export const getRecords = async (
             gender: getLabel('gender', record.gender, fields),
             status: getLabel('status', record.status, fields),
             group_id: getLabel('group_id', record.group_id, fields),
+            selectable:
+              getLabel('status', record.status, fields) === 'Ativo'
+                ? true
+                : false,
           };
         });
       }
@@ -167,3 +176,31 @@ export function getFormat(templateFormat: any, toPicker: boolean) {
   }
   return format;
 }
+
+export const changeRecordsStatus = async (
+  loading: { value: boolean },
+  recordsIds: any,
+  records: any,
+  snack: any
+) => {
+  recordsUpdateStatus(recordsIds).then((resp) => {
+    if (resp.success) {
+      recordsIds.forEach((element: number) => {
+        const recordFound = records.value.find(
+          (record: any) => element == record.id
+        );
+        recordFound.status = 'Arquivado';
+        recordFound.selectable = false;
+      });
+      snack.value.showSnackbar('Declarações arquivadas com sucesso.', '', true);
+    } else {
+      console.error('erro', resp);
+      snack.value.showSnackbar(
+        'Ocorreu um erro ao arquivar as declarações.',
+        'Tente novamente mais tarde',
+        true
+      );
+    }
+    loading.value = false;
+  });
+};

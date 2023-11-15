@@ -51,3 +51,17 @@ export async function recordDelete(index: string): Promise<ApiResponse<any>> {
     return errorResponse(e);
   }
 }
+
+export async function recordsUpdateStatus(
+  recordsIds: Array<String>
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.post(
+      `/records/update-many-status/`,
+      recordsIds
+    );
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}
