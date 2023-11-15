@@ -144,50 +144,26 @@
                     :rules="getFieldRules(validation)"
                   />
 
-                  <!-- DATETIME -->
+                  <!-- DATE/DATETIME/TIME -->
                   <v-text-field
                     v-if="
-                      validation.field_type.toLowerCase() === 'date' &&
-                      isDateOrDateTime(validation.name) == 'datetime'
+                      ['DATE', 'DATETIME', 'TIME'].indexOf(
+                        validation.field_type
+                      ) >= 0
                     "
-                    type="datetime-local"
+                    :type="getDateType(validation, templateValidations)"
                     :label="
                       validation.label ? validation.label : validation.name
                     "
                     :rules="getFieldRules(validation)"
-                    @update:model-value="handleDate($event, validation.name)"
-                    :error-messages="errorMessages[validation.name]"
-                    :placeholder="validation.placeholder ?? null"
-                  />
-
-                  <!-- DATE -->
-                  <v-text-field
-                    v-if="
-                      validation.field_type.toLowerCase() === 'date' &&
-                      isDateOrDateTime(validation.name) == 'date'
+                    @update:model-value="
+                      handleDate(
+                        $event,
+                        validation.name,
+                        validation.field_type === 'TIME' ? true : false
+                      )
                     "
-                    type="date"
-                    :label="
-                      validation.label ? validation.label : validation.name
-                    "
-                    :rules="getFieldRules(validation)"
-                    @update:model-value="handleDate($event, validation.name)"
-                    :error-messages="errorMessages[validation.name]"
-                    :placeholder="validation.placeholder ?? null"
-                  />
-
-                  <!-- TIME -->
-                  <v-text-field
-                    v-if="
-                      validation.field_type.toLowerCase() === 'date' &&
-                      isDateOrDateTime(validation.name) == 'time'
-                    "
-                    type="time"
-                    :label="
-                      validation.label ? validation.label : validation.name
-                    "
-                    :rules="getFieldRules(validation)"
-                    @update:model-value="handleTime($event, validation.name)"
+                    clearable
                     :error-messages="errorMessages[validation.name]"
                     :placeholder="validation.placeholder ?? null"
                   />
@@ -229,12 +205,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
-import { generateDocument, getTemplates } from '@/api/recordTemplates';
+import { getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
-import { clickDownloadFile } from '@/utils/downloadFile';
-import { getFieldRules } from './modal.helper';
-import moment from 'moment';
-import { getFormat } from '../helper';
+import {
+  getFieldRules,
+  getDateType,
+  getValidations,
+  saveForm,
+  getDateFormated
+} from './modal.helper';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -267,8 +246,16 @@ const booleanOptions = [
 const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção.'];
 const isTemplateSelected = ref(false);
 
-function confirmClose() {
+function emitCloseModal() {
   emit('close-modal');
+}
+
+function emitSnackMessages(message: any) {
+  emit('snack-messages', message);
+}
+
+function confirmClose() {
+  emitCloseModal();
   modalFields.value = {
     to_send_option: '',
     template: '',
@@ -277,97 +264,29 @@ function confirmClose() {
 }
 
 function save() {
-  isLoading.value = true;
-  form.value.validate().then((resp: any) => {
-    if (resp.valid) {
-      generateDocument(props.documentId.raw.id, modalFields.value).then(
-        (docResp) => {
-          console.log(docResp)
-          if (docResp.success) {
-            clickDownloadFile(
-              { data: docResp.data.file },
-              props.documentId.raw.name
-            );
-            emit('snack-messages', [
-              'Documento emitido com sucesso.',
-              '',
-              true,
-            ]);
-            emit('close-modal');
-            modalFields.value = {
-              to_send_option: '',
-              template: '',
-              validations: {},
-            };
-            isLoading.value = false;
-          } else {
-            if (docResp.error && docResp.error.status.toString()[0] === '4') {
-              emit('snack-messages', [
-                'Formulário preenchido incorretamente.',
-                'Preencha todos os campos em falta',
-                false,
-              ]);
-              getApiErrors(docResp.error);
-              isLoading.value = false;
-            } else {
-              emit('snack-messages', [
-                'Ocorreu um erro. Tente novamente mais tarde.',
-                'Em caso de presistencia, contacte os administradores do sistema',
-                false,
-              ]);
-              isLoading.value = false;
-            }
-          }
-        }
-      );
-    } else {
-      emit('snack-messages', [
-        'Formulário preenchido incorretamente.',
-        'Preencha todos os campos em falta',
-        false,
-      ]);
-      isLoading.value = false;
-    }
-  });
+  saveForm(
+    isLoading,
+    form,
+    props,
+    modalFields,
+    errorMessages,
+    emitSnackMessages,
+    emitCloseModal
+  );
 }
 
-function isDateOrDateTime(fieldName: String) {
+function handleDate(modelData: Date, fieldName: string, isTime: boolean) {
   const selectedVal = templateValidations.value.find(
     (templateVal: { name: String }) => {
       return templateVal.name === fieldName;
     }
   );
-  let format = 'datetime';
-  const dateFormats = ['DAY_MONTH_YEAR', 'MONTH_YEAR', 'DAY_MONTH'];
-  const timeFormats = [
-    'HOURS_ONLY',
-    'MINUTES_ONLY',
-    'SECONDS_ONLY',
-    'HOURS_MINUTES_SECONDS',
-    'HOURS_MINUTES',
-    'MINUTES_SECONDS',
-  ];
-  if (dateFormats.includes(selectedVal.format)) {
-    format = 'date';
-  }
-  if (timeFormats.includes(selectedVal.format)) {
-    format = 'time';
-  }
-  return format;
-}
-
-const handleDate = (modelData: Date, fieldName: string) => {
-  const format = getFormat(fieldName, templateValidations.value, false);
-  modalFields.value.validations[fieldName] = moment(modelData).format(format);
-};
-
-const handleTime = (modelData: Date, fieldName: string) => {
-  const format = getFormat(fieldName, templateValidations.value, false);
-  modalFields.value.validations[fieldName] = moment(
+  modalFields.value.validations[fieldName] = getDateFormated(
+    selectedVal.format,
     modelData,
-    'HH:mm:ss'
-  ).format(format);
-};
+    isTime
+  );
+}
 
 const templateValidations = computed(() => {
   let selected = {};
@@ -397,62 +316,21 @@ watch(
   }
 );
 
-function getApiErrors(errors: any) {
-  for (var t = 0; t < Object.keys(errorMessages.value).length; t++) {
-    const errorMessageKey = Object.keys(errorMessages.value)[t];
-    errorMessages.value[errorMessageKey] = '';
-  }
-  console.log('keys_missing', errors.keys_missing)
-  if (errors.keys_missing) {
-    for (let i = 0; i < errors.keys_missing.length; i++) {
-      const key = errors.keys_missing[i];
-      console.log('key - ' + key)
-      errorMessages.value[key] = 'Campo obrigatório.';
-    }
-    console.log('errorMessages.value', errorMessages.value)
-  }
-  if (errors.errors) {
-    for (let i = 0; i < Object.keys(errors.errors).length; i++) {
-      const key = Object.keys(errors.errors)[i];
-      if (typeof errors.errors[key] === 'object' && errors.errors[key][Object.keys(errors.errors[key])[0]]) {
-        errorMessages.value[key] =
-          errors.errors[key][Object.keys(errors.errors[key])[0]];
-      }else{
-        errorMessages.value[key] = errors.errors[key]
-      }
-    }
-  }
-}
-
-function getValidations(templateValidationsItem: any) {
-  let newValidations: any[] = [];
-  templateValidationsItem.map((val: any) => {
-    errorMessages.value[val.name] = '';
-    if (val.is_field_custom) {
-      newValidations.push(val);
-    }
-  });
-  return newValidations;
-}
-
 onBeforeMount(async () => {
   await getTemplates(props.documentId.raw.id).then((resp) => {
+    templates.value = [];
+    errorMessages.value = {};
     if (resp.success) {
-      templates.value = [];
-      errorMessages.value = {};
       resp.data.data.map(
         (i: { send_type: any; title: any; id: any; validations: any }) => {
           templates.value.push({ label: i.title, value: i.id });
           validations.value.push({
             id: i.id,
-            validations: getValidations(i.validations),
+            validations: getValidations(i.validations, errorMessages),
             send_type: i.send_type,
           });
         }
       );
-    } else {
-      templates.value = [];
-      validations.value = [];
     }
   });
 });
