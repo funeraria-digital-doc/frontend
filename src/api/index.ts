@@ -5,6 +5,7 @@ import type { AxiosError } from 'axios';
 import router from '@/router';
 import jwt_decode from 'jwt-decode';
 import { useUser } from '@/composables/user';
+import { useLoadingSpinner } from '@/composables/loadingSpinner';
 
 export type ApiError<E = {}> = E & {
   type: string;
@@ -35,23 +36,29 @@ function getToken() {
   return null;
 }
 
-let token = getToken();
+//let token = getToken();
+const { loadingSpinner } = useLoadingSpinner()
 
-export let apiInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
-  headers: token ? { Authorization: `Bearer ${token}` } : {},
-});
+export let apiInstance = setupAxiosInstance();
 
 export function createNewAxiosInstance() {
-  token = getToken();
-  apiInstance = axios.create({
+  apiInstance = setupAxiosInstance();
+}
+
+function setupAxiosInstance() {
+  const token = getToken();
+  const instance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
-  apiInstance.interceptors.response.use(
-    (response) => response,
+  instance.interceptors.response.use(
+    (response) => {
+      loadingSpinner.active = false
+      return response;
+    },
     (error) => {
+      loadingSpinner.active = false
       const errorCode = error.response.status;
 
       if ([401, 403].includes(errorCode)) {
@@ -62,6 +69,19 @@ export function createNewAxiosInstance() {
       return Promise.reject(error);
     }
   );
+
+  instance.interceptors.request.use(
+    (config) => {
+      loadingSpinner.active = true
+      return config;
+    },
+    (error) => {
+      loadingSpinner.active = true
+      return Promise.reject(error)
+    }
+  );
+
+  return instance;
 }
 
 export function errorResponse<E = {}>(

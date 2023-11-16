@@ -9,6 +9,7 @@
       @snack-messages="snackMessages"
     ></generate-documents>
   </page>
+
   <error-success-message ref="snack"></error-success-message>
 </template>
 <script lang="ts">
@@ -25,7 +26,7 @@ export default defineComponent({
   components: {
     DataTable,
     GenerateDocuments,
-    ErrorSuccessMessage
+    ErrorSuccessMessage,
   },
 });
 </script>

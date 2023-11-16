@@ -1,11 +1,6 @@
 <template>
   <page :title="templatesTitle" back="templates">
-    <v-form
-      ref="form"
-      validate-on="submit"
-      @submit.prevent="save"
-      :disabled="isLoading"
-    >
+    <v-form ref="form" validate-on="submit" @submit.prevent="save">
       <v-container>
         <v-row>
           <v-col cols="6" sm="6" md="6">
@@ -52,7 +47,6 @@
               @click:clear="handleClearFileClick"
               prepend-icon="mdi-paperclip"
               clearable
-              :disabled="isLoadingFileVars || isLoading"
               :rules="constants.requiredFileRule"
             ></v-file-input>
           </v-col>
@@ -101,9 +95,9 @@
             ></v-combobox>
           </v-col>
         </v-row>
-        <v-row v-if="template.validations.length > 0 && !isLoadingFileVars">
+        <v-row v-if="template.validations.length > 0">
           <v-col cols="12" sm="12" md="12">
-            <v-list :disabled="isLoading">
+            <v-list>
               <v-list-subheader>Validações</v-list-subheader>
               <v-list-item
                 v-for="(item, i) in template.validations"
@@ -121,21 +115,8 @@
             </v-list>
           </v-col>
         </v-row>
-        <v-container v-if="isLoadingFileVars" class="login_spinner">
-          <v-progress-circular
-            :size="70"
-            :width="7"
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </v-container>
       </v-container>
-      <v-btn
-        color="blue-darken-1"
-        variant="text"
-        type="submit"
-        :disabled="isLoading || isLoadingFileVars"
-      >
+      <v-btn color="blue-darken-1" variant="text" type="submit">
         Submeter
       </v-btn>
     </v-form>
@@ -185,7 +166,7 @@ const defaultObj: TemplateValidation = {
   is_date_numeric: true,
   is_field_custom: false,
   label: '',
-  min: 1, 
+  min: 1,
   max: 1,
   optional: true,
   options: [],
@@ -206,8 +187,6 @@ let validationItemEdit = ref();
 const file_temp = ref();
 const mode = ref('');
 const form = ref();
-const isLoading = ref(true);
-const isLoadingFileVars = ref(false);
 const openCloseModal = ref(false);
 const editIndex = ref();
 const errorMessages = ref({
@@ -247,7 +226,7 @@ const templatesTitle = computed(() => {
   return '';
 });
 
-function checkErrors(error: any){
+function checkErrors(error: any) {
   if (error && error.errors) {
     let errors = '';
     for (var i = 0; i < Object.keys(error.errors).length; i++) {
@@ -293,25 +272,21 @@ async function save() {
 
     if (valid) {
       if (mode.value === 'edit') {
-        isLoading.value = true;
         templateEdit(template.value).then((resp) => {
           if (resp.success) {
             router.push({ name: 'templates' });
           } else {
             checkErrors(resp.error);
           }
-          isLoading.value = false;
         });
       } else if (mode.value === 'create') {
         const formData = formatDataBeforeRequest(template.value, 'create');
-        isLoading.value = true;
         templateCreate(formData).then((resp) => {
           if (resp.success) {
             router.push({ name: 'templates' });
           } else {
             checkErrors(resp.error);
           }
-          isLoading.value = false;
         });
       }
     } else {
@@ -335,7 +310,6 @@ const handleFileUpload = (file: Blob[]) => {
     }
     snack.value.showSnackbar('O documento tem de ser do tipo .docx', '', false);
   } else {
-    isLoadingFileVars.value = true;
     getVariablesFromFile(file[0] as any).then((resp: any) => {
       if (
         resp &&
@@ -364,7 +338,6 @@ const handleFileUpload = (file: Blob[]) => {
         handleClearFileClick();
         snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
       }
-      isLoadingFileVars.value = false;
     });
   }
 };
@@ -372,7 +345,6 @@ const handleFileUpload = (file: Blob[]) => {
 const handleClearFileClick = () => {
   file_temp.value = null;
   template.value.validations = [];
-  isLoadingFileVars.value = false;
 };
 
 const editValidation = (index: number) => {
@@ -403,11 +375,9 @@ onBeforeMount(async () => {
       resp && (template.value = resp);
       file_temp.value = [new File([template.value.file], 'file')];
       mode.value = 'edit';
-      isLoading.value = false;
     });
   } else if (route.name === 'templates_create') {
     mode.value = 'create';
-    isLoading.value = false;
   }
 });
 </script>
