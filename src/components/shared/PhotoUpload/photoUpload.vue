@@ -1,13 +1,5 @@
 <template>
-  <v-container v-if="isLoading" class="login_spinner">
-    <v-progress-circular
-      :size="70"
-      :width="7"
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-  </v-container>
-  <v-container v-else>
+  <v-container>
     <v-row>
       <div class="profile-picture">
         <label :for="photoId" class="profile-label">
@@ -34,7 +26,6 @@
 </template>
 <script lang="ts">
 import { checkImageTypeAndSize } from '@/utils/imageHelper';
-import { watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 export default defineComponent({
   name: 'PhotoUpload',
@@ -43,21 +34,13 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // saveFunction - callback to save it on BE
-const props = defineProps([
-  'snack',
-  'saveFunction',
-  'imageUrl',
-  'isLoading',
-  'id',
-  'label',
-]);
+const props = defineProps(['snack', 'saveFunction', 'imageUrl', 'id', 'label']);
 
 // save - callback to save the file object on FE
 const emit = defineEmits(['save']);
 
 const photoId = ref(props.id ?? 'photo-input');
 const photoLabel = ref(props.label ?? 'Carregar foto');
-const isLoading = ref(props.isLoading);
 const input = ref();
 
 const handleSave = (base64File: string, file: any) => {
@@ -86,8 +69,6 @@ const handleFileChange = (event: any) => {
 async function saveImage(base64File: string, file: any) {
   // save photo on BE
   if (props.saveFunction) {
-    isLoading.value = true;
-
     props.saveFunction(base64File).then((resp: any) => {
       if (resp.success) {
         handleSave(base64File, file);
@@ -95,20 +76,12 @@ async function saveImage(base64File: string, file: any) {
       } else {
         props.snack.showSnackbar('Erro a processar a imagem.', '', false);
       }
-      isLoading.value = false;
     });
   } else {
     // save photo on BE by parent component
     handleSave(base64File, file);
   }
 }
-
-watch(
-  () => props.isLoading,
-  (newValue) => {
-    isLoading.value = newValue;
-  }
-);
 </script>
 
 <style scoped>
