@@ -1,4 +1,9 @@
-import { recordDelete, recordItem, recordsList } from '@/api/records';
+import {
+  recordDelete,
+  recordItem,
+  recordsList,
+  recordsUpdateStatus,
+} from '@/api/records';
 import { getLabel } from '@/utils/datatableHelper';
 
 export const getRecords = async (
@@ -18,7 +23,11 @@ export const getRecords = async (
             family_member_phone: record.family_member_phone,
             gender: getLabel('gender', record.gender, fields),
             status: getLabel('status', record.status, fields),
-            group_id: getLabel('group_id', record.group_id, fields)
+            group_id: getLabel('group_id', record.group_id, fields),
+            selectable:
+              getLabel('status', record.status, fields) === 'Ativo'
+                ? true
+                : false,
           };
         });
       }
@@ -115,44 +124,35 @@ export function generateDocuments(record: any, callback: Function) {
   callback(record);
 }
 
-export function getFormat(
-  fieldName: String,
-  templateValidations: any,
-  toPicker: boolean
-) {
-  const selectedVal = templateValidations.find(
-    (templateVal: { name: String }) => {
-      return templateVal.name === fieldName;
-    }
-  );
+export function getFormat(templateFormat: any, toPicker: boolean) {
   let format = '';
-  if (['DAY', 'DAYS'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['DAY', 'DAYS'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
       format += '/';
     }
     format += toPicker ? 'dd' : 'DD';
   }
-  if (['MONTH', 'MONTHS'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['MONTH', 'MONTHS'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
       format += '/';
     }
     format += 'MM';
   }
-  if (['YEAR', 'YEARS'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['YEAR', 'YEARS'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
       format += '/';
     }
     format += 'YYYY';
   }
-  if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['HOUR', 'HOURS'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
       format += ' ';
     }
     format += 'HH';
   }
-  if (['MINUTE', 'MINUTES'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['MINUTE', 'MINUTES'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
-      if (['HOUR', 'HOURS'].some((sub) => selectedVal.format.includes(sub))) {
+      if (['HOUR', 'HOURS'].some((sub) => templateFormat.includes(sub))) {
         format += ':';
       } else {
         format += ' ';
@@ -160,11 +160,11 @@ export function getFormat(
     }
     format += 'mm';
   }
-  if (['SECOND', 'SECONDS'].some((sub) => selectedVal.format.includes(sub))) {
+  if (['SECOND', 'SECONDS'].some((sub) => templateFormat.includes(sub))) {
     if (format) {
       if (
         ['MINUTE', 'MINUTES', 'HOUR', 'HOURS'].some((sub) =>
-          selectedVal.format.includes(sub)
+          templateFormat.includes(sub)
         )
       ) {
         format += ':';
@@ -176,3 +176,31 @@ export function getFormat(
   }
   return format;
 }
+
+export const changeRecordsStatus = async (
+  loading: { value: boolean },
+  recordsIds: any,
+  records: any,
+  snack: any
+) => {
+  recordsUpdateStatus(recordsIds).then((resp) => {
+    if (resp.success) {
+      recordsIds.forEach((element: number) => {
+        const recordFound = records.value.find(
+          (record: any) => element == record.id
+        );
+        recordFound.status = 'Arquivado';
+        recordFound.selectable = false;
+      });
+      snack.value.showSnackbar('Declarações arquivadas com sucesso.', '', true);
+    } else {
+      console.error('erro', resp);
+      snack.value.showSnackbar(
+        'Ocorreu um erro ao arquivar as declarações.',
+        'Tente novamente mais tarde',
+        true
+      );
+    }
+    loading.value = false;
+  });
+};

@@ -17,7 +17,12 @@ import { defineComponent, onBeforeMount, ref } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import GenerateDocuments from '../Records/modal/modal.vue';
 import * as constants from './constants';
-import { getRecords, deleteRecord, canAction } from './helper';
+import {
+  getRecords,
+  deleteRecord,
+  canAction,
+  changeRecordsStatus,
+} from './helper';
 import { groupsList } from '@/api/groups';
 import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 
@@ -63,6 +68,10 @@ onBeforeMount(() => {
         delete: deleteRecord,
         getData: getRecords,
         canAction: canAction,
+        multiSort: true,
+        selectCheckbox: true,
+        search: true,
+        selectFunction: changeRecordsStatus,
       };
 
       tableData.fields = tableData.fields.map((field: any) =>
