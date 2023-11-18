@@ -27,6 +27,11 @@
 
     <app-footer />
   </v-app>
+  <loading
+    v-model:active="loadingSpinner.active"
+    :is-full-page="true"
+    transition="fade"
+  />
 </template>
 
 <script lang="ts">
@@ -37,6 +42,8 @@ import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
 import { watch } from 'vue';
 import { getAuth } from './authorizations/authorizations';
+import { useLoadingSpinner } from './composables/loadingSpinner';
+import Loading from 'vue-loading-overlay';
 
 export default defineComponent({
   name: 'LoginModal',
@@ -52,6 +59,7 @@ export default defineComponent({
 import router from '@/router';
 
 const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
+const { loadingSpinner } = useLoadingSpinner();
 
 const sideNavLinks = [
   {

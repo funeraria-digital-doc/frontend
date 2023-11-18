@@ -1,5 +1,5 @@
 <template>
-  <v-form v-if="!isLoading" ref="form" @submit.prevent="onSubmit">
+  <v-form ref="form" @submit.prevent="onSubmit">
     <v-container>
       <v-row>
         <v-text-field
@@ -23,15 +23,6 @@
 
     <v-btn type="submit" class="mt-2">Entrar</v-btn>
   </v-form>
-  <v-container v-else class="login_spinner">
-    <v-progress-circular
-      :size="70"
-      :width="7"
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-  </v-container>
-
   <v-snackbar
     v-model="hasErrorMessage"
     :timeout="3000"
@@ -64,13 +55,11 @@ const errorMessage = ref('');
 const form = ref();
 const email = ref('');
 const password = ref('');
-const isLoading = ref(false);
 const fieldRules = [(v: string) => !!v || 'Campo obrigatório'];
 const onSubmit = async () => {
   const { valid } = await form.value.validate();
 
   if (valid) {
-    isLoading.value = true;
     const data = {
       email,
       password,
@@ -85,8 +74,6 @@ const onSubmit = async () => {
       }
     });
   }
-
-  isLoading.value = false;
 };
 </script>
 
