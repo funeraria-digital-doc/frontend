@@ -45,7 +45,7 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
       { label: 'Divorciado', value: 'DIVORCED' },
       { label: 'Viúvo', value: 'WIDOWER' },
     ],
-    rules: fieldRules(false, null, 64),
+    rules: fieldRules(true, null, 64),
   },
   {
     label: 'Cartão de cidadão',

@@ -118,7 +118,7 @@ const onSubmit = (values: any) => {
         navigateToRecords(resp.success, 'Declaração editada com sucesso.');
       } else {
         checkErrors(
-          { ...resp.error, errors: resp.error.error },
+          resp.error,
           errorMessages,
           errorIndexes,
           snack,
