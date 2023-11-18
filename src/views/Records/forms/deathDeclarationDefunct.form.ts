@@ -9,15 +9,13 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
   },
   {
     items: [
-      { label: 'Inativo', value: 'INACTIVE' },
       { label: 'Ativo', value: 'ACTIVE' },
-      { label: 'Pendente', value: 'PENDING' },
-      { label: 'Finalizado', value: 'COMPLETED' },
       { label: 'Arquivado', value: 'ARCHIVED' },
     ],
     label: 'Estado',
     name: 'status',
     rules: fieldRules(true, null, null),
+    value: 'ACTIVE',
     input: 'select',
   },
   {
@@ -47,7 +45,7 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
       { label: 'Divorciado', value: 'DIVORCED' },
       { label: 'Viúvo', value: 'WIDOWER' },
     ],
-    rules: fieldRules(true, null, 64),
+    rules: fieldRules(false, null, 64),
   },
   {
     label: 'Cartão de cidadão',
