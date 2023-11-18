@@ -75,7 +75,7 @@ const onSubmit = async (input: any) => {
       values[entry[0]] =
         entry[1] instanceof File
           ? input.target[entry[0]].attributes.value
-          : entry[1];
+          : entry[1] || null;
     });
 
     emit('on-submit', values);
