@@ -93,6 +93,8 @@ const onSubmit = (values: any) => {
     if (isValid) {
       router.push('/records');
       snack.value.showSnackbar(successMessage, '', true);
+
+      return;
     } else {
       snack.value.showSnackbar('Ocorreu um erro, tente novamente.', '', false);
     }
@@ -127,6 +129,12 @@ const onSubmit = (values: any) => {
       }
     });
   }
+
+  fieldsGroups.value.forEach((fieldsGroup) =>
+    fieldsGroup.fields.forEach((field) => {
+      field.value = values[field.name];
+    })
+  );
 };
 
 onBeforeMount(async () => {
