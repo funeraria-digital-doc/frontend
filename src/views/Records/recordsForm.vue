@@ -87,6 +87,8 @@ const submitBtnLabel = computed(() =>
 );
 
 const onSubmit = (values: any) => {
+  errorMessages.value = {};
+
   const navigateToRecords = (isValid: any, successMessage: string) => {
     if (isValid) {
       router.push('/records');
@@ -116,7 +118,7 @@ const onSubmit = (values: any) => {
         navigateToRecords(resp.success, 'Declaração editada com sucesso.');
       } else {
         checkErrors(
-          resp.error,
+          { ...resp.error, errors: resp.error.error },
           errorMessages,
           errorIndexes,
           snack,
