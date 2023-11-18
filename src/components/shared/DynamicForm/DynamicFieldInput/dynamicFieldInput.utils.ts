@@ -10,7 +10,7 @@ export const fieldRules = (
   minLength &&
     rules.push(
       (v: string) =>
-        (v ? v.length > minLength : true) || `Minimo ${maxLength} caracteres`
+        (v ? v.length >= minLength : true) || `Minimo ${minLength} caracteres`
     );
 
   maxLength &&
