@@ -7,7 +7,7 @@
       :label="field.label"
       :rules="field.rules"
       :type="field.type"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :name="field.name"
     />
 
@@ -16,13 +16,13 @@
       :id="field.name"
       v-model="model"
       :label="field.label"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :name="field.name"
     />
 
     <v-select
       v-if="field.input === 'select'"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :id="field.name"
       :items="field.items"
       :label="field.label"
@@ -32,11 +32,12 @@
       item-title="label"
       item-value="value"
       v-model="model"
+      autocomplete="off"
     />
 
     <date-picker
       v-if="field.input === 'date'"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :field="field"
       :name="field.name"
       v-model="model"
@@ -44,7 +45,7 @@
 
     <date-time-picker
       v-if="field.input === 'date-time'"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :field="field"
       :name="field.name"
       v-model="dateTimeModel"
@@ -52,7 +53,7 @@
 
     <time-picker
       v-if="field.input === 'time'"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :field="field"
       :name="field.name"
       v-model="model"
@@ -60,7 +61,7 @@
 
     <photo-upload
       v-if="field.input === 'file'"
-      :error-messages="errorMessages"
+      :error-messages="error"
       :id="field.name"
       :imageUrl="imageUrl"
       :isLoading="isLoading"
@@ -81,7 +82,6 @@ import TimePicker from '../../TimePicker/timePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 import ErrorSuccessMessage from '../../ErrorSuccessMessages/errorSuccessMessages.vue';
-import { computed } from 'vue';
 
 const props = defineProps({
   field: {
@@ -95,6 +95,7 @@ const props = defineProps({
 });
 
 const model = ref(props.field.value);
+const error = ref(props.errorMessages);
 
 // for image
 const snack = ref();
@@ -104,9 +105,13 @@ const imageUrl = ref(props.field.value);
 // for datetime
 const dateTimeModel = ref();
 
+// for edit case (input with a pre-filled value)
 watch(props, (newProps) => {
   model.value = newProps.field.value;
+  error.value = newProps.errorMessages;
   imageUrl.value = newProps.field.value;
+
+  // parse value for 'date-time' input type
   if (newProps.field.input === 'date-time') {
     dateTimeModel.value = ((newProps.field.value as string) ?? '').replace(
       'Z',
@@ -115,6 +120,14 @@ watch(props, (newProps) => {
   }
 });
 
+// clear error message when input changes
+watch(model, (newModel) => {
+  if (props.field.value != newModel) {
+    error.value = '';
+  }
+});
+
+// for file type
 const saveFile = (base64File: string) => {
   imageUrl.value = base64File;
 };
