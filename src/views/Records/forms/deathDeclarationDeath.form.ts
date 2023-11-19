@@ -25,7 +25,7 @@ export const DeathDeclarationDeathForm: DynamicField[] = [
     rules: fieldRules(false, null, 255),
   },
   {
-    label: 'Freguesia do falecimento',
+    label: 'Municipio do falecimento',
     name: 'death_municipality',
     input: 'text',
     rules: fieldRules(false, null, 255),
