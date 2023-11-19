@@ -205,15 +205,17 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
-import { getTemplates } from '@/api/recordTemplates';
+import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import {
   getFieldRules,
   getDateType,
   getValidations,
   saveForm,
-  getDateFormated
+  getDateFormated,
+  getApiErrors
 } from './modal.helper';
+import { clickDownloadFile } from '@/utils/downloadFile';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -294,7 +296,7 @@ function save() {
                 'Preencha todos os campos em falta',
                 false,
               ]);
-              getApiErrors(docResp.error);
+              getApiErrors(docResp.error, errorMessages);
               isLoading.value = false;
             } else {
               emit('snack-messages', [
