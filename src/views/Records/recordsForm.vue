@@ -89,12 +89,16 @@ const submitBtnLabel = computed(() =>
 const onSubmit = (values: any) => {
   errorMessages.value = {};
 
+  fieldsGroups.value.forEach((fieldsGroup) =>
+    fieldsGroup.fields.forEach((field) => {
+      field.value = values[field.name];
+    })
+  );
+
   const navigateToRecords = (isValid: any, successMessage: string) => {
     if (isValid) {
-      router.push('/records');
       snack.value.showSnackbar(successMessage, '', true);
-
-      return;
+      setTimeout(() => router.push('/records'), 1000);
     } else {
       snack.value.showSnackbar('Ocorreu um erro, tente novamente.', '', false);
     }
@@ -103,7 +107,7 @@ const onSubmit = (values: any) => {
   if (mode.value === 'edit') {
     recordEdit(route.params.id as string, values).then((resp) => {
       if (resp.success) {
-        navigateToRecords(resp.success, 'Declaração criada com sucesso.');
+        navigateToRecords(resp.success, 'Declaração editada com sucesso.');
       } else {
         checkErrors(
           resp.error,
@@ -117,7 +121,7 @@ const onSubmit = (values: any) => {
   } else if (mode.value === 'create') {
     recordCreate(values).then((resp) => {
       if (resp.success) {
-        navigateToRecords(resp.success, 'Declaração editada com sucesso.');
+        navigateToRecords(resp.success, 'Declaração criada com sucesso.');
       } else {
         checkErrors(
           resp.error,
@@ -129,15 +133,10 @@ const onSubmit = (values: any) => {
       }
     });
   }
-
-  fieldsGroups.value.forEach((fieldsGroup) =>
-    fieldsGroup.fields.forEach((field) => {
-      field.value = values[field.name];
-    })
-  );
 };
 
 onBeforeMount(async () => {
+  // clear errors
   fieldsGroups.value.forEach((fieldsGroup) =>
     fieldsGroup.fields.forEach((field) => {
       if (!errorMessages.value[field.name]) {
