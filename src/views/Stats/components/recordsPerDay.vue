@@ -11,20 +11,11 @@
     Últimos {{ days }} dias
   </v-btn>
   <apexchart
-    v-if="!isLoading"
     width="500"
     type="area"
     :options="options"
     :series="series"
   ></apexchart>
-  <v-container v-else class="login_spinner">
-    <v-progress-circular
-      :size="70"
-      :width="7"
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-  </v-container>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -43,7 +34,6 @@ import { getDeathsPerDay } from '@/api/stats';
 import ptLocale from 'apexcharts/dist/locales/pt.json';
 //Records Chart
 const daysToSearch = ref(30);
-const isLoading = ref(false);
 const options = ref({
   chart: {
     height: 350,
@@ -102,7 +92,6 @@ const series = ref([
 
 const changePerDayDay = (day: number) => {
   daysToSearch.value = day;
-  isLoading.value = true;
   getData();
 };
 
@@ -113,7 +102,6 @@ const getData = async () => {
     } else {
       console.error('erro', resp);
     }
-    isLoading.value = false;
   });
 };
 onMounted(() => {

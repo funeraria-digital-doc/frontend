@@ -35,6 +35,11 @@ export const DeathDeclarationFamilyMemberForm: DynamicField[] = [
     label: 'Telemóvel do familiar',
     name: 'family_member_phone',
     input: 'text',
-    rules: fieldRules(true, null, 32),
+    rules: [
+      ...fieldRules(true, 9, 32),
+      (v: string) =>
+        (v ? /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s./0-9]*$/g.test(v) : true) ||
+        `Formato inválido`,
+    ],
   },
 ];

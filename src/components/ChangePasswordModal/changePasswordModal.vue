@@ -1,6 +1,6 @@
 <template>
   <modal title="Alterar Palavra Passe" @close-modal="closeModal">
-    <v-form v-if="!isLoading" ref="form" @submit.prevent="onSubmit">
+    <v-form ref="form" @submit.prevent="onSubmit">
       <v-container>
         <v-row>
           <v-text-field
@@ -27,14 +27,6 @@
       </v-container>
       <v-btn type="submit" class="mt-2">Alterar</v-btn>
     </v-form>
-    <v-container v-else class="change_password_spinner">
-      <v-progress-circular
-        :size="70"
-        :width="7"
-        indeterminate
-        color="primary"
-      ></v-progress-circular>
-    </v-container>
     <v-snackbar
       v-model="hasErrorMessage"
       :timeout="2000"
@@ -69,7 +61,6 @@ const errorMessage = ref('');
 const form = ref();
 const password = ref('');
 const confirmPassword = ref('');
-const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const passwordRules = [
@@ -87,7 +78,6 @@ const onSubmit = async () => {
   const { valid } = await form.value.validate();
 
   if (valid) {
-    isLoading.value = true;
 
     const data = {
       password,
@@ -104,7 +94,6 @@ const onSubmit = async () => {
       }
     });
   }
-  isLoading.value = false;
 };
 </script>
 

@@ -11,20 +11,11 @@
     {{ months == 1 ? 'Mês corrente' : 'Últimos ' + months + 'meses' }}
   </v-btn>
   <apexchart
-    v-if="!isLoading"
     width="500"
     type="area"
     :options="options"
     :series="series"
   ></apexchart>
-  <v-container v-else class="login_spinner">
-    <v-progress-circular
-      :size="70"
-      :width="7"
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-  </v-container>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -43,7 +34,6 @@ import { getRecordsPerMonth } from '@/api/stats';
 import ptLocale from 'apexcharts/dist/locales/pt.json';
 //Templates Chart
 const monthsToSearch = ref(1);
-const isLoading = ref(false);
 const maxYAxis = ref(0);
 const tickAmount = ref(0);
 const options = ref({
@@ -105,7 +95,6 @@ const series = ref([
 
 const changeMonthToSearch = (day: number) => {
   monthsToSearch.value = day;
-  isLoading.value = true;
   getData();
 };
 
@@ -116,7 +105,6 @@ const getData = async () => {
     } else {
       console.error('erro', resp);
     }
-    isLoading.value = false;
   });
 };
 onMounted(() => {

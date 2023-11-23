@@ -7,6 +7,9 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
+import { LoadingPlugin } from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/css/index.css';
+
 import '@mdi/font/css/materialdesignicons.css';
 import './assets/main.css';
 
@@ -25,5 +28,5 @@ const vuetify = createVuetify({
 const app = createApp(App);
 
 app.use(router);
-
+app.use(LoadingPlugin);
 app.use(vuetify).mount('#app');

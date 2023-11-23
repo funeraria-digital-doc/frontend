@@ -11,7 +11,7 @@ export const DeathDeclarationSpouseForm: DynamicField[] = [
     label: 'Nome do cônjuge',
     name: 'spouse_name',
     input: 'text',
-    rules: fieldRules(true, null, 255),
+    rules: fieldRules(false, null, 255),
   },
   {
     label: 'Sexo do cônjuge',
@@ -22,7 +22,7 @@ export const DeathDeclarationSpouseForm: DynamicField[] = [
       { label: 'Feminino', value: 'WOMAN' },
       { label: 'Outro', value: 'OTHER' },
     ],
-    rules: fieldRules(true, null, null),
+    rules: fieldRules(false, null, null),
   },
   {
     label: 'Idade do cônjuge',

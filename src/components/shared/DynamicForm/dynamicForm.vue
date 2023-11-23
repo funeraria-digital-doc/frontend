@@ -69,14 +69,20 @@ const onSubmit = async (input: any) => {
 
   if (valid) {
     const values: any = {};
-    const data = new FormData(input.target);
 
-    [...data.entries()].forEach((entry) => {
-      values[entry[0]] =
-        entry[1] instanceof File
-          ? input.target[entry[0]].attributes.value
-          : entry[1];
-    });
+    for (let element of input.target.elements) {
+      if (element.name) {
+        let value = element.value || null;
+
+        if (element.type === 'checkbox') {
+          value = element.checked;
+        } else if (element.type === 'file') {
+          value = element.attributes.value;
+        }
+
+        values[element.name] = value;
+      }
+    }
 
     emit('on-submit', values);
   }

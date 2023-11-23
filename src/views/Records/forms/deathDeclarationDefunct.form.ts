@@ -9,15 +9,13 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
   },
   {
     items: [
-      { label: 'Inativo', value: 'INACTIVE' },
       { label: 'Ativo', value: 'ACTIVE' },
-      { label: 'Pendente', value: 'PENDING' },
-      { label: 'Finalizado', value: 'COMPLETED' },
       { label: 'Arquivado', value: 'ARCHIVED' },
     ],
     label: 'Estado',
     name: 'status',
     rules: fieldRules(true, null, null),
+    value: 'ACTIVE',
     input: 'select',
   },
   {
@@ -54,6 +52,11 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
     name: 'cc',
     input: 'text',
     rules: fieldRules(false, null, 16),
+  },
+  {
+    label: 'Validade do cartão de cidadão',
+    name: 'cc_valid_until',
+    input: 'date',
   },
   {
     label: 'Número de identificação fiscal',
