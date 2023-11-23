@@ -18,26 +18,24 @@ export function base64ToFile(base64Data: string, username: any) {
   return new File([byteArray], filename, { type: 'image/jpeg' }); // Create a File object from the Uint8Array
 }
 
-export function checkImageTypeAndSize(file: File, snack: any) {
+export function checkImageTypeAndSize(file: File) {
   const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
   let canUpload = true;
+  let snackMessage = '';
+  canUpload = false;
   if (
     file.type !== 'image/png' &&
     file.type !== 'image/jpeg' &&
     parseInt(sizeInMB) > 10
   ) {
-    canUpload = false;
-    snack.value.showSnackbar(
-      'A imagem tem de ser jpeg ou png. <br/> A imagem tem mais de 10mb de tamanho',
-      '',
-      false
-    );
+    snackMessage =
+      'A imagem tem de ser jpeg ou png. <br/> A imagem tem mais de 10mb de tamanho';
   } else if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
-    canUpload = false;
-    snack.value.showSnackbar('A imagem tem de ser jpeg ou png.', '', false);
+    snackMessage = 'A imagem tem de ser jpeg ou png.';
   } else if (parseInt(sizeInMB) > 10) {
-    canUpload = false;
-    snack.value.showSnackbar('A imagem tem mais de 10mb.', '', false);
+    snackMessage = 'A imagem tem mais de 10mb.';
+  } else {
+    canUpload = true;
   }
-  return canUpload;
+  return { snackMessage: snackMessage, canUpload: canUpload };
 }

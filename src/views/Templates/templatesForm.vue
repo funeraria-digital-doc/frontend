@@ -121,6 +121,28 @@
             </v-list>
           </v-col>
         </v-row>
+        <v-row
+          v-if="template.file_validations.length > 0 && !isLoadingFileVars"
+        >
+          <v-col cols="12" sm="12" md="12">
+            <v-list :disabled="isLoading">
+              <v-list-subheader>Validações de Imagens</v-list-subheader>
+              <v-list-item
+                v-for="(imageVal, imgKey) in template.file_validations"
+                :key="imgKey"
+                :value="imageVal"
+                :title="imageVal.name"
+                :class="{ 'error-item': errorFileIndexes.includes(imgKey) }"
+                color="white"
+                variant="plain"
+                prepend-icon="mdi-arrow-right-bold-circle-outline"
+                mandatory="false"
+                @click="editFileValidation(imgKey)"
+              >
+              </v-list-item>
+            </v-list>
+          </v-col>
+        </v-row>
         <v-container v-if="isLoadingFileVars" class="login_spinner">
           <v-progress-circular
             :size="70"
@@ -149,6 +171,15 @@
       @save="saveEditValidation"
       @cancel="cancelEditValidation"
     />
+    <file-validation-edit-modal
+      v-if="openCloseFileModal"
+      :editModal="openCloseFileModal"
+      :index="editFileIndex"
+      :validation="fileValidationItemEdit"
+      :errorMessages="errorMessages.file_validations"
+      @save="saveFileEditValidation"
+      @cancel="cancelFileEditValidation"
+    />
   </page>
 </template>
 <script lang="ts">
@@ -159,17 +190,23 @@ import * as constants from './constants';
 import { getSingleTemplate, formatDataBeforeRequest } from './helper';
 import Page from '../../components/shared/Page/page.vue';
 import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
+import FileValidationEditModal from './components/FileValidationEditModal/fileValidationEditModal.vue';
 import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 import {
   getVariablesFromFile,
   templateCreate,
   templateEdit,
 } from '@/api/templates';
-import type { Template, TemplateValidation } from './templatesForm.interface';
+import type {
+  Template,
+  TemplateValidation,
+  TemplateFileValidation,
+} from './templatesForm.interface';
 export default defineComponent({
   name: 'TemplatesForm',
   components: {
     ValidationEditModal,
+    FileValidationEditModal,
   },
 });
 </script>
@@ -177,6 +214,7 @@ export default defineComponent({
 const route = useRoute();
 const snack = ref();
 const errorIndexes = ref([]);
+const errorFileIndexes = ref([]);
 const defaultObj: TemplateValidation = {
   db_collection: '',
   db_field_reference: '',
@@ -185,11 +223,17 @@ const defaultObj: TemplateValidation = {
   is_date_numeric: true,
   is_field_custom: false,
   label: '',
-  min: 1, 
+  min: 1,
   max: 1,
   optional: true,
   options: [],
   placeholder: '',
+};
+
+const defaultFileObj: TemplateFileValidation = {
+  db_collection: '',
+  db_field_reference: '',
+  is_field_custom: false,
 };
 
 const template = ref<Template>({
@@ -200,16 +244,20 @@ const template = ref<Template>({
   send_type: 'NONE',
   title: '',
   validations: [],
+  file_validations: [],
 });
 
 let validationItemEdit = ref();
+let fileValidationItemEdit = ref();
 const file_temp = ref();
 const mode = ref('');
 const form = ref();
 const isLoading = ref(true);
 const isLoadingFileVars = ref(false);
 const openCloseModal = ref(false);
+const openCloseFileModal = ref(false);
 const editIndex = ref();
+const editFileIndex = ref();
 const errorMessages = ref({
   title: '',
   group_id: '',
@@ -218,6 +266,7 @@ const errorMessages = ref({
   send_email_to_cc: '',
   send_email_to: '',
   validations: {},
+  file_validations: {},
 });
 
 const defaultErrorMessages = {};
@@ -247,7 +296,7 @@ const templatesTitle = computed(() => {
   return '';
 });
 
-function checkErrors(error: any){
+function checkErrors(error: any) {
   if (error && error.errors) {
     let errors = '';
     for (var i = 0; i < Object.keys(error.errors).length; i++) {
@@ -337,12 +386,7 @@ const handleFileUpload = (file: Blob[]) => {
   } else {
     isLoadingFileVars.value = true;
     getVariablesFromFile(file[0] as any).then((resp: any) => {
-      if (
-        resp &&
-        resp.data &&
-        resp.data.variables &&
-        resp.data.variables.length > 0
-      ) {
+      if (resp && resp.data) {
         if (file[0]) {
           const reader = new FileReader();
           reader.readAsDataURL(file[0]);
@@ -356,13 +400,38 @@ const handleFileUpload = (file: Blob[]) => {
         } else {
           template.value.file = '';
         }
+      } else {
+        handleClearFileClick();
+        snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
+      }
+      if (
+        resp &&
+        resp.data &&
+        resp.data.variables &&
+        resp.data.variables.length > 0
+      ) {
         let newValidations = resp.data.variables.map((item: any) => {
           return { ...defaultObj, name: item };
         });
         template.value.validations = newValidations ? newValidations : [];
-      } else {
-        handleClearFileClick();
-        snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
+      }
+      if (
+        resp &&
+        resp.data &&
+        resp.data.file_variables &&
+        resp.data.file_variables.length > 0
+      ) {
+        let newFileValidations = resp.data.file_variables.map((item: any) => {
+          return {
+            ...defaultFileObj,
+            name: item.name,
+            name_with_extension: item.name_with_extension,
+            image_data_base64: item.image_data_base64,
+          };
+        });
+        template.value.file_validations = newFileValidations
+          ? newFileValidations
+          : [];
       }
       isLoadingFileVars.value = false;
     });
@@ -372,6 +441,7 @@ const handleFileUpload = (file: Blob[]) => {
 const handleClearFileClick = () => {
   file_temp.value = null;
   template.value.validations = [];
+  template.value.file_validations = [];
   isLoadingFileVars.value = false;
 };
 
@@ -397,9 +467,33 @@ const cancelEditValidation = () => {
   validationItemEdit.value = {};
 };
 
+//-------------
+const editFileValidation = (index: number) => {
+  fileValidationItemEdit.value = { ...template.value.file_validations[index] };
+
+  openCloseFileModal.value = true;
+  editFileIndex.value = index;
+};
+
+const saveFileEditValidation = (validation: any, index: number) => {
+  openCloseFileModal.value = false;
+  editFileIndex.value = null;
+  template.value.file_validations[index] = {
+    ...template.value.file_validations[index],
+    ...validation,
+  };
+  fileValidationItemEdit.value = {};
+};
+
+const cancelFileEditValidation = () => {
+  openCloseFileModal.value = false;
+  editFileIndex.value = null;
+  fileValidationItemEdit.value = {};
+};
+
 onBeforeMount(async () => {
   if (route.name === 'templates_edit') {
-    getSingleTemplate(route.params.id as string, defaultObj).then((resp) => {
+    getSingleTemplate(route.params.id as string).then((resp) => {
       resp && (template.value = resp);
       file_temp.value = [new File([template.value.file], 'file')];
       mode.value = 'edit';

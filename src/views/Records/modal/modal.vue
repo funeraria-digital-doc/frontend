@@ -186,6 +186,23 @@
                   />
                 </v-col>
               </div>
+              <div
+                v-for="(fileValidation, fileIndex) in templateFileValidations"
+                :key="fileIndex"
+              >
+                <v-col>
+                  <v-file-input
+                    variant="filled"
+                    prepend-icon="mdi-camera"
+                    :id="fileValidation.name"
+                    label="Imagem"
+                    :rules="imageRules"
+                    :error-messages="errorMessages[fileValidation.name]"
+                    accept="image/*"
+                    @change="handleFileChange($event, fileValidation.name)"
+                  ></v-file-input>
+                </v-col>
+              </div>
             </div>
           </v-container>
           <v-card-actions>
@@ -205,15 +222,18 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
-import { getTemplates } from '@/api/recordTemplates';
+import { generateDocument, getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import {
   getFieldRules,
   getDateType,
   getValidations,
   saveForm,
-  getDateFormated
+  getDateFormated,
+  getApiErrors,
 } from './modal.helper';
+import { clickDownloadFile } from '@/utils/downloadFile';
+import { checkImageTypeAndSize } from '@/utils/imageHelper';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {},
@@ -226,6 +246,7 @@ const modalFields = ref({
   to_send_option: '',
   template: '',
   validations: {},
+  file_validations: {},
 });
 const props = defineProps(['documentId', 'modalState']);
 const emit = defineEmits(['close-modal', 'snack-messages']);
@@ -233,6 +254,8 @@ const isLoading = ref(false);
 const errorMessages = ref();
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
+const isTemplateSelected = ref(false);
+
 const toSendOptionsItems = [
   { label: 'Documento', value: 'DOCUMENT' },
   { label: 'Email', value: 'EMAIL' },
@@ -244,7 +267,7 @@ const booleanOptions = [
 ];
 
 const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção.'];
-const isTemplateSelected = ref(false);
+const imageRules = [];
 
 function emitCloseModal() {
   emit('close-modal');
@@ -260,6 +283,7 @@ function confirmClose() {
     to_send_option: '',
     template: '',
     validations: {},
+    file_validations: {},
   };
 }
 
@@ -269,7 +293,6 @@ function save() {
     if (resp.valid) {
       generateDocument(props.documentId.id, modalFields.value).then(
         (docResp) => {
-          console.log(docResp)
           if (docResp.success) {
             clickDownloadFile(
               { data: docResp.data.file },
@@ -285,6 +308,7 @@ function save() {
               to_send_option: '',
               template: '',
               validations: {},
+              file_validations: {},
             };
             isLoading.value = false;
           } else {
@@ -294,7 +318,7 @@ function save() {
                 'Preencha todos os campos em falta',
                 false,
               ]);
-              getApiErrors(docResp.error);
+              getApiErrors(docResp.error, errorMessages);
               isLoading.value = false;
             } else {
               emit('snack-messages', [
@@ -351,6 +375,40 @@ const templateValidations = computed(() => {
   return selected;
 });
 
+const templateFileValidations = computed(() => {
+  let selected = {};
+  console.log('validations', validations.value);
+  validations.value.map((i: any) => {
+    if (i.id == modalFields.value.template) {
+      selected = i.file_validations;
+      i.file_validations.map((f: { name: string }) => {
+        modalFields.value.file_validations[f.name] = '';
+      });
+    }
+  });
+  console.log('selected', selected);
+  return selected;
+});
+
+const handleFileChange = (event: any, name: string) => {
+  const file = event.target.files[0];
+  const { snackMessage, canUpload } = checkImageTypeAndSize(file);
+  if (snackMessage) {
+    emit('snack-messages', [snackMessage, '', false]);
+  }
+  if (file && canUpload) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      modalFields.value.file_validations[name] = reader.result;
+    };
+    reader.onerror = (error) => {
+      console.log(error);
+      emit('snack-messages', ['Erro a processar a imagem', '', false]);
+    };
+  }
+};
+
 watch(
   () => modalFields.value.template,
   () => {
@@ -376,11 +434,18 @@ onBeforeMount(async () => {
 
     if (resp.success) {
       resp.data.data.map(
-        (i: { send_type: any; title: any; id: any; validations: any }) => {
+        (i: {
+          send_type: any;
+          title: any;
+          id: any;
+          validations: any;
+          file_validations: any;
+        }) => {
           templates.value.push({ label: i.title, value: i.id });
           validations.value.push({
             id: i.id,
             validations: getValidations(i.validations, errorMessages),
+            file_validations: getValidations(i.file_validations, errorMessages),
             send_type: i.send_type,
           });
         }

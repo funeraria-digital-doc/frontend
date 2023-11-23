@@ -34,7 +34,11 @@ export const getTemplates = async (
   });
 };
 
-export const getSingleTemplate = async (id: string, defaultObj: any) => {
+export const getSingleTemplate = async (
+  id: string,
+  //defaultObj: any,
+  // defaultFileObj: any
+) => {
   return templateItem(id).then((resp) => {
     if (resp.success) {
       if (resp.data.id) {
@@ -55,7 +59,12 @@ export const getSingleTemplate = async (id: string, defaultObj: any) => {
             resp.data.validations &&
             Object.keys(resp.data.validations).length > 0
               ? resp.data.validations
-              : [{ ...defaultObj }],
+              : [],
+          file_validations:
+            resp.data.file_validations &&
+            Object.keys(resp.data.file_validations).length > 0
+              ? resp.data.file_validations
+              : [],
         };
       }
     } else {
@@ -63,7 +72,7 @@ export const getSingleTemplate = async (id: string, defaultObj: any) => {
     }
   });
 };
-
+//: [{ ...defaultObj }],//: defaultFileObj,
 export const deleteTemplate = async (
   id: string | number,
   templates: { value: { [x: string]: any } },
@@ -97,7 +106,7 @@ export function downloadTemplate(template: any) {
   try {
     downloadTemplateFile(template.columns.id).then((resp: any) => {
       if (resp.success) {
-        clickDownloadFile(resp.data, template.columns.title)
+        clickDownloadFile(resp.data, template.columns.title);
       } else {
         console.log('error', resp);
       }
@@ -196,6 +205,6 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
   return formData;
 };
 
-export function canAction(){
-  return true
+export function canAction() {
+  return true;
 }
