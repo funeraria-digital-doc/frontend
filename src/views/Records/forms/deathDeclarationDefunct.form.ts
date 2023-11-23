@@ -54,6 +54,11 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
     rules: fieldRules(false, null, 16),
   },
   {
+    label: 'Validade do cartão de cidadão',
+    name: 'cc_valid_until',
+    input: 'date',
+  },
+  {
     label: 'Número de identificação fiscal',
     name: 'nif',
     input: 'text',

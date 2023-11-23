@@ -37,7 +37,7 @@ function getToken() {
 }
 
 //let token = getToken();
-const { loadingSpinner } = useLoadingSpinner()
+const { loadingSpinner } = useLoadingSpinner();
 
 export let apiInstance = setupAxiosInstance();
 
@@ -54,14 +54,14 @@ function setupAxiosInstance() {
 
   instance.interceptors.response.use(
     (response) => {
-      loadingSpinner.active = false
+      loadingSpinner.active = false;
       return response;
     },
     (error) => {
-      loadingSpinner.active = false
+      loadingSpinner.active = false;
       const errorCode = error.response.status;
 
-      if ([401, 403].includes(errorCode)) {
+      if ([401].includes(errorCode)) {
         const { logoutUser } = useUser();
         logoutUser();
       }
@@ -72,12 +72,12 @@ function setupAxiosInstance() {
 
   instance.interceptors.request.use(
     (config) => {
-      loadingSpinner.active = true
+      loadingSpinner.active = true;
       return config;
     },
     (error) => {
-      loadingSpinner.active = true
-      return Promise.reject(error)
+      loadingSpinner.active = true;
+      return Promise.reject(error);
     }
   );
 
