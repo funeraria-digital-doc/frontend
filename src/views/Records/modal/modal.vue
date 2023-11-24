@@ -222,17 +222,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
-import { generateDocument, getTemplates } from '@/api/recordTemplates';
+import { getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import {
   getFieldRules,
   getDateType,
   getValidations,
   saveForm,
-  getDateFormated,
-  getApiErrors,
+  getDateFormated
 } from './modal.helper';
-import { clickDownloadFile } from '@/utils/downloadFile';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 export default defineComponent({
   name: 'GenerateDocuments',
@@ -290,58 +288,6 @@ function confirmClose() {
 
 function save() {
   isLoading.value = true;
-  form.value.validate().then((resp: any) => {
-    if (resp.valid) {
-      generateDocument(props.documentId.id, modalFields.value).then(
-        (docResp) => {
-          if (docResp.success) {
-            clickDownloadFile(
-              { data: docResp.data.file },
-              props.documentId.name
-            );
-            emit('snack-messages', [
-              'Documento emitido com sucesso.',
-              '',
-              true,
-            ]);
-            emit('close-modal');
-            modalFields.value = {
-              to_send_option: '',
-              template: '',
-              validations: {},
-              file_validations: {},
-            };
-            isLoading.value = false;
-          } else {
-            if (docResp.error && docResp.error.status.toString()[0] === '4') {
-              emit('snack-messages', [
-                'Formulário preenchido incorretamente.',
-                'Preencha todos os campos em falta',
-                false,
-              ]);
-              getApiErrors(docResp.error, errorMessages);
-              isLoading.value = false;
-            } else {
-              emit('snack-messages', [
-                'Ocorreu um erro. Tente novamente mais tarde.',
-                'Em caso de presistencia, contacte os administradores do sistema',
-                false,
-              ]);
-              isLoading.value = false;
-            }
-          }
-        }
-      );
-    } else {
-      emit('snack-messages', [
-        'Formulário preenchido incorretamente.',
-        'Preencha todos os campos em falta',
-        false,
-      ]);
-      isLoading.value = false;
-    }
-  });
-
   saveForm(
     isLoading,
     form,
@@ -382,7 +328,9 @@ const templateFileValidations = computed(() => {
     if (i.id == modalFields.value.template) {
       selected = i.file_validations;
       i.file_validations.map((f: { name: string }) => {
-        modalFields.value.file_validations[f.name] = f.image_data_base64 ? f.image_data_base64 : ''
+        modalFields.value.file_validations[f.name] = f.image_data_base64
+          ? f.image_data_base64
+          : '';
       });
     }
   });
@@ -390,9 +338,7 @@ const templateFileValidations = computed(() => {
 });
 
 const handleFileChange = (base64File: string, file: any, name: string) => {
-  if (file) {
-    modalFields.value.file_validations[name] = base64File;
-  }
+  modalFields.value.file_validations[name] = base64File ?? '';
 };
 
 watch(

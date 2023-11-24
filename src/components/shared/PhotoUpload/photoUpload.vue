@@ -73,6 +73,7 @@ const handleFileChange = (event: any) => {
       reader.result && saveImage(reader.result as string, file);
 
       input.value && (input.value.attributes.value = reader.result);
+      console.log('teste')
     };
     reader.onerror = (error) => {
       console.log(error);

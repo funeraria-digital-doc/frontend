@@ -164,6 +164,7 @@ export function saveForm(
               to_send_option: '',
               template: '',
               validations: {},
+              file_validations: {},
             };
             isLoading.value = false;
           } else {
