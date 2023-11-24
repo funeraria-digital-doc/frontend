@@ -1,28 +1,32 @@
 <template>
-  <v-container>
-    <v-row>
-      <div class="profile-picture">
-        <label :for="photoId" class="profile-label">
-          <div class="profile-preview" v-if="props.imageUrl">
-            <img :src="props.imageUrl" alt="Profile Preview" />
-          </div>
-          <div v-else class="profile-placeholder">
-            <v-icon class="profile-icon">mdi-camera</v-icon>
-            <span class="profile-text">{{ photoLabel }}</span>
-          </div>
-          <input
-            type="file"
-            :id="photoId"
-            :name="id"
-            class="profile-input"
-            accept="image/*"
-            ref="input"
-            @change="handleFileChange"
-          />
-        </label>
-      </div>
-    </v-row>
-  </v-container>
+  <div>
+    <h3>{{ title }}</h3>
+    <v-spacer></v-spacer>
+    <v-container>
+      <v-row>
+        <div class="profile-picture">
+          <label :for="photoId" class="profile-label">
+            <div class="profile-preview" v-if="props.imageUrl">
+              <img :src="props.imageUrl" alt="Profile Preview" />
+            </div>
+            <div v-else class="profile-placeholder">
+              <v-icon class="profile-icon">mdi-camera</v-icon>
+              <span class="profile-text">{{ photoLabel }}</span>
+            </div>
+            <input
+              type="file"
+              :id="photoId"
+              :name="id"
+              class="profile-input"
+              accept="image/*"
+              ref="input"
+              @change="handleFileChange"
+            />
+          </label>
+        </div>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 <script lang="ts">
 import { checkImageTypeAndSize } from '@/utils/imageHelper';
@@ -34,17 +38,25 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // saveFunction - callback to save it on BE
-const props = defineProps(['snack', 'saveFunction', 'imageUrl', 'id', 'label']);
+const props = defineProps([
+  'snack',
+  'saveFunction',
+  'imageUrl',
+  'id',
+  'label',
+  'title',
+]);
 
 // save - callback to save the file object on FE
 const emit = defineEmits(['save']);
 
 const photoId = ref(props.id ?? 'photo-input');
 const photoLabel = ref(props.label ?? 'Carregar foto');
+const title = ref(props.title ?? 'Imagem');
 const input = ref();
 
 const handleSave = (base64File: string, file: any) => {
-  emit('save', base64File, file);
+  emit('save', base64File, file, props.id);
 };
 
 const handleFileChange = (event: any) => {

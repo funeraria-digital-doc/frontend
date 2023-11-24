@@ -191,16 +191,16 @@
                 :key="fileIndex"
               >
                 <v-col>
-                  <v-file-input
-                    variant="filled"
-                    prepend-icon="mdi-camera"
+                  <photo-upload
+                    :error-messages="fileValidation.name"
                     :id="fileValidation.name"
-                    label="Imagem"
-                    :rules="imageRules"
-                    :error-messages="errorMessages[fileValidation.name]"
-                    accept="image/*"
-                    @change="handleFileChange($event, fileValidation.name)"
-                  ></v-file-input>
+                    :title="fileValidation.name"
+                    :imageUrl="
+                      modalFields.file_validations[fileValidation.name]
+                    "
+                    :label="fileValidation.name"
+                    @save="handleFileChange"
+                  />
                 </v-col>
               </div>
             </div>
@@ -233,10 +233,12 @@ import {
   getApiErrors,
 } from './modal.helper';
 import { clickDownloadFile } from '@/utils/downloadFile';
-import { checkImageTypeAndSize } from '@/utils/imageHelper';
+import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 export default defineComponent({
   name: 'GenerateDocuments',
-  components: {},
+  components: {
+    PhotoUpload,
+  },
 });
 </script>
 
@@ -267,7 +269,6 @@ const booleanOptions = [
 ];
 
 const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção.'];
-const imageRules = [];
 
 function emitCloseModal() {
   emit('close-modal');
@@ -377,35 +378,20 @@ const templateValidations = computed(() => {
 
 const templateFileValidations = computed(() => {
   let selected = {};
-  console.log('validations', validations.value);
   validations.value.map((i: any) => {
     if (i.id == modalFields.value.template) {
       selected = i.file_validations;
       i.file_validations.map((f: { name: string }) => {
-        modalFields.value.file_validations[f.name] = '';
+        modalFields.value.file_validations[f.name] = f.image_data_base64 ? f.image_data_base64 : ''
       });
     }
   });
-  console.log('selected', selected);
   return selected;
 });
 
-const handleFileChange = (event: any, name: string) => {
-  const file = event.target.files[0];
-  const { snackMessage, canUpload } = checkImageTypeAndSize(file);
-  if (snackMessage) {
-    emit('snack-messages', [snackMessage, '', false]);
-  }
-  if (file && canUpload) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      modalFields.value.file_validations[name] = reader.result;
-    };
-    reader.onerror = (error) => {
-      console.log(error);
-      emit('snack-messages', ['Erro a processar a imagem', '', false]);
-    };
+const handleFileChange = (base64File: string, file: any, name: string) => {
+  if (file) {
+    modalFields.value.file_validations[name] = base64File;
   }
 };
 
