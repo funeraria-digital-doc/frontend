@@ -139,7 +139,6 @@ export function getApiErrors(errors: any, errorMessages: any) {
 }
 
 export function saveForm(
-  isLoading: any,
   form: any,
   props: any,
   modalFields: any,
@@ -147,7 +146,6 @@ export function saveForm(
   emitSnackMessages: Function,
   emitCloseModal: Function
 ) {
-  isLoading.value = true;
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
       generateDocument(props.documentId.id, modalFields.value).then(
@@ -166,7 +164,6 @@ export function saveForm(
               validations: {},
               file_validations: {},
             };
-            isLoading.value = false;
           } else {
             if (docResp.error && docResp.error.status.toString()[0] === '4') {
               emitSnackMessages([
@@ -175,14 +172,12 @@ export function saveForm(
                 false,
               ]);
               getApiErrors(docResp.error, errorMessages);
-              isLoading.value = false;
             } else {
               emitSnackMessages([
                 'Ocorreu um erro. Tente novamente mais tarde.',
                 'Em caso de presistencia, contacte os administradores do sistema',
                 false,
               ]);
-              isLoading.value = false;
             }
           }
         }
@@ -193,7 +188,6 @@ export function saveForm(
         'Preencha todos os campos em falta',
         false,
       ]);
-      isLoading.value = false;
     }
   });
 }

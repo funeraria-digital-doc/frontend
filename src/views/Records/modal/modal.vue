@@ -5,12 +5,7 @@
         <span class="text-h5 ml-6">Gerar Documentos</span>
       </v-card-title>
       <v-card-text>
-        <v-form
-          ref="form"
-          validate-on="submit"
-          @submit.prevent="save"
-          :disabled="isLoading"
-        >
+        <v-form ref="form" validate-on="submit" @submit.prevent="save">
           <v-container>
             <v-col>
               <v-select
@@ -229,7 +224,7 @@ import {
   getDateType,
   getValidations,
   saveForm,
-  getDateFormated
+  getDateFormated,
 } from './modal.helper';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 export default defineComponent({
@@ -250,7 +245,6 @@ const modalFields = ref({
 });
 const props = defineProps(['documentId', 'modalState']);
 const emit = defineEmits(['close-modal', 'snack-messages']);
-const isLoading = ref(false);
 const errorMessages = ref();
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
@@ -287,9 +281,7 @@ function confirmClose() {
 }
 
 function save() {
-  isLoading.value = true;
   saveForm(
-    isLoading,
     form,
     props,
     modalFields,

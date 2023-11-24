@@ -115,11 +115,9 @@
             </v-list>
           </v-col>
         </v-row>
-        <v-row
-          v-if="template.file_validations.length > 0 && !isLoadingFileVars"
-        >
+        <v-row v-if="template.file_validations.length > 0">
           <v-col cols="12" sm="12" md="12">
-            <v-list :disabled="isLoading">
+            <v-list>
               <v-list-subheader>Validações de Imagens</v-list-subheader>
               <v-list-item
                 v-for="(imageVal, imgKey) in template.file_validations"
@@ -137,14 +135,6 @@
             </v-list>
           </v-col>
         </v-row>
-        <v-container v-if="isLoadingFileVars" class="login_spinner">
-          <v-progress-circular
-            :size="70"
-            :width="7"
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </v-container>
       </v-container>
       <v-btn color="blue-darken-1" variant="text" type="submit">
         Submeter
@@ -423,7 +413,6 @@ const handleClearFileClick = () => {
   file_temp.value = null;
   template.value.validations = [];
   template.value.file_validations = [];
-  isLoadingFileVars.value = false;
 };
 
 const editValidation = (index: number) => {
