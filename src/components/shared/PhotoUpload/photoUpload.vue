@@ -52,7 +52,7 @@ const emit = defineEmits(['save']);
 
 const photoId = ref(props.id ?? 'photo-input');
 const photoLabel = ref(props.label ?? 'Carregar foto');
-const title = ref(props.title ?? 'Imagem');
+const title = ref(props.title ?? '');
 const input = ref();
 
 const handleSave = (base64File: string, file: any) => {
@@ -73,7 +73,6 @@ const handleFileChange = (event: any) => {
       reader.result && saveImage(reader.result as string, file);
 
       input.value && (input.value.attributes.value = reader.result);
-      console.log('teste')
     };
     reader.onerror = (error) => {
       console.log(error);
