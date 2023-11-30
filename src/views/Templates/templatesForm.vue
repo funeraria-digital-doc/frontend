@@ -217,6 +217,7 @@ const defaultFileObj: TemplateFileValidation = {
 
 const template = ref<Template>({
   file: '',
+  file_name: '',
   send_email_to_bcc: [],
   send_email_to_cc: [],
   send_email_to: [],
@@ -363,7 +364,9 @@ const handleFileUpload = (file: Blob[]) => {
           const reader = new FileReader();
           reader.readAsDataURL(file[0]);
           reader.onload = () => {
-            reader.result && (template.value.file = reader.result);
+            reader.result &&
+              (template.value.file = reader.result) &&
+              (template.value.file_name = file[0].name);
           };
           reader.onerror = () => {
             handleClearFileClick();
@@ -371,6 +374,7 @@ const handleFileUpload = (file: Blob[]) => {
           };
         } else {
           template.value.file = '';
+          template.value.file_name = '';
         }
       } else {
         handleClearFileClick();
@@ -413,6 +417,7 @@ const handleClearFileClick = () => {
   file_temp.value = null;
   template.value.validations = [];
   template.value.file_validations = [];
+  template.value.file_name = '';
 };
 
 const editValidation = (index: number) => {
@@ -465,7 +470,10 @@ onBeforeMount(async () => {
   if (route.name === 'templates_edit') {
     getSingleTemplate(route.params.id as string).then((resp) => {
       resp && (template.value = resp);
-      file_temp.value = [new File([template.value.file], 'file')];
+      console.log(template.value,'template.value.file_name')
+      file_temp.value = [
+        new File([template.value.file], template.value.file_name),
+      ];
       mode.value = 'edit';
     });
   } else if (route.name === 'templates_create') {

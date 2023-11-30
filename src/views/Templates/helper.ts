@@ -55,6 +55,7 @@ export const getSingleTemplate = async (
             ? resp.data.send_email_to_bcc
             : [],
           file: resp.data.file ? resp.data.file : null,
+          file_name: resp.data.file_name ? resp.data.file_name : null,
           validations:
             resp.data.validations &&
             Object.keys(resp.data.validations).length > 0
