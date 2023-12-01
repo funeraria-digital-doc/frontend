@@ -360,7 +360,6 @@ const defaultValueValues = computed(() => {
     });
   }
   if (validation.value.field_type === 'BOOLEAN') {
-    console.log(constants.BooleanOptions);
     return constants.BooleanOptions;
   }
   return [];
@@ -421,7 +420,6 @@ watch(
     } else {
       validation.value.max = null;
     }
-    console.log('validations', validation.value);
   }
 );
 

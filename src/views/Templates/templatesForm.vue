@@ -470,7 +470,6 @@ onBeforeMount(async () => {
   if (route.name === 'templates_edit') {
     getSingleTemplate(route.params.id as string).then((resp) => {
       resp && (template.value = resp);
-      console.log(template.value,'template.value.file_name')
       file_temp.value = [
         new File([template.value.file], template.value.file_name),
       ];

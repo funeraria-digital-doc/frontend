@@ -113,14 +113,11 @@ export function getApiErrors(errors: any, errorMessages: any) {
     const errorMessageKey = Object.keys(errorMessages.value)[t];
     errorMessages.value[errorMessageKey] = '';
   }
-  console.log('keys_missing', errors.keys_missing);
   if (errors.keys_missing) {
     for (let i = 0; i < errors.keys_missing.length; i++) {
       const key = errors.keys_missing[i];
-      console.log('key - ' + key);
       errorMessages.value[key] = 'Campo obrigatório.';
     }
-    console.log('errorMessages.value', errorMessages.value);
   }
   if (errors.errors) {
     for (let i = 0; i < Object.keys(errors.errors).length; i++) {
@@ -192,11 +189,8 @@ export function saveForm(
 }
 
 export function getDatesPlaceholders(selected: any, validations: any) {
-  console.log('selected', selected);
-  console.log('validations', Object.keys(validations));
   Object.keys(validations).map((val: any) => {
     const selectedVar = selected.find((item: any) => item.name === val);
-    console.log('selectedVar', selectedVar);
     const format =
       selectedVar.format instanceof Array
         ? selectedVar.format[0]
@@ -205,22 +199,17 @@ export function getDatesPlaceholders(selected: any, validations: any) {
       selectedVar.default_value instanceof Array
         ? selectedVar.default_value[0]
         : selectedVar.default_value;
-    console.log('format', format);
-    console.log('default_value', default_value);
     if (
       ['DATE', 'DATETIME', 'TIME'].indexOf(selectedVar.field_type) >= 0 &&
       format &&
       selectedVar.default_value
     ) {
-      const datee = getDateFormated(
+      const date = getDateFormated(
         format,
         default_value,
         isDateOrDateTime(format) === 'time' ? true : false
       );
-      console.log(datee);
-      console.log('antes', validations[selectedVar.name]);
-      validations[selectedVar.name] = datee;
-      console.log('depois', validations[selectedVar.name]);
+      validations[selectedVar.name] = date;
     }
   });
 }
