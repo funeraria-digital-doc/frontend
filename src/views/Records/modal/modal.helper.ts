@@ -231,9 +231,6 @@ export function getDateFormated(
   isTime: boolean
 ) {
   const format = getFormat(apiFormat, false);
-  console.log('aquiiiiii', format )
-  console.log('isTime', isTime )
-  console.log('modelData', modelData )
   let dateFormated;
   if (isTime) {
     dateFormated = moment(modelData).format(format);
