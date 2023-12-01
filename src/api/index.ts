@@ -59,9 +59,15 @@ function setupAxiosInstance() {
     },
     (error) => {
       loadingSpinner.active = false;
-      const errorCode = error.response.status;
-
-      if ([401].includes(errorCode)) {
+      if (
+        (!error.response ||
+          !error.response.status ||
+          error.code === 'ERR_NETWORK') &&
+        router.currentRoute.value.name !== 'service_unavailable' &&
+        router.currentRoute.value.name !== 'not_found'
+      ) {
+        router.push({ name: 'service_unavailable' });
+      } else if ([401].includes(error.response.status)) {
         const { logoutUser } = useUser();
         logoutUser();
       }
