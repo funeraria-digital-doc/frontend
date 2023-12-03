@@ -15,19 +15,43 @@
             <v-col cols="9" sm="12" md="9">
               <v-container>
                 <v-row>
+                  <!-- is_blocked -->
+                  <v-col cols="6" sm="6" md="6" class="d-flex">
+                    <v-checkbox
+                      :id="'is_blocked_' + props.index"
+                      class="validation-edit-modal__is-field-custom-chk"
+                      v-model="validation.is_blocked"
+                      :error-messages="errorMessages.is_blocked"
+                    />
+                    <v-label
+                      class="validation-edit-modal__is-field-custom-label"
+                    >
+                      Conteúdo Estático?
+                    </v-label>
+                  </v-col>
                   <!-- is_field_custom -->
-                  <v-checkbox
-                    :id="'is_field_custom_' + props.index"
-                    class="validation-edit-modal__is-field-custom-chk"
-                    v-model="validation.is_field_custom"
-                    :error-messages="errorMessages.is_field_custom"
-                  />
-                  <v-label class="validation-edit-modal__is-field-custom-label">
-                    Campo Personalizado?
-                  </v-label>
+                  <v-col
+                    v-if="blockImage"
+                    cols="6"
+                    sm="6"
+                    md="6"
+                    class="d-flex"
+                  >
+                    <v-checkbox
+                      :id="'is_field_custom_' + props.index"
+                      class="validation-edit-modal__is-field-custom-chk"
+                      v-model="validation.is_field_custom"
+                      :error-messages="errorMessages.is_field_custom"
+                    />
+                    <v-label
+                      class="validation-edit-modal__is-field-custom-label"
+                    >
+                      Campo Personalizado?
+                    </v-label>
+                  </v-col>
                 </v-row>
 
-                <v-row v-if="showDbFields">
+                <v-row v-if="showDbFields && blockImage">
                   <!-- db_collection -->
                   <v-col cols="6" sm="6" md="6">
                     <v-select
@@ -122,6 +146,8 @@ const showDbFields = computed(() =>
   validation.value.is_field_custom ? false : true
 );
 
+const blockImage = computed(() => (validation.value.is_blocked ? false : true));
+
 watch(showDbFields, (showDbFields) => {
   if (!showDbFields) {
     validation.value.db_collection = null;
@@ -158,6 +184,15 @@ watch(
     } else {
       mapDbFields();
     }
+  }
+);
+
+watch(
+  () => validation.value.is_blocked,
+  () => {
+    validation.value.db_collection = '';
+    validation.value.db_field_reference = '';
+    validation.value.is_field_custom = false;
   }
 );
 
@@ -204,6 +239,7 @@ onBeforeMount(() => {
       db_collection: '',
       db_field_reference: '',
       is_field_custom: '',
+      is_blocked: '',
     };
   }
   if (validation.value.db_collection != '') {

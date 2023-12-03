@@ -213,6 +213,7 @@ const defaultFileObj: TemplateFileValidation = {
   db_collection: '',
   db_field_reference: '',
   is_field_custom: false,
+  is_blocked: false,
 };
 
 const template = ref<Template>({
