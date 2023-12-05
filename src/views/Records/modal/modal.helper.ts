@@ -3,6 +3,11 @@ import { clickDownloadFile } from '@/utils/downloadFile';
 import { generateDocument } from '@/api/recordTemplates';
 import moment from 'moment';
 import { getFormat } from '../helper';
+import { DeathDeclarationDeathForm } from '../forms/deathDeclarationDeath.form';
+import { DeathDeclarationDefunctForm } from '../forms/deathDeclarationDefunct.form';
+import { DeathDeclarationFamilyMemberForm } from '../forms/deathDeclarationFamilyMember.form';
+import { DeathDeclarationFuneralForm } from '../forms/deathDeclarationFuneral.form';
+import { DeathDeclarationSpouseForm } from '../forms/deathDeclarationSpouse.form';
 
 export function getFieldRules(validation: any) {
   const rules = [];
@@ -141,43 +146,51 @@ export function saveForm(
   modalFields: any,
   errorMessages: any,
   emitSnackMessages: Function,
-  emitCloseModal: Function
+  emitCloseModal: Function,
+  hasKeysMissing: any,
+  forceSave: any,
+  missingKeys: any
 ) {
+  const auxForceSave = forceSave.value;
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
-      generateDocument(props.documentId.id, modalFields.value).then(
-        (docResp) => {
-          if (docResp.success) {
-            clickDownloadFile(
-              { data: docResp.data.file },
-              props.documentId.name
-            );
-            emitSnackMessages(['Documento emitido com sucesso.', '', true]);
-            emitCloseModal();
-            modalFields.value = {
-              to_send_option: '',
-              template: '',
-              validations: {},
-              file_validations: {},
-            };
+      generateDocument(
+        props.documentId.id,
+        modalFields.value,
+        auxForceSave
+      ).then((docResp: any) => {
+        if (docResp.success) {
+          clickDownloadFile({ data: docResp.data.file }, props.documentId.name);
+          emitSnackMessages(['Documento emitido com sucesso.', '', true]);
+          emitCloseModal();
+          modalFields.value = {
+            to_send_option: '',
+            template: '',
+            validations: {},
+            file_validations: {},
+          };
+          hasKeysMissing.value = false;
+        } else {
+          if (docResp.data && docResp.data.missingVars) {
+            missingKeys.value = docResp.data.missingVars;
+            hasKeysMissing.value = true;
+          }
+          if (docResp.error && docResp.error.status.toString()[0] === '4') {
+            emitSnackMessages([
+              'Formulário preenchido incorretamente.',
+              'Preencha todos os campos em falta',
+              false,
+            ]);
+            getApiErrors(docResp.error, errorMessages);
           } else {
-            if (docResp.error && docResp.error.status.toString()[0] === '4') {
-              emitSnackMessages([
-                'Formulário preenchido incorretamente.',
-                'Preencha todos os campos em falta',
-                false,
-              ]);
-              getApiErrors(docResp.error, errorMessages);
-            } else {
-              emitSnackMessages([
-                'Ocorreu um erro. Tente novamente mais tarde.',
-                'Em caso de presistencia, contacte os administradores do sistema',
-                false,
-              ]);
-            }
+            emitSnackMessages([
+              'Ocorreu um erro. Tente novamente mais tarde.',
+              'Em caso de presistencia, contacte os administradores do sistema',
+              false,
+            ]);
           }
         }
-      );
+      });
     } else {
       emitSnackMessages([
         'Formulário preenchido incorretamente.',
@@ -227,4 +240,57 @@ export function getDateFormated(
     dateFormated = moment(modelData, 'HH:mm:ss').format(format);
   }
   return dateFormated;
+}
+
+export function getMissingKeysLabelHelper(key: any) {
+  let newLabel = '';
+  if (key.is_field_custom) {
+    newLabel = key.label;
+  } else {
+    let collection = '';
+    switch (key.db_collection) {
+      case 'RECORDS':
+        collection = 'Declarações - ';
+        break;
+      case 'TEMPLATES':
+        collection = 'Modelos - ';
+        break;
+      case 'SYSTEM':
+        collection = 'Sistema - ';
+        break;
+      case 'USERS':
+        collection = 'Utilizadores - ';
+        break;
+      case 'GROUPS':
+        collection = 'Funerária - ';
+        break;
+      default:
+        collection = '';
+    }
+    if (key.db_collection === 'RECORDS') {
+      const compareObjects = [
+        DeathDeclarationDeathForm,
+        DeathDeclarationDefunctForm,
+        DeathDeclarationFamilyMemberForm,
+        DeathDeclarationFuneralForm,
+        DeathDeclarationSpouseForm,
+      ];
+      let jump = false;
+      for (let i = 0; i < compareObjects.length; i++) {
+        compareObjects[i].forEach((val) => {
+          if (val.name === key.db_field_reference) {
+            newLabel = collection + val.label;
+            jump = true;
+            return true;
+          }
+        });
+        if (jump) {
+          continue;
+        }
+      }
+    } else {
+      newLabel = collection + key.db_field_reference;
+    }
+  }
+  return newLabel;
 }

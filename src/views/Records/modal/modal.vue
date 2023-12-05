@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="props.modalState" max-width="500px" persistent>
-    <v-card>
+    <v-card v-if="!hasKeysMissing">
       <v-card-title class="mt-3">
         <span class="text-h5 ml-6">Gerar Documentos</span>
       </v-card-title>
@@ -212,7 +212,29 @@
         </v-form>
       </v-card-text>
     </v-card>
+    <v-card v-else>
+      <v-card-title class="mt-3">
+        <span class="text-h5 ml-6">Informações em falta</span>
+      </v-card-title>
+      <v-card-text>
+        <div v-for="msg in missingKeys" :key="msg">
+          <div v-html="getMissingKeyLabel(msg)"></div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue-darken-1" variant="text" @click="redirectToRecord"
+          >Preencher dados em falta</v-btn
+        >
+        <v-btn color="blue-darken-1" variant="text" @click="closeMissingModal"
+          >Cancelar</v-btn
+        >
+      </v-card-actions>
+    </v-card>
   </v-dialog>
+  <!-- <v-dialog v-model="hasKeysMissing" max-width="500px" persistent>
+    
+  </v-dialog> -->
 </template>
 
 <script lang="ts">
@@ -225,8 +247,10 @@ import {
   getValidations,
   saveForm,
   getDateFormated,
+  getMissingKeysLabelHelper
 } from './modal.helper';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
+import router from '@/router';
 export default defineComponent({
   name: 'GenerateDocuments',
   components: {
@@ -249,6 +273,9 @@ const errorMessages = ref();
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
 const isTemplateSelected = ref(false);
+const hasKeysMissing = ref(false);
+const forceSave = ref(false);
+const missingKeys = ref();
 
 const toSendOptionsItems = [
   { label: 'Documento', value: 'DOCUMENT' },
@@ -280,6 +307,25 @@ function confirmClose() {
   };
 }
 
+function redirectToRecord() {
+  hasKeysMissing.value = false;
+  missingKeys.value = []
+  modalFields.value = {
+    to_send_option: '',
+    template: '',
+    validations: {},
+    file_validations: {},
+  }
+  router.push({ name: 'records_edit', params: { id: props.documentId.id } });
+  emitCloseModal();
+}
+
+
+function closeMissingModal(){
+  hasKeysMissing.value = false;
+  missingKeys.value = []
+}
+
 function save() {
   saveForm(
     form,
@@ -287,7 +333,10 @@ function save() {
     modalFields,
     errorMessages,
     emitSnackMessages,
-    emitCloseModal
+    emitCloseModal,
+    hasKeysMissing,
+    forceSave,
+    missingKeys
   );
 }
 
@@ -302,6 +351,10 @@ function handleDate(modelData: Date, fieldName: string, isTime: boolean) {
     modelData,
     isTime
   );
+}
+
+function getMissingKeyLabel(key: any) {
+  return getMissingKeysLabelHelper(key)
 }
 
 const templateValidations = computed(() => {
