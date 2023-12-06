@@ -8,6 +8,7 @@ export interface Template {
   send_type: string;
   title: string;
   validations: TemplateValidation[];
+  file_validations: TemplateFileValidation[]
 }
 
 export interface TemplateValidation {
@@ -25,4 +26,11 @@ export interface TemplateValidation {
   optional: boolean;
   options: any[];
   placeholder: string;
+}
+
+export interface TemplateFileValidation {
+  name: string;
+  name_with_extension: string;
+  image_data: string;
+  image_data_base64: string
 }

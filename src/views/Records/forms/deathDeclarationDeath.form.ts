@@ -3,6 +3,12 @@ import type { DynamicField } from '@/models/dynamicField.model';
 
 export const DeathDeclarationDeathForm: DynamicField[] = [
   {
+    label: 'Número do assento',
+    name: 'death_declaration_number',
+    input: 'text',
+    rules: fieldRules(false, null, 255),
+  },
+  {
     label: 'Data do falecimento',
     name: 'death_date',
     input: 'date',

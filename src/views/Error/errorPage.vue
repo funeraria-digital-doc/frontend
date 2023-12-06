@@ -20,7 +20,6 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const message = ref('');
 onBeforeMount(() => {
-  console.log(route.meta.status);
   if (route.meta.status === 'service-unavailable') {
     message.value =
       '<h1>Serviço temporáriamente indisponível.</br>' +

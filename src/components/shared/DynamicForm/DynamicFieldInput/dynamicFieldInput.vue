@@ -64,7 +64,6 @@
       :error-messages="error"
       :id="field.name"
       :imageUrl="imageUrl"
-      :isLoading="isLoading"
       :label="field.label"
       :snack="snack"
       @save="saveFile"
@@ -99,7 +98,6 @@ const error = ref(props.errorMessages);
 
 // for image
 const snack = ref();
-const isLoading = ref(false);
 const imageUrl = ref(props.field.value);
 
 // for datetime

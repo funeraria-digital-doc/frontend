@@ -133,6 +133,13 @@ export const dbCollections = [
   { label: 'Sistema', value: 'SYSTEM' },
 ];
 
+export const dbCollectionsFile = [
+  //{ label: 'Funerárias', value: 'GROUPS' },
+  { label: 'Utilizadores', value: 'USERS' },
+  { label: 'Declarações', value: 'RECORDS' },
+  //{ label: 'Sistema', value: 'SYSTEM' },
+];
+
 export const usersFields = [
   { label: 'Nome', value: 'username', type: 'TEXT' },
   { label: 'Email', value: 'email', type: 'EMAIL' },
@@ -142,10 +149,14 @@ export const usersFields = [
   { label: 'Ultimo Login', value: 'last_login', type: 'DATE' },
 ];
 
+export const usersFieldsFile = [{ label: 'Fotografia', value: 'file' }];
+
 export const groupsFields = [
   { label: 'id', value: 'id', type: 'TEXT' },
   { label: 'Nome', value: 'name', type: 'TEXT' },
 ];
+
+export const groupsFieldsFile = [];
 
 export const recordsFields = [
   { label: 'Telefone', value: 'phone', type: 'TEXT' },
@@ -212,12 +223,12 @@ export const recordsFields = [
   { label: 'Causa da Morte', value: 'cause_of_death', type: 'TEXT' },
   { label: 'Mensagem da Sepultura', value: 'grave_message', type: 'TEXT' },
   { label: 'Local do Velório', value: 'wake_local', type: 'TEXT' },
-  { label: 'Data do Velório', value: 'wake_local', type: 'DATE' },
-  { label: 'Hora do Velório', value: 'wake_local', type: 'TIME' },
+  { label: 'Data do Velório', value: 'wake_date', type: 'DATE' },
+  { label: 'Hora do Velório', value: 'wake_time', type: 'TIME' },
   {
     label: 'Hora de Saida da Casa Mortuária',
-    value: 'leaving_mortuary_time',
-    type: 'TIME',
+    value: 'leaving_mortuary_datetime',
+    type: 'DATETIME',
   },
   {
     label: 'Data e Hora do Funeral',
@@ -249,9 +260,13 @@ export const recordsFields = [
   },
 ];
 
+export const recordsFieldsFile = [{ label: 'Fotografia', value: 'photo' }];
+
 export const systemFields = [
   { label: 'Data Atual', value: 'CURRENT_DATE', type: 'DATE' },
 ];
+
+export const systemFieldsFile = [];
 
 export const dateFormat = [
   { label: 'Horas', value: 'HOURS_ONLY' },

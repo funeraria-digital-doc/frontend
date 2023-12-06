@@ -34,6 +34,8 @@ import { getDeathsPerDay } from '@/api/stats';
 import ptLocale from 'apexcharts/dist/locales/pt.json';
 //Records Chart
 const daysToSearch = ref(30);
+const maxYAxis = ref(0);
+const tickAmount = ref(0);
 const options = ref({
   chart: {
     height: 350,
@@ -63,8 +65,9 @@ const options = ref({
     },
   },
   yaxis: {
-    max: 0,
-    tickAmount: 0,
+    max: maxYAxis,
+    tickAmount: tickAmount,
+    min: 0,
   },
   tooltip: {
     x: {

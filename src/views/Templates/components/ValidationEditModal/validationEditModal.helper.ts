@@ -1,5 +1,4 @@
 export function isDateOrDateTime(apiFormat: String) {
-  console.log('apiFormat', apiFormat)
   let format = 'datetime';
   const dateFormats = ['DAY_MONTH_YEAR', 'MONTH_YEAR', 'DAY_MONTH'];
   const timeFormats = [
@@ -16,6 +15,5 @@ export function isDateOrDateTime(apiFormat: String) {
   if (timeFormats.includes(apiFormat)) {
     format = 'time';
   }
-  console.log('format', format)
   return format;
 }

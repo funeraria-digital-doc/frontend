@@ -3,6 +3,11 @@ import { clickDownloadFile } from '@/utils/downloadFile';
 import { generateDocument } from '@/api/recordTemplates';
 import moment from 'moment';
 import { getFormat } from '../helper';
+import { DeathDeclarationDeathForm } from '../forms/deathDeclarationDeath.form';
+import { DeathDeclarationDefunctForm } from '../forms/deathDeclarationDefunct.form';
+import { DeathDeclarationFamilyMemberForm } from '../forms/deathDeclarationFamilyMember.form';
+import { DeathDeclarationFuneralForm } from '../forms/deathDeclarationFuneral.form';
+import { DeathDeclarationSpouseForm } from '../forms/deathDeclarationSpouse.form';
 
 export function getFieldRules(validation: any) {
   const rules = [];
@@ -113,14 +118,11 @@ export function getApiErrors(errors: any, errorMessages: any) {
     const errorMessageKey = Object.keys(errorMessages.value)[t];
     errorMessages.value[errorMessageKey] = '';
   }
-  console.log('keys_missing', errors.keys_missing);
   if (errors.keys_missing) {
     for (let i = 0; i < errors.keys_missing.length; i++) {
       const key = errors.keys_missing[i];
-      console.log('key - ' + key);
       errorMessages.value[key] = 'Campo obrigatório.';
     }
-    console.log('errorMessages.value', errorMessages.value);
   }
   if (errors.errors) {
     for (let i = 0; i < Object.keys(errors.errors).length; i++) {
@@ -139,70 +141,69 @@ export function getApiErrors(errors: any, errorMessages: any) {
 }
 
 export function saveForm(
-  isLoading: any,
   form: any,
   props: any,
   modalFields: any,
   errorMessages: any,
   emitSnackMessages: Function,
-  emitCloseModal: Function
+  emitCloseModal: Function,
+  hasKeysMissing: any,
+  forceSave: any,
+  missingKeys: any
 ) {
-  isLoading.value = true;
+  const auxForceSave = forceSave.value;
   form.value.validate().then((resp: any) => {
     if (resp.valid) {
-      generateDocument(props.documentId.raw.id, modalFields.value).then(
-        (docResp) => {
-          console.log(docResp);
-          if (docResp.success) {
-            clickDownloadFile(
-              { data: docResp.data.file },
-              props.documentId.raw.name
-            );
-            emitSnackMessages(['Documento emitido com sucesso.', '', true]);
-            emitCloseModal();
-            modalFields.value = {
-              to_send_option: '',
-              template: '',
-              validations: {},
-            };
-            isLoading.value = false;
+      generateDocument(
+        props.documentId.id,
+        modalFields.value,
+        auxForceSave
+      ).then((docResp: any) => {
+        if (docResp.success) {
+          clickDownloadFile({ data: docResp.data.file }, props.documentId.name);
+          emitSnackMessages(['Documento emitido com sucesso.', '', true]);
+          emitCloseModal();
+          modalFields.value = {
+            to_send_option: '',
+            template: '',
+            validations: {},
+            file_validations: {},
+          };
+          hasKeysMissing.value = false;
+        } else {
+          if (docResp.data && docResp.data.missingVars) {
+            missingKeys.value = docResp.data.missingVars;
+            hasKeysMissing.value = true;
+          }
+          if (docResp.error && docResp.error.status.toString()[0] === '4') {
+            emitSnackMessages([
+              'Formulário preenchido incorretamente.',
+              'Preencha todos os campos em falta',
+              false,
+            ]);
+            getApiErrors(docResp.error, errorMessages);
           } else {
-            if (docResp.error && docResp.error.status.toString()[0] === '4') {
-              emitSnackMessages([
-                'Formulário preenchido incorretamente.',
-                'Preencha todos os campos em falta',
-                false,
-              ]);
-              getApiErrors(docResp.error, errorMessages);
-              isLoading.value = false;
-            } else {
-              emitSnackMessages([
-                'Ocorreu um erro. Tente novamente mais tarde.',
-                'Em caso de presistencia, contacte os administradores do sistema',
-                false,
-              ]);
-              isLoading.value = false;
-            }
+            emitSnackMessages([
+              'Ocorreu um erro. Tente novamente mais tarde.',
+              'Em caso de presistencia, contacte os administradores do sistema',
+              false,
+            ]);
           }
         }
-      );
+      });
     } else {
       emitSnackMessages([
         'Formulário preenchido incorretamente.',
         'Preencha todos os campos em falta',
         false,
       ]);
-      isLoading.value = false;
     }
   });
 }
 
 export function getDatesPlaceholders(selected: any, validations: any) {
-  console.log('selected', selected);
-  console.log('validations', Object.keys(validations));
   Object.keys(validations).map((val: any) => {
     const selectedVar = selected.find((item: any) => item.name === val);
-    console.log('selectedVar', selectedVar);
     const format =
       selectedVar.format instanceof Array
         ? selectedVar.format[0]
@@ -211,22 +212,17 @@ export function getDatesPlaceholders(selected: any, validations: any) {
       selectedVar.default_value instanceof Array
         ? selectedVar.default_value[0]
         : selectedVar.default_value;
-    console.log('format', format);
-    console.log('default_value', default_value);
     if (
       ['DATE', 'DATETIME', 'TIME'].indexOf(selectedVar.field_type) >= 0 &&
       format &&
       selectedVar.default_value
     ) {
-      const datee = getDateFormated(
+      const date = getDateFormated(
         format,
         default_value,
         isDateOrDateTime(format) === 'time' ? true : false
       );
-      console.log(datee);
-      console.log('antes', validations[selectedVar.name]);
-      validations[selectedVar.name] = datee;
-      console.log('depois', validations[selectedVar.name]);
+      validations[selectedVar.name] = date;
     }
   });
 }
@@ -237,9 +233,6 @@ export function getDateFormated(
   isTime: boolean
 ) {
   const format = getFormat(apiFormat, false);
-  console.log('aquiiiiii', format )
-  console.log('isTime', isTime )
-  console.log('modelData', modelData )
   let dateFormated;
   if (isTime) {
     dateFormated = moment(modelData).format(format);
@@ -247,4 +240,57 @@ export function getDateFormated(
     dateFormated = moment(modelData, 'HH:mm:ss').format(format);
   }
   return dateFormated;
+}
+
+export function getMissingKeysLabelHelper(key: any) {
+  let newLabel = '';
+  if (key.is_field_custom) {
+    newLabel = key.label;
+  } else {
+    let collection = '';
+    switch (key.db_collection) {
+      case 'RECORDS':
+        collection = 'Declarações - ';
+        break;
+      case 'TEMPLATES':
+        collection = 'Modelos - ';
+        break;
+      case 'SYSTEM':
+        collection = 'Sistema - ';
+        break;
+      case 'USERS':
+        collection = 'Utilizadores - ';
+        break;
+      case 'GROUPS':
+        collection = 'Funerária - ';
+        break;
+      default:
+        collection = '';
+    }
+    if (key.db_collection === 'RECORDS') {
+      const compareObjects = [
+        DeathDeclarationDeathForm,
+        DeathDeclarationDefunctForm,
+        DeathDeclarationFamilyMemberForm,
+        DeathDeclarationFuneralForm,
+        DeathDeclarationSpouseForm,
+      ];
+      let jump = false;
+      for (let i = 0; i < compareObjects.length; i++) {
+        compareObjects[i].forEach((val) => {
+          if (val.name === key.db_field_reference) {
+            newLabel = collection + val.label;
+            jump = true;
+            return true;
+          }
+        });
+        if (jump) {
+          continue;
+        }
+      }
+    } else {
+      newLabel = collection + key.db_field_reference;
+    }
+  }
+  return newLabel;
 }
