@@ -213,7 +213,8 @@
       </v-card-text>
     </v-card>
     <v-card v-else>
-      <v-card-title class="mt-3">
+      <v-card-title class="mt-3 d-flex align-items-center">
+        <v-icon color="warning" icon="mdi-alert-circle" size="x-large"></v-icon>
         <span class="text-h5 ml-6">Informações em falta</span>
       </v-card-title>
       <v-card-text>
@@ -247,7 +248,7 @@ import {
   getValidations,
   saveForm,
   getDateFormated,
-  getMissingKeysLabelHelper
+  getMissingKeysLabelHelper,
 } from './modal.helper';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 import router from '@/router';
@@ -309,21 +310,20 @@ function confirmClose() {
 
 function redirectToRecord() {
   hasKeysMissing.value = false;
-  missingKeys.value = []
+  missingKeys.value = [];
   modalFields.value = {
     to_send_option: '',
     template: '',
     validations: {},
     file_validations: {},
-  }
+  };
   router.push({ name: 'records_edit', params: { id: props.documentId.id } });
   emitCloseModal();
 }
 
-
-function closeMissingModal(){
+function closeMissingModal() {
   hasKeysMissing.value = false;
-  missingKeys.value = []
+  missingKeys.value = [];
 }
 
 function save() {
@@ -354,7 +354,7 @@ function handleDate(modelData: Date, fieldName: string, isTime: boolean) {
 }
 
 function getMissingKeyLabel(key: any) {
-  return getMissingKeysLabelHelper(key)
+  return getMissingKeysLabelHelper(key);
 }
 
 const templateValidations = computed(() => {
