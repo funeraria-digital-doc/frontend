@@ -1,6 +1,7 @@
 export interface ValidationInterface {
   id: string;
   validations: any;
+  file_validations: any;
   send_type: string;
 }
 

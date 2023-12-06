@@ -88,7 +88,7 @@
             </v-col>
             <!-- db_field_reference -->
             <v-col cols="6" sm="6" md="6">
-              <v-select
+              <v-autocomplete
                 :id="'db_field_reference_' + props.index"
                 v-model="validation.db_field_reference"
                 label="Campo da Tabela"
@@ -100,7 +100,7 @@
                 clearable
                 :rules="constants.groupRules"
                 :error-messages="errorMessages.db_field_reference"
-              />
+              ></v-autocomplete>
             </v-col>
           </v-row>
 
@@ -360,7 +360,6 @@ const defaultValueValues = computed(() => {
     });
   }
   if (validation.value.field_type === 'BOOLEAN') {
-    console.log(constants.BooleanOptions);
     return constants.BooleanOptions;
   }
   return [];
@@ -421,7 +420,6 @@ watch(
     } else {
       validation.value.max = null;
     }
-    console.log('validations', validation.value);
   }
 );
 

@@ -4,7 +4,6 @@ import { apiInstance, errorResponse, type ApiResponse } from '.';
 export async function templateList(): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.get('/template-logic/list/');
-
     return { success: true, data: response.data.data };
   } catch (e: any) {
     console.error('List templates error', e);
@@ -86,7 +85,6 @@ export async function templateEdit(
       newTemplateValidations.push(newValidationItem);
     });
     template = { ...template, validations: newTemplateValidations };
-    console.log(template);
     const response = await apiInstance.post(
       '/template-logic/edit/' + template.id + '/',
       template

@@ -2,7 +2,6 @@
   <page title="Profile">
     <photo-upload
       :snack="snack"
-      :isLoading="isLoading"
       :saveFunction="editProfileImage"
       :imageUrl="imageUrl"
       @save="saveFile"
@@ -46,7 +45,7 @@
 
 <script lang="ts" setup>
 import { useUser } from '@/composables/user';
-import { onMounted, ref, onBeforeMount } from 'vue';
+import { onMounted, ref } from 'vue';
 import Page from '../../components/shared/Page/page.vue';
 import { editProfile, getProfileImage, editProfileImage } from '@/api/users';
 import ChangePasswordModal from '@/components/ChangePasswordModal/changePasswordModal.vue';
@@ -61,7 +60,6 @@ const imageUrl = ref();
 const image = ref();
 const isChangePasswordOpen = ref(false);
 const snack = ref();
-const isLoading = ref(false);
 
 const onOpenChangePassword = () => {
   isChangePasswordOpen.value = true;
@@ -100,12 +98,7 @@ const saveFile = (base64File: string, file: any) => {
   image.value = file;
 };
 
-onBeforeMount(() => {
-  isLoading.value = true;
-});
-
 onMounted(() => {
-  isLoading.value = true;
   getProfileImage().then((resp) => {
     if (resp.success && resp.data.image) {
       imageUrl.value = resp.data.image;
@@ -115,7 +108,6 @@ onMounted(() => {
     } else {
       console.error('Get profile image error');
     }
-    isLoading.value = false;
   });
 });
 </script>

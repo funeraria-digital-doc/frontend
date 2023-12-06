@@ -1,16 +1,11 @@
 <template>
   <v-dialog v-model="props.modalState" max-width="500px" persistent>
-    <v-card>
+    <v-card v-if="!hasKeysMissing">
       <v-card-title class="mt-3">
         <span class="text-h5 ml-6">Gerar Documentos</span>
       </v-card-title>
       <v-card-text>
-        <v-form
-          ref="form"
-          validate-on="submit"
-          @submit.prevent="save"
-          :disabled="isLoading"
-        >
+        <v-form ref="form" validate-on="submit" @submit.prevent="save">
           <v-container>
             <v-col>
               <v-select
@@ -186,6 +181,23 @@
                   />
                 </v-col>
               </div>
+              <div
+                v-for="(fileValidation, fileIndex) in templateFileValidations"
+                :key="fileIndex"
+              >
+                <v-col>
+                  <photo-upload
+                    :error-messages="fileValidation.name"
+                    :id="fileValidation.name"
+                    :title="fileValidation.name"
+                    :imageUrl="
+                      modalFields.file_validations[fileValidation.name]
+                    "
+                    :label="fileValidation.name"
+                    @save="handleFileChange"
+                  />
+                </v-col>
+              </div>
             </div>
           </v-container>
           <v-card-actions>
@@ -200,12 +212,35 @@
         </v-form>
       </v-card-text>
     </v-card>
+    <v-card v-else>
+      <v-card-title class="mt-3 d-flex align-items-center">
+        <v-icon color="warning" icon="mdi-alert-circle" size="x-large"></v-icon>
+        <span class="text-h5 ml-6">Informações em falta</span>
+      </v-card-title>
+      <v-card-text>
+        <div v-for="msg in missingKeys" :key="msg">
+          <div v-html="getMissingKeyLabel(msg)"></div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue-darken-1" variant="text" @click="redirectToRecord"
+          >Preencher dados em falta</v-btn
+        >
+        <v-btn color="blue-darken-1" variant="text" @click="closeMissingModal"
+          >Cancelar</v-btn
+        >
+      </v-card-actions>
+    </v-card>
   </v-dialog>
+  <!-- <v-dialog v-model="hasKeysMissing" max-width="500px" persistent>
+    
+  </v-dialog> -->
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
-import { generateDocument, getTemplates } from '@/api/recordTemplates';
+import { getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import {
   getFieldRules,
@@ -213,12 +248,15 @@ import {
   getValidations,
   saveForm,
   getDateFormated,
-  getApiErrors
+  getMissingKeysLabelHelper,
 } from './modal.helper';
-import { clickDownloadFile } from '@/utils/downloadFile';
+import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
+import router from '@/router';
 export default defineComponent({
   name: 'GenerateDocuments',
-  components: {},
+  components: {
+    PhotoUpload,
+  },
 });
 </script>
 
@@ -228,13 +266,18 @@ const modalFields = ref({
   to_send_option: '',
   template: '',
   validations: {},
+  file_validations: {},
 });
 const props = defineProps(['documentId', 'modalState']);
 const emit = defineEmits(['close-modal', 'snack-messages']);
-const isLoading = ref(false);
 const errorMessages = ref();
 const templates = ref<TemplateInterface[]>([]);
 const validations = ref<ValidationInterface[]>([]);
+const isTemplateSelected = ref(false);
+const hasKeysMissing = ref(false);
+const forceSave = ref(false);
+const missingKeys = ref();
+
 const toSendOptionsItems = [
   { label: 'Documento', value: 'DOCUMENT' },
   { label: 'Email', value: 'EMAIL' },
@@ -246,7 +289,6 @@ const booleanOptions = [
 ];
 
 const rules = [(value: string) => !!value || 'É obrigatório escolher 1 opção.'];
-const isTemplateSelected = ref(false);
 
 function emitCloseModal() {
   emit('close-modal');
@@ -262,71 +304,39 @@ function confirmClose() {
     to_send_option: '',
     template: '',
     validations: {},
+    file_validations: {},
   };
 }
 
-function save() {
-  isLoading.value = true;
-  form.value.validate().then((resp: any) => {
-    if (resp.valid) {
-      generateDocument(props.documentId.id, modalFields.value).then(
-        (docResp) => {
-          console.log(docResp)
-          if (docResp.success) {
-            clickDownloadFile(
-              { data: docResp.data.file },
-              props.documentId.name
-            );
-            emit('snack-messages', [
-              'Documento emitido com sucesso.',
-              '',
-              true,
-            ]);
-            emit('close-modal');
-            modalFields.value = {
-              to_send_option: '',
-              template: '',
-              validations: {},
-            };
-            isLoading.value = false;
-          } else {
-            if (docResp.error && docResp.error.status.toString()[0] === '4') {
-              emit('snack-messages', [
-                'Formulário preenchido incorretamente.',
-                'Preencha todos os campos em falta',
-                false,
-              ]);
-              getApiErrors(docResp.error, errorMessages);
-              isLoading.value = false;
-            } else {
-              emit('snack-messages', [
-                'Ocorreu um erro. Tente novamente mais tarde.',
-                'Em caso de presistencia, contacte os administradores do sistema',
-                false,
-              ]);
-              isLoading.value = false;
-            }
-          }
-        }
-      );
-    } else {
-      emit('snack-messages', [
-        'Formulário preenchido incorretamente.',
-        'Preencha todos os campos em falta',
-        false,
-      ]);
-      isLoading.value = false;
-    }
-  });
+function redirectToRecord() {
+  hasKeysMissing.value = false;
+  missingKeys.value = [];
+  modalFields.value = {
+    to_send_option: '',
+    template: '',
+    validations: {},
+    file_validations: {},
+  };
+  router.push({ name: 'records_edit', params: { id: props.documentId.id } });
+  emitCloseModal();
+}
 
+function closeMissingModal() {
+  hasKeysMissing.value = false;
+  missingKeys.value = [];
+}
+
+function save() {
   saveForm(
-    isLoading,
     form,
     props,
     modalFields,
     errorMessages,
     emitSnackMessages,
-    emitCloseModal
+    emitCloseModal,
+    hasKeysMissing,
+    forceSave,
+    missingKeys
   );
 }
 
@@ -343,6 +353,10 @@ function handleDate(modelData: Date, fieldName: string, isTime: boolean) {
   );
 }
 
+function getMissingKeyLabel(key: any) {
+  return getMissingKeysLabelHelper(key);
+}
+
 const templateValidations = computed(() => {
   let selected = {};
   validations.value.map((i: any) => {
@@ -352,6 +366,25 @@ const templateValidations = computed(() => {
   });
   return selected;
 });
+
+const templateFileValidations = computed(() => {
+  let selected = {};
+  validations.value.map((i: any) => {
+    if (i.id == modalFields.value.template) {
+      selected = i.file_validations;
+      i.file_validations.map((f: { name: string }) => {
+        modalFields.value.file_validations[f.name] = f.image_data_base64
+          ? f.image_data_base64
+          : '';
+      });
+    }
+  });
+  return selected;
+});
+
+const handleFileChange = (base64File: string, file: any, name: string) => {
+  modalFields.value.file_validations[name] = base64File ?? '';
+};
 
 watch(
   () => modalFields.value.template,
@@ -378,11 +411,18 @@ onBeforeMount(async () => {
 
     if (resp.success) {
       resp.data.data.map(
-        (i: { send_type: any; title: any; id: any; validations: any }) => {
+        (i: {
+          send_type: any;
+          title: any;
+          id: any;
+          validations: any;
+          file_validations: any;
+        }) => {
           templates.value.push({ label: i.title, value: i.id });
           validations.value.push({
             id: i.id,
             validations: getValidations(i.validations, errorMessages),
+            file_validations: getValidations(i.file_validations, errorMessages),
             send_type: i.send_type,
           });
         }
