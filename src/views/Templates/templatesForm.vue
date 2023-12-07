@@ -140,7 +140,7 @@
         Submeter
       </v-btn>
     </v-form>
-    <error-success-message ref="snack"></error-success-message>
+
     <validation-edit-modal
       v-if="openCloseModal"
       :editModal="openCloseModal"
@@ -170,7 +170,6 @@ import { getSingleTemplate, formatDataBeforeRequest } from './helper';
 import Page from '../../components/shared/Page/page.vue';
 import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
 import FileValidationEditModal from './components/FileValidationEditModal/fileValidationEditModal.vue';
-import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 import {
   getVariablesFromFile,
   templateCreate,
@@ -181,6 +180,8 @@ import type {
   TemplateValidation,
   TemplateFileValidation,
 } from './templatesForm.interface';
+import { useSnackBar } from '@/composables/snackBar';
+
 export default defineComponent({
   name: 'TemplatesForm',
   components: {
@@ -190,8 +191,9 @@ export default defineComponent({
 });
 </script>
 <script lang="ts" setup>
+const { showSnackbar } = useSnackBar();
 const route = useRoute();
-const snack = ref();
+
 const errorIndexes = ref([]);
 const errorFileIndexes = ref([]);
 const defaultObj: TemplateValidation = {
@@ -291,7 +293,7 @@ function checkErrors(error: any) {
       errorMessages.value[validationKey] = validationItem;
     }
     if (errors.substring(errors.length - 2) == ', ') {
-      snack.value.showSnackbar(
+      showSnackbar(
         'Contém erros nos seguintes campos:',
         errors.substring(0, errors.length - 2),
         false
@@ -300,7 +302,7 @@ function checkErrors(error: any) {
   } else {
     errorMessages.value = { ...defaultErrorMessages };
   }
-  snack.value.showSnackbar(
+  showSnackbar(
     'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
     '',
     false
@@ -339,11 +341,7 @@ async function save() {
         });
       }
     } else {
-      snack.value.showSnackbar(
-        'Preencha todos os os campos obrigatórios.',
-        '',
-        false
-      );
+      showSnackbar('Preencha todos os os campos obrigatórios.', '', false);
     }
   });
 }
@@ -357,7 +355,7 @@ const handleFileUpload = (file: Blob[]) => {
     if (template.value.validations.length > 0) {
       template.value.validations = [];
     }
-    snack.value.showSnackbar('O documento tem de ser do tipo .docx', '', false);
+    showSnackbar('O documento tem de ser do tipo .docx', '', false);
   } else {
     getVariablesFromFile(file[0] as any).then((resp: any) => {
       if (resp && resp.data) {
@@ -371,7 +369,7 @@ const handleFileUpload = (file: Blob[]) => {
           };
           reader.onerror = () => {
             handleClearFileClick();
-            snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
+            showSnackbar('Erro ao processar ficheiro', '', false);
           };
         } else {
           template.value.file = '';
@@ -379,7 +377,7 @@ const handleFileUpload = (file: Blob[]) => {
         }
       } else {
         handleClearFileClick();
-        snack.value.showSnackbar('Erro ao processar ficheiro', '', false);
+        showSnackbar('Erro ao processar ficheiro', '', false);
       }
       if (
         resp &&

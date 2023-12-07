@@ -11,7 +11,6 @@
       />
     </div>
   </page>
-  <error-success-message ref="snack"></error-success-message>
 </template>
 
 <script lang="ts" setup>
@@ -27,8 +26,8 @@ import router from '@/router';
 import { onBeforeMount, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { checkErrors, getSingleRecord } from './helper';
-import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 import type { FormFieldsGroup } from '@/components/shared/DynamicForm/dynamicForm.models';
+import { useSnackBar } from '@/composables/snackBar';
 
 const fieldsGroups = ref<FormFieldsGroup[]>([
   {
@@ -59,8 +58,9 @@ const fieldsGroups = ref<FormFieldsGroup[]>([
 ]);
 
 const route = useRoute();
+const { showSnackbar } = useSnackBar();
+
 const mode = ref('');
-const snack = ref();
 
 const errorIndexes = ref([]);
 const errorMessages = ref<{ [key: string]: string }>({});
@@ -97,10 +97,11 @@ const onSubmit = (values: any) => {
 
   const navigateToRecords = (isValid: any, successMessage: string) => {
     if (isValid) {
-      snack.value.showSnackbar(successMessage, '', true);
-      setTimeout(() => router.push('/records'), 1000);
+      showSnackbar(successMessage, '', true);
+
+      router.push('/records');
     } else {
-      snack.value.showSnackbar('Ocorreu um erro, tente novamente.', '', false);
+      showSnackbar('Ocorreu um erro, tente novamente.', '', false);
     }
   };
 
@@ -113,7 +114,6 @@ const onSubmit = (values: any) => {
           resp.error,
           errorMessages,
           errorIndexes,
-          snack,
           defaultErrorMessages
         );
       }
@@ -127,7 +127,6 @@ const onSubmit = (values: any) => {
           resp.error,
           errorMessages,
           errorIndexes,
-          snack,
           defaultErrorMessages
         );
       }

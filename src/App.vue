@@ -27,11 +27,14 @@
 
     <app-footer />
   </v-app>
+
   <loading
     v-model:active="loadingSpinner.active"
     :is-full-page="true"
     transition="fade"
   />
+
+  <error-success-message></error-success-message>
 </template>
 
 <script lang="ts">
@@ -44,6 +47,7 @@ import { watch } from 'vue';
 import { getAuth } from './authorizations/authorizations';
 import { useLoadingSpinner } from './composables/loadingSpinner';
 import Loading from 'vue-loading-overlay';
+import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 
 export default defineComponent({
   name: 'LoginModal',
