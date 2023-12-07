@@ -1,6 +1,9 @@
 import { listAllUsers, userCreate, userDelete, userEdit } from '@/api/users';
+import { useSnackBar } from '@/composables/snackBar';
 import { useUser } from '@/composables/user';
 import { getLabel } from '@/utils/datatableHelper';
+
+const { showSnackbar } = useSnackBar();
 
 export const getUsers = async (
   loading: { value: boolean },
@@ -27,12 +30,7 @@ export const getUsers = async (
     loading.value = false;
   });
 };
-export const createUser = async (
-  newUser: any,
-  users: any,
-  snack: any,
-  fields: any
-) => {
+export const createUser = async (newUser: any, users: any, fields: any) => {
   const newUserSubmit = {
     username: newUser.username,
     email: newUser.email,
@@ -58,9 +56,9 @@ export const createUser = async (
           status: getLabel('status', resp.data.status, fields),
         };
         users.value.push(user);
-        snack.value.showSnackbar('Funerária criada com sucesso.', '', true);
+        showSnackbar('Funerária criada com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
           resp.error && resp.error.data ? JSON.stringify(resp.error.data) : '',
           false
@@ -68,7 +66,7 @@ export const createUser = async (
       }
     });
   } catch (e: any) {
-    snack.value.showSnackbar(
+    showSnackbar(
       'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
       JSON.stringify(e),
       false
@@ -80,7 +78,6 @@ export const editUser = async (
   editedUser: any,
   index: string | number,
   users: { value: { [x: string]: any } },
-  snack: any,
   fields: any
 ) => {
   try {
@@ -111,9 +108,9 @@ export const editUser = async (
           status: getLabel('status', resp.data.status, fields),
         };
         users.value[index] = user;
-        snack.value.showSnackbar('Funerária editada com sucesso.', '', true);
+        showSnackbar('Funerária editada com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro ao editar a funerária. <br>Por favor, tente novamente mais tarde.',
           resp.error && resp.error.data ? JSON.stringify(resp.error.data) : '',
           false
@@ -121,7 +118,7 @@ export const editUser = async (
       }
     });
   } catch (e: any) {
-    snack.value.showSnackbar(
+    showSnackbar(
       'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
       JSON.stringify(e),
       false
@@ -131,8 +128,7 @@ export const editUser = async (
 
 export const deleteUser = async (
   id: string | number,
-  users: { value: { [x: string]: any } },
-  snack: any
+  users: { value: { [x: string]: any } }
 ) => {
   try {
     userDelete(id).then((resp) => {
@@ -140,9 +136,9 @@ export const deleteUser = async (
         users.value = users.value.filter(
           (obj: { id: string | number }) => obj.id !== id
         );
-        snack.value.showSnackbar('Funerária eliminada com sucesso.', '', true);
+        showSnackbar('Funerária eliminada com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro ao eliminar a funerária. <br>Por favor, tente novamente mais tarde.',
           JSON.stringify(resp),
           false
@@ -150,7 +146,7 @@ export const deleteUser = async (
       }
     });
   } catch (e: any) {
-    snack.value.showSnackbar(
+    showSnackbar(
       'Ocorreu um erro ao criar a funerária. <br>Por favor, tente novamente mais tarde.',
       JSON.stringify(e),
       false

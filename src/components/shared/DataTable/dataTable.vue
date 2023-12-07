@@ -226,8 +226,8 @@
       </div>
     </template>
   </v-data-table>
-  <error-success-message ref="snack"></error-success-message>
 </template>
+
 <script lang="ts">
 import router from '@/router';
 import {
@@ -238,16 +238,13 @@ import {
   watch,
   onMounted,
 } from 'vue';
-import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 import { getLabel } from '@/utils/datatableHelper';
+
 export default defineComponent({
   name: 'GenericDataTable',
-  components: {
-    ErrorSuccessMessage,
-  },
 });
 </script>
 
@@ -329,8 +326,6 @@ const canChangeStatus = computed(() => {
   );
 });
 
-const snack = ref(null);
-
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   let newItem = {};
@@ -350,8 +345,7 @@ function deleteItem(item: any) {
 async function deleteItemConfirm() {
   await propsData.data.delete(
     serverItems.value[editedIndex.value].id,
-    serverItems,
-    snack
+    serverItems
   );
   closeDelete();
 }
@@ -378,19 +372,13 @@ async function save() {
     try {
       if (editedIndex.value > -1) {
         propsData.data
-          .edit(
-            editedItem.value,
-            editedIndex.value,
-            serverItems,
-            snack,
-            fields.value
-          )
+          .edit(editedItem.value, editedIndex.value, serverItems, fields.value)
           .then(() => {
             close();
           });
       } else {
         propsData.data
-          .save(editedItem.value, serverItems, snack, fields.value)
+          .save(editedItem.value, serverItems, fields.value)
           .then(() => {
             close();
           });
@@ -432,9 +420,9 @@ function canAction(itemRaw: { username: string; email: string; role: string }) {
   return propsData.data.canAction(itemRaw);
 }
 
-function clickSelect(){
-  propsData.data.selectFunction(loading, selected.value, serverItems, snack)
-  selected.value = []
+function clickSelect() {
+  propsData.data.selectFunction(loading, selected.value, serverItems);
+  selected.value = [];
 }
 
 onMounted(() => {

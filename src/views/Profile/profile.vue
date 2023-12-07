@@ -1,7 +1,6 @@
 <template>
   <page title="Profile">
     <photo-upload
-      :snack="snack"
       :saveFunction="editProfileImage"
       :imageUrl="imageUrl"
       @save="saveFile"
@@ -40,7 +39,6 @@
       </v-container>
     </v-form>
   </page>
-  <error-success-message ref="snack"></error-success-message>
 </template>
 
 <script lang="ts" setup>
@@ -50,16 +48,18 @@ import Page from '../../components/shared/Page/page.vue';
 import { editProfile, getProfileImage, editProfileImage } from '@/api/users';
 import ChangePasswordModal from '@/components/ChangePasswordModal/changePasswordModal.vue';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
-import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 import { base64ToFile } from '@/utils/imageHelper';
+import { useSnackBar } from '@/composables/snackBar';
+
+const { showSnackbar } = useSnackBar();
 const { user } = useUser();
+
 const username = ref(user.name);
 const email = ref(user.email);
 const form = ref();
 const imageUrl = ref();
 const image = ref();
 const isChangePasswordOpen = ref(false);
-const snack = ref();
 
 const onOpenChangePassword = () => {
   isChangePasswordOpen.value = true;
@@ -81,9 +81,9 @@ const onSubmit = async () => {
     };
     editProfile(data).then((resp) => {
       if (resp.success) {
-        snack.value.showSnackbar('Perfil guardado com sucesso.', '', true);
+        showSnackbar('Perfil guardado com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro a guardar o perfil.\r\n Por favor tente mais tarde.',
           '',
           false

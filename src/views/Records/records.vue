@@ -9,13 +9,24 @@
       @snack-messages="snackMessages"
     ></generate-documents>
   </page>
-
-  <error-success-message ref="snack"></error-success-message>
 </template>
+
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from 'vue';
 import DataTable from '../../components/shared/DataTable/dataTable.vue';
 import GenerateDocuments from '../Records/modal/modal.vue';
+
+export default defineComponent({
+  name: 'RecordsDatatable',
+  components: {
+    DataTable,
+    GenerateDocuments,
+  },
+});
+</script>
+
+<script lang="ts" setup>
+import Page from '../../components/shared/Page/page.vue';
 import * as constants from './constants';
 import {
   getRecords,
@@ -24,29 +35,20 @@ import {
   changeRecordsStatus,
 } from './helper';
 import { groupsList } from '@/api/groups';
-import ErrorSuccessMessage from '../../components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
+import { useSnackBar } from '@/composables/snackBar';
 
-export default defineComponent({
-  name: 'RecordsDatatable',
-  components: {
-    DataTable,
-    GenerateDocuments,
-    ErrorSuccessMessage,
-  },
-});
-</script>
-<script lang="ts" setup>
-import Page from '../../components/shared/Page/page.vue';
+const { showSnackbar } = useSnackBar();
+
 const docId = ref();
 const data = ref();
 const modalState = ref(false);
-const snack = ref();
+
 function closeModal() {
   modalState.value = false;
 }
 
 function snackMessages(message: any) {
-  snack.value.showSnackbar(message[0], message[1], message[2]);
+  showSnackbar(message[0], message[1], message[2]);
 }
 
 onBeforeMount(() => {
