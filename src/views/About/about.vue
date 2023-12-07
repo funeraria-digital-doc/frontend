@@ -9,7 +9,7 @@
       <h3>
         Centralizando toda a informação num único local, a plataforma permite
         registar declarações de óbito, exportar os dados em diferentes
-        templates, necessários para a realização de funerais, e gerir os dados
+        modelos, necessários para a realização de funerais, e gerir os dados
         dos clientes.
       </h3>
     </div>
