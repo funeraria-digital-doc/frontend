@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>{{ title }}</h3>
+    <h3 v-if="title">{{ title }}</h3>
     <v-spacer></v-spacer>
     <v-container>
       <v-row>
@@ -29,6 +29,7 @@
   </div>
 </template>
 <script lang="ts">
+import { useSnackBar } from '@/composables/snackBar';
 import { checkImageTypeAndSize } from '@/utils/imageHelper';
 import { defineComponent, ref } from 'vue';
 export default defineComponent({
@@ -38,17 +39,12 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // saveFunction - callback to save it on BE
-const props = defineProps([
-  'snack',
-  'saveFunction',
-  'imageUrl',
-  'id',
-  'label',
-  'title',
-]);
+const props = defineProps(['saveFunction', 'imageUrl', 'id', 'label', 'title']);
 
 // save - callback to save the file object on FE
 const emit = defineEmits(['save']);
+
+const { showSnackbar } = useSnackBar();
 
 const photoId = ref(props.id ?? 'photo-input');
 const photoLabel = ref(props.label ?? 'Carregar foto');
@@ -63,7 +59,7 @@ const handleFileChange = (event: any) => {
   const file = event.target.files[0];
   const { snackMessage, canUpload } = checkImageTypeAndSize(file);
   if (snackMessage) {
-    props.snack.showSnackbar(snackMessage, '', false);
+    showSnackbar(snackMessage, '', false);
   }
 
   if (file && canUpload) {
@@ -76,7 +72,7 @@ const handleFileChange = (event: any) => {
     };
     reader.onerror = (error) => {
       console.log(error);
-      props.snack.showSnackbar('Erro a processar a imagem.', '', false);
+      showSnackbar('Erro a processar a imagem.', '', false);
     };
   }
 };
@@ -87,9 +83,9 @@ async function saveImage(base64File: string, file: any) {
     props.saveFunction(base64File).then((resp: any) => {
       if (resp.success) {
         handleSave(base64File, file);
-        props.snack.showSnackbar('Imagem guardada com sucesso.', '', true);
+        showSnackbar('Imagem guardada com sucesso.', '', true);
       } else {
-        props.snack.showSnackbar('Erro a processar a imagem.', '', false);
+        showSnackbar('Erro a processar a imagem.', '', false);
       }
     });
   } else {
