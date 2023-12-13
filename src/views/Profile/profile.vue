@@ -52,7 +52,7 @@ import { base64ToFile } from '@/utils/imageHelper';
 import { useSnackBar } from '@/composables/snackBar';
 
 const { showSnackbar } = useSnackBar();
-const { user } = useUser();
+const { user, changeUserProfileImage } = useUser();
 
 const username = ref(user.name);
 const email = ref(user.email);
@@ -96,6 +96,8 @@ const onSubmit = async () => {
 const saveFile = (base64File: string, file: any) => {
   imageUrl.value = base64File;
   image.value = file;
+
+  changeUserProfileImage(base64File);
 };
 
 onMounted(() => {

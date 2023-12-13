@@ -18,6 +18,7 @@
                 item-value="value"
                 clearable
                 disabled
+                autocomplete="off"
               />
             </v-col>
             <v-col>
@@ -30,6 +31,7 @@
                 item-title="label"
                 item-value="value"
                 clearable
+                autocomplete="off"
               />
             </v-col>
             <div v-if="isTemplateSelected">
