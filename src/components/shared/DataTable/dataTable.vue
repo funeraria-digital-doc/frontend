@@ -8,8 +8,6 @@
     item-value="id"
     class="elevation-1 d-flex flex-column"
     density="comfortable"
-    :loading="loading"
-    loading-text="A carregar"
     v-model="selected"
     v-model:search="search"
     no-data-text="Nenhum registo disponível"
@@ -236,8 +234,8 @@
       </div>
     </template>
   </v-data-table>
-  <error-success-message ref="snack"></error-success-message>
 </template>
+
 <script lang="ts">
 import router from '@/router';
 import {
@@ -248,16 +246,13 @@ import {
   watch,
   onMounted,
 } from 'vue';
-import ErrorSuccessMessage from '../ErrorSuccessMessages/errorSuccessMessages.vue';
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 import { getLabel } from '@/utils/datatableHelper';
+
 export default defineComponent({
   name: 'GenericDataTable',
-  components: {
-    ErrorSuccessMessage,
-  },
 });
 </script>
 
@@ -289,7 +284,6 @@ type DataTableHeader = {
 const search = ref('');
 const selected = ref([]);
 const form = ref();
-const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
@@ -370,8 +364,7 @@ function deleteItem(item: any) {
 async function deleteItemConfirm() {
   await propsData.data.delete(
     serverItems.value[editedIndex.value].id,
-    serverItems,
-    snack
+    serverItems
   );
   closeDelete();
 }
@@ -400,19 +393,13 @@ async function save() {
     try {
       if (editedIndex.value > -1) {
         propsData.data
-          .edit(
-            editedItem.value,
-            editedIndex.value,
-            serverItems,
-            snack,
-            fields.value
-          )
+          .edit(editedItem.value, editedIndex.value, serverItems, fields.value)
           .then(() => {
             close();
           });
       } else {
         propsData.data
-          .save(editedItem.value, serverItems, snack, fields.value)
+          .save(editedItem.value, serverItems, fields.value)
           .then(() => {
             close();
           });
@@ -448,7 +435,7 @@ function canAction(itemRaw: { username: string; email: string; role: string }) {
 }
 
 function clickSelect() {
-  propsData.data.selectFunction(selected.value, serverItems, snack);
+  propsData.data.selectFunction(selected.value, serverItems);
   selected.value = [];
 }
 

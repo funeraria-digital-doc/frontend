@@ -4,7 +4,10 @@ import {
   recordsUpdateStatus,
   recordsListByStatus,
 } from '@/api/records';
+import { useSnackBar } from '@/composables/snackBar';
 import { getLabel } from '@/utils/datatableHelper';
+
+const { showSnackbar } = useSnackBar();
 
 export const getRecords = async (
   records: { value: any },
@@ -51,8 +54,7 @@ export const getSingleRecord = async (id: string) => {
 
 export const deleteRecord = async (
   id: string,
-  records: { value: { [x: string]: any } },
-  snack: any
+  records: { value: { [x: string]: any } }
 ) => {
   try {
     recordDelete(id).then((resp: any) => {
@@ -60,9 +62,9 @@ export const deleteRecord = async (
         records.value = records.value.filter(
           (obj: { id: string | number }) => obj.id !== id
         );
-        snack.value.showSnackbar('Declaração eliminada com sucesso.', '', true);
+        showSnackbar('Declaração eliminada com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro ao eliminar a declaração. <br>Por favor, tente novamente mais tarde.',
           JSON.stringify(resp.error.error),
           false
@@ -70,7 +72,7 @@ export const deleteRecord = async (
       }
     });
   } catch (e: any) {
-    snack.value.showSnackbar(
+    showSnackbar(
       'Ocorreu um erro ao criar a declaração. <br>Por favor, tente novamente mais tarde.',
       JSON.stringify(e),
       false
@@ -82,7 +84,6 @@ export function checkErrors(
   error: any,
   errorMessages: any,
   errorIndexes: any,
-  snack: any,
   defaultErrorMessages: any
 ) {
   if (error && error.errors) {
@@ -100,7 +101,7 @@ export function checkErrors(
       errorMessages.value[validationKey] = validationItem;
     }
     if (errors.substring(errors.length - 2) == ', ') {
-      snack.value.showSnackbar(
+      showSnackbar(
         'Contém erros nos seguintes campos:',
         errors.substring(0, errors.length - 2),
         false
@@ -109,7 +110,7 @@ export function checkErrors(
   } else {
     errorMessages.value = { ...defaultErrorMessages };
   }
-  snack.value.showSnackbar(
+  showSnackbar(
     'Verifique que todos os campos obrigatórios estão preenchidos e tente novamente.',
     '',
     false
@@ -177,11 +178,7 @@ export function getFormat(templateFormat: any, toPicker: boolean) {
   return format;
 }
 
-export const changeRecordsStatus = async (
-  recordsIds: any,
-  records: any,
-  snack: any
-) => {
+export const changeRecordsStatus = async (recordsIds: any, records: any) => {
   recordsUpdateStatus(recordsIds).then((resp) => {
     if (resp.success) {
       recordsIds.forEach((element: number) => {
@@ -192,10 +189,10 @@ export const changeRecordsStatus = async (
         recordFound.status = 'Arquivado';
         recordFound.selectable = false;
       });
-      snack.value.showSnackbar('Declarações arquivadas com sucesso.', '', true);
+      showSnackbar('Declarações arquivadas com sucesso.', '', true);
     } else {
       console.error('erro', resp);
-      snack.value.showSnackbar(
+      showSnackbar(
         'Ocorreu um erro ao arquivar as declarações.',
         'Tente novamente mais tarde',
         true

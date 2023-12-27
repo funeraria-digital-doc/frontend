@@ -65,11 +65,8 @@
       :id="field.name"
       :imageUrl="imageUrl"
       :label="field.label"
-      :snack="snack"
       @save="saveFile"
     />
-
-    <error-success-message ref="snack"></error-success-message>
   </div>
 </template>
 
@@ -80,7 +77,6 @@ import DateTimePicker from '../../DateTimePicker/dateTimePicker.vue';
 import TimePicker from '../../TimePicker/timePicker.vue';
 import type { DynamicField } from '../../../../models/dynamicField.model';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
-import ErrorSuccessMessage from '../../ErrorSuccessMessages/errorSuccessMessages.vue';
 
 const props = defineProps({
   field: {
@@ -97,7 +93,6 @@ const model = ref(props.field.value);
 const error = ref(props.errorMessages);
 
 // for image
-const snack = ref();
 const imageUrl = ref(props.field.value);
 
 // for datetime

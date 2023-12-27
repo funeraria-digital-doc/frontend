@@ -4,8 +4,11 @@ import {
   templateItem,
   templateList,
 } from '@/api/templates';
+import { useSnackBar } from '@/composables/snackBar';
 import { getLabel } from '@/utils/datatableHelper';
 import { clickDownloadFile } from '@/utils/downloadFile';
+
+const { showSnackbar } = useSnackBar();
 
 export const getTemplates = async (templates: { value: any }, fields: any) => {
   templateList().then((resp) => {
@@ -71,8 +74,7 @@ export const getSingleTemplate = async (
 //: [{ ...defaultObj }],//: defaultFileObj,
 export const deleteTemplate = async (
   id: string | number,
-  templates: { value: { [x: string]: any } },
-  snack: any
+  templates: { value: { [x: string]: any } }
 ) => {
   try {
     templateDelete(id).then((resp) => {
@@ -80,9 +82,9 @@ export const deleteTemplate = async (
         templates.value = templates.value.filter(
           (obj: { id: string | number }) => obj.id !== id
         );
-        snack.value.showSnackbar('Template eliminado com sucesso.', '', true);
+        showSnackbar('Template eliminado com sucesso.', '', true);
       } else {
-        snack.value.showSnackbar(
+        showSnackbar(
           'Ocorreu um erro ao eliminar o template. <br>Por favor, tente novamente mais tarde.',
           JSON.stringify(resp.error.error),
           false
@@ -90,7 +92,7 @@ export const deleteTemplate = async (
       }
     });
   } catch (e: any) {
-    snack.value.showSnackbar(
+    showSnackbar(
       'Ocorreu um erro ao criar o template. <br>Por favor, tente novamente mais tarde.',
       JSON.stringify(e),
       false
