@@ -45,7 +45,17 @@
           variant="solo-filled"
         ></v-text-field>
         <v-spacer></v-spacer>
-        <div class="d-flex">
+        <div class="action-bar">
+          <v-switch
+            v-if="propsData.data.toggle"
+            class="mr-2"
+            v-model="toggle"
+            hide-details
+            inset
+            :label="toggleLabel"
+            @change="changeToggle"
+          />
+          <v-spacer></v-spacer>
           <v-btn
             v-if="canChangeStatus"
             color="primary"
@@ -284,6 +294,7 @@ const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
 const fields = ref(propsData.data.fields);
+const snack = ref(null);
 const itemsPerPageOptions = ref([
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -298,9 +309,18 @@ const serverItems = ref([]);
 const editedIndex = ref(-1);
 const editedItem = ref({});
 const defaultItem = ref({});
+const toggle = ref(true);
+
+const toggleLabel = computed(() => {
+  return toggle.value
+    ? propsData.data.toggle.truelabel
+    : propsData.data.toggle.falselabel;
+});
+
 const mode = computed(() => {
   return editedIndex.value === -1 ? 'create' : 'edit';
 });
+
 const formTitle = computed(() => {
   return editedIndex.value === -1
     ? propsData.data.newItemTitle
@@ -329,8 +349,6 @@ const canChangeStatus = computed(() => {
   );
 });
 
-const snack = ref(null);
-
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   let newItem = {};
@@ -342,11 +360,13 @@ function editItem(item: any) {
   editedItem.value = Object.assign({}, newItem);
   dialog.value = true;
 }
+
 function deleteItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
 }
+
 async function deleteItemConfirm() {
   await propsData.data.delete(
     serverItems.value[editedIndex.value].id,
@@ -355,6 +375,7 @@ async function deleteItemConfirm() {
   );
   closeDelete();
 }
+
 function close() {
   dialog.value = false;
   nextTick(() => {
@@ -363,6 +384,7 @@ function close() {
     setFields();
   });
 }
+
 function closeDelete() {
   dialogDelete.value = false;
   nextTick(() => {
@@ -402,13 +424,6 @@ async function save() {
   }
 }
 
-watch(dialog, (val) => {
-  val || close();
-});
-watch(dialogDelete, (val) => {
-  val || closeDelete();
-});
-
 function setFields() {
   let newEditedItem = {};
   for (let i = 0; i < fields.value.length; i++) {
@@ -432,13 +447,39 @@ function canAction(itemRaw: { username: string; email: string; role: string }) {
   return propsData.data.canAction(itemRaw);
 }
 
-function clickSelect(){
-  propsData.data.selectFunction(loading, selected.value, serverItems, snack)
-  selected.value = []
+function clickSelect() {
+  propsData.data.selectFunction(selected.value, serverItems, snack);
+  selected.value = [];
 }
 
+function changeToggle() {
+  propsData.data.toggle.changeFunction(
+    serverItems,
+    fields.value,
+    propsData.data.toggle.field,
+    toggle.value
+  );
+}
+
+watch(dialog, (val) => {
+  val || close();
+});
+
+watch(dialogDelete, (val) => {
+  val || closeDelete();
+});
+
 onMounted(() => {
-  propsData.data.getData(loading, serverItems, fields.value);
+  propsData.data.getData(
+    serverItems,
+    fields.value,
+    propsData.data.toggle && propsData.data.toggle.field
+      ? propsData.data.toggle.field
+      : 'status',
+    propsData.data.toggle && propsData.data.toggle.trueValue
+      ? propsData.data.toggle.trueValue
+      : 'ACTIVE'
+  );
   setFields();
 });
 
@@ -451,4 +492,9 @@ onBeforeMount(() => {
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.action-bar {
+  display: flex !important;
+  align-items: center !important;
+}
+</style>

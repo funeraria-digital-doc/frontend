@@ -7,11 +7,7 @@ import {
 import { getLabel } from '@/utils/datatableHelper';
 import { clickDownloadFile } from '@/utils/downloadFile';
 
-export const getTemplates = async (
-  loading: { value: boolean },
-  templates: { value: any },
-  fields: any
-) => {
+export const getTemplates = async (templates: { value: any }, fields: any) => {
   templateList().then((resp) => {
     if (resp.success) {
       let templateData = [];
@@ -30,12 +26,11 @@ export const getTemplates = async (
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 
 export const getSingleTemplate = async (
-  id: string,
+  id: string
   //defaultObj: any,
   // defaultFileObj: any
 ) => {

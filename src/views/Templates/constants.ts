@@ -3,37 +3,37 @@ import { AUTH_PERMISSIONS } from '@/authorizations/constants';
 import { downloadTemplate } from './helper';
 
 export const headers = [
-  {
-    title: 'ID',
-    align: 'start',
-    key: 'id',
-    sortable: true,
-    roles: AUTH_PERMISSIONS.USER,
-  },
+  // {
+  //   title: 'ID',
+  //   align: 'start',
+  //   key: 'id',
+  //   sortable: true,
+  //   roles: AUTH_PERMISSIONS.USER,
+  // },
   {
     title: 'Titulo',
-    align: 'end',
+    align: 'start',
     key: 'title',
     sortable: true,
     roles: AUTH_PERMISSIONS.USER,
   },
   {
     title: 'Funerária',
-    align: 'end',
+    align: 'center',
     key: 'group_id',
     sortable: true,
     roles: AUTH_PERMISSIONS.USER,
   },
   {
     title: 'Ficheiro',
-    align: 'end',
+    align: 'center',
     key: 'file',
     sortable: true,
     roles: AUTH_PERMISSIONS.USER,
   },
   {
     title: 'Tipo de Envio',
-    align: 'end',
+    align: 'center',
     key: 'send_type',
     sortable: true,
     roles: AUTH_PERMISSIONS.USER,

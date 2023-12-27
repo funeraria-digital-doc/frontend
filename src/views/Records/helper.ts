@@ -1,17 +1,18 @@
 import {
   recordDelete,
   recordItem,
-  recordsList,
   recordsUpdateStatus,
+  recordsListByStatus,
 } from '@/api/records';
 import { getLabel } from '@/utils/datatableHelper';
 
 export const getRecords = async (
-  loading: { value: boolean },
   records: { value: any },
-  fields: any
+  fields: any,
+  dbField: string,
+  status: string
 ) => {
-  recordsList().then((resp) => {
+  recordsListByStatus(status).then((resp) => {
     if (resp.success) {
       let recordsData = [];
       if (resp.data.length > 0) {
@@ -35,7 +36,6 @@ export const getRecords = async (
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 
@@ -178,7 +178,6 @@ export function getFormat(templateFormat: any, toPicker: boolean) {
 }
 
 export const changeRecordsStatus = async (
-  loading: { value: boolean },
   recordsIds: any,
   records: any,
   snack: any
@@ -189,6 +188,7 @@ export const changeRecordsStatus = async (
         const recordFound = records.value.find(
           (record: any) => element == record.id
         );
+        records.value.splice(records.value.indexOf(recordFound), 1);
         recordFound.status = 'Arquivado';
         recordFound.selectable = false;
       });
@@ -201,6 +201,15 @@ export const changeRecordsStatus = async (
         true
       );
     }
-    loading.value = false;
   });
+};
+
+export const changeDatatableStatus = async (
+  records: { value: any },
+  fields: any,
+  dbField: string,
+  statusRef: boolean
+) => {
+  const status = statusRef ? 'ACTIVE' : 'ARCHIVED';
+  getRecords(records, fields, dbField, status);
 };

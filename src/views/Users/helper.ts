@@ -2,11 +2,7 @@ import { listAllUsers, userCreate, userDelete, userEdit } from '@/api/users';
 import { useUser } from '@/composables/user';
 import { getLabel } from '@/utils/datatableHelper';
 
-export const getUsers = async (
-  loading: { value: boolean },
-  users: { value: any },
-  fields: any
-) => {
+export const getUsers = async (users: { value: any }, fields: any) => {
   listAllUsers().then((resp) => {
     if (resp.success) {
       const usersData = resp.data.users.map((user: any) => {
@@ -24,7 +20,6 @@ export const getUsers = async (
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 export const createUser = async (
