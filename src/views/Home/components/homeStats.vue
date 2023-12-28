@@ -32,11 +32,9 @@
         <h3 v-else class="counter">---</h3>
       </v-card>
     </v-col>
+
+    <v-btn class="redirect_btn" color="primary" dark @click="goToRoute">Ver Mais</v-btn>
   </v-row>
-  <div class="spacer-2"></div>
-  <div class="redirect_btn">
-    <v-btn color="primary" dark @click="goToRoute">Ver Mais</v-btn>
-  </div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -111,12 +109,7 @@ onMounted(() => {
   max-width: 400px;
 }
 
-.spacer-2 {
-  height: 2rem;
-}
-
 .redirect_btn {
-  display: flex;
-  justify-content: end;
+  margin: 1rem 0.8rem 1rem auto;
 }
 </style>

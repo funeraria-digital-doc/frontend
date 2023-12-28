@@ -7,7 +7,7 @@
       <v-card-text>
         <v-form ref="form" validate-on="submit" @submit.prevent="save">
           <v-container>
-            <v-col>
+            <!-- <v-col>
               <v-select
                 id="to_send_option_id"
                 v-model="modalFields.to_send_option"
@@ -20,7 +20,7 @@
                 disabled
                 autocomplete="off"
               />
-            </v-col>
+            </v-col> -->
             <v-col>
               <v-select
                 id="template_id"
@@ -207,9 +207,9 @@
             <v-btn color="blue-darken-1" variant="text" @click="confirmClose"
               >Cancelar</v-btn
             >
-            <v-btn color="blue-darken-1" variant="text" type="submit"
-              >Guardar</v-btn
-            >
+            <v-btn color="blue-darken-1" variant="text" type="submit">
+              Guardar
+            </v-btn>
           </v-card-actions>
         </v-form>
       </v-card-text>
@@ -266,7 +266,7 @@ export default defineComponent({
 const form = ref();
 const modalFields = ref({
   to_send_option: '',
-  template: '',
+  template: null,
   validations: {},
   file_validations: {},
 });
@@ -329,6 +329,10 @@ function closeMissingModal() {
 }
 
 function save() {
+  const selectedDocName = templates.value.filter(
+    (i) => i.value === modalFields.value.template
+  )[0].label;
+
   saveForm(
     form,
     props,
@@ -338,7 +342,8 @@ function save() {
     emitCloseModal,
     hasKeysMissing,
     forceSave,
-    missingKeys
+    missingKeys,
+    selectedDocName
   );
 }
 

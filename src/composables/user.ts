@@ -30,6 +30,7 @@ export function useUser() {
     user.email = '';
     user.role = '';
     user.expiration_date = 0;
+    user.imageBase64 = '';
 
     deleteLocalStorage(TOKEN_KEY);
     createNewAxiosInstance();
