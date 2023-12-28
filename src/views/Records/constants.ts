@@ -61,10 +61,12 @@ export const headers = [
 export const fields = (generateDocumentsCallback: Function) => [
   {
     name: 'name',
+    label: 'Nome',
     type: 'text-field',
   },
   {
     name: 'group_id',
+    label: 'Funerária',
     type: 'select',
     items: [],
   },

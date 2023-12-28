@@ -329,6 +329,10 @@ function closeMissingModal() {
 }
 
 function save() {
+  if (!modalFields.value.template) {
+    return;
+  }
+
   const selectedDocName = templates.value.filter(
     (i) => i.value === modalFields.value.template
   )[0].label;
