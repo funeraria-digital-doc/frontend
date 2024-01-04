@@ -161,7 +161,10 @@ export function saveForm(
         auxForceSave
       ).then((docResp: any) => {
         if (docResp.success) {
-          clickDownloadFile({ data: docResp.data.file }, `${documentName} ${props.documentId.name}`);
+          clickDownloadFile(
+            { data: docResp.data.file },
+            `${documentName} ${props.documentId.name}`
+          );
           clickDownloadImages(
             { data: docResp.data.images },
             props.documentId.name
