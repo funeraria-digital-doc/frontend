@@ -83,6 +83,7 @@ onBeforeMount(async () => {
 
   &__login {
     width: 30%;
+    margin: auto
   }
 }
 .spacer-2 {
