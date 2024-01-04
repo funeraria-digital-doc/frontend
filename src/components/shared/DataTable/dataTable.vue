@@ -295,7 +295,6 @@ const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
 const fields = ref(propsData.data.fields);
-const snack = ref(null);
 const itemsPerPageOptions = ref([
   { value: 5, title: '5' },
   { value: 10, title: '10' },
@@ -490,6 +489,7 @@ onBeforeMount(() => {
 .action-bar {
   display: flex !important;
   align-items: center !important;
+}
 .modal__col {
   padding-bottom: 0;
 }
