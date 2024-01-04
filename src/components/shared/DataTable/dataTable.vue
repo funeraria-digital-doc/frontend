@@ -8,8 +8,6 @@
     item-value="id"
     class="elevation-1 d-flex flex-column"
     density="comfortable"
-    :loading="loading"
-    loading-text="A carregar"
     v-model="selected"
     v-model:search="search"
     no-data-text="Nenhum registo disponível"
@@ -45,7 +43,17 @@
           variant="solo-filled"
         ></v-text-field>
         <v-spacer></v-spacer>
-        <div class="d-flex">
+        <div class="action-bar">
+          <v-switch
+            v-if="propsData.data.toggle"
+            class="mr-2"
+            v-model="toggle"
+            hide-details
+            inset
+            :label="toggleLabel"
+            @change="changeToggle"
+          />
+          <v-spacer></v-spacer>
           <v-btn
             v-if="canChangeStatus"
             color="primary"
@@ -283,7 +291,6 @@ type DataTableHeader = {
 const search = ref('');
 const selected = ref([]);
 const form = ref();
-const loading = ref(false);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
@@ -302,9 +309,18 @@ const serverItems = ref([]);
 const editedIndex = ref(-1);
 const editedItem = ref({});
 const defaultItem = ref({});
+const toggle = ref(true);
+
+const toggleLabel = computed(() => {
+  return toggle.value
+    ? propsData.data.toggle.truelabel
+    : propsData.data.toggle.falselabel;
+});
+
 const mode = computed(() => {
   return editedIndex.value === -1 ? 'create' : 'edit';
 });
+
 const formTitle = computed(() => {
   return editedIndex.value === -1
     ? propsData.data.newItemTitle
@@ -344,11 +360,13 @@ function editItem(item: any) {
   editedItem.value = Object.assign({}, newItem);
   dialog.value = true;
 }
+
 function deleteItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   editedItem.value = Object.assign({}, item);
   dialogDelete.value = true;
 }
+
 async function deleteItemConfirm() {
   await propsData.data.delete(
     serverItems.value[editedIndex.value].id,
@@ -356,6 +374,7 @@ async function deleteItemConfirm() {
   );
   closeDelete();
 }
+
 function close() {
   dialog.value = false;
   nextTick(() => {
@@ -364,6 +383,7 @@ function close() {
     setFields();
   });
 }
+
 function closeDelete() {
   dialogDelete.value = false;
   nextTick(() => {
@@ -397,13 +417,6 @@ async function save() {
   }
 }
 
-watch(dialog, (val) => {
-  val || close();
-});
-watch(dialogDelete, (val) => {
-  val || closeDelete();
-});
-
 function setFields() {
   let newEditedItem = {};
   for (let i = 0; i < fields.value.length; i++) {
@@ -428,12 +441,38 @@ function canAction(itemRaw: { username: string; email: string; role: string }) {
 }
 
 function clickSelect() {
-  propsData.data.selectFunction(loading, selected.value, serverItems);
+  propsData.data.selectFunction(selected.value, serverItems);
   selected.value = [];
 }
 
+function changeToggle() {
+  propsData.data.toggle.changeFunction(
+    serverItems,
+    fields.value,
+    propsData.data.toggle.field,
+    toggle.value
+  );
+}
+
+watch(dialog, (val) => {
+  val || close();
+});
+
+watch(dialogDelete, (val) => {
+  val || closeDelete();
+});
+
 onMounted(() => {
-  propsData.data.getData(loading, serverItems, fields.value);
+  propsData.data.getData(
+    serverItems,
+    fields.value,
+    propsData.data.toggle && propsData.data.toggle.field
+      ? propsData.data.toggle.field
+      : 'status',
+    propsData.data.toggle && propsData.data.toggle.trueValue
+      ? propsData.data.toggle.trueValue
+      : 'ACTIVE'
+  );
   setFields();
 });
 
@@ -447,6 +486,10 @@ onBeforeMount(() => {
 </script>
 
 <style lang="scss">
+.action-bar {
+  display: flex !important;
+  align-items: center !important;
+}
 .modal__col {
   padding-bottom: 0;
 }

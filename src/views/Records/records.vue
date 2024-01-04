@@ -33,6 +33,7 @@ import {
   deleteRecord,
   canAction,
   changeRecordsStatus,
+  changeDatatableStatus
 } from './helper';
 import { groupsList } from '@/api/groups';
 import { useSnackBar } from '@/composables/snackBar';
@@ -74,6 +75,14 @@ onBeforeMount(() => {
         selectCheckbox: true,
         search: true,
         selectFunction: changeRecordsStatus,
+        toggle: {
+          field: 'status',
+          trueValue: 'ACTIVE',
+          falseValue: 'ARCHIVED',
+          truelabel: 'Ativos',
+          falselabel: 'Arquivados',
+          changeFunction: changeDatatableStatus
+        }
       };
 
       tableData.fields = tableData.fields.map((field: any) =>
