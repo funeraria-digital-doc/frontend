@@ -1,18 +1,18 @@
 <template>
   <page title="Estatísticas">
     <v-row>
-      <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
+      <v-col>
         <records-per-month></records-per-month>
       </v-col>
-      <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
+      <v-col>
         <records-per-day></records-per-day>
       </v-col>
     </v-row>
     <v-row>
-      <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
+      <v-col>
         <deaths-by-district></deaths-by-district>
       </v-col>
-      <v-col :cols="6" :sm="12" :md="12" :lg="6" :xl="4">
+      <v-col>
         <deaths-by-user></deaths-by-user>
       </v-col>
     </v-row>

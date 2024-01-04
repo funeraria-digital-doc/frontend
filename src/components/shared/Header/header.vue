@@ -11,9 +11,18 @@
         <v-icon>mdi-export</v-icon>
       </v-btn>
 
-      <v-menu v-if="isUserAuthenticated()" open-on-hover>
+      <v-menu v-if="isUserAuthenticated()">
         <template v-slot:activator="{ props }">
-          <v-btn v-bind="props"> {{ user.name }} </v-btn>
+          <div class="user">
+            <v-btn v-bind="props"> {{ user.name }} </v-btn>
+
+            <img
+              v-if="user.imageBase64"
+              :src="user.imageBase64"
+              class="user__profile-img"
+              :onclick="handleProfile"
+            />
+          </div>
         </template>
 
         <v-list>
@@ -90,12 +99,25 @@ const accountLinks = [
   &__title {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: 0.5rem;
     cursor: pointer;
   }
 
   &__user-actions {
     margin-left: auto;
+  }
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  &__profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
   }
 }
 </style>

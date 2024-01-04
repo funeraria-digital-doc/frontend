@@ -136,7 +136,12 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-btn color="blue-darken-1" variant="text" type="submit">
+      <v-btn
+        color="blue-darken-1"
+        variant="text"
+        type="submit"
+        style="float: right"
+      >
         Submeter
       </v-btn>
     </v-form>

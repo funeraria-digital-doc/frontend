@@ -1,13 +1,18 @@
 <template>
   <page :title="title">
-    <div v-if="isLoggedIn">
+    <div class="home__content">
+      <img src="@/assets/logo.png" alt="logo" class="home__image" />
       <p>
-        Plataforma para agilizar e gerir os documentos referentes ao processo de
-        declarar um falecimento.
+        Plataforma para agilizar e gerir documentos referentes ao processo de
+        declaração de um falecimento.
       </p>
+
       <home-stats v-if="hasStats"></home-stats>
     </div>
-    <login v-else></login>
+
+    <div v-if="!isLoggedIn" class="home__login">
+      <login />
+    </div>
   </page>
 </template>
 
@@ -34,14 +39,6 @@ const { isUserAuthenticated, user } = useUser();
 const title = ref('');
 const isLoggedIn = ref(false);
 const hasStats = ref(false);
-watch(user, () => {
-  isLoggedIn.value = isUserAuthenticated();
-});
-
-watch(isLoggedIn, async () => {
-  getTitle();
-  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
-});
 
 const getTitle = () => {
   if (!isLoggedIn.value) {
@@ -51,13 +48,43 @@ const getTitle = () => {
   }
 };
 
+watch(user, () => {
+  isLoggedIn.value = isUserAuthenticated();
+});
+
+watch(isLoggedIn, async () => {
+  getTitle();
+
+  hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
+});
+
 onBeforeMount(async () => {
   isLoggedIn.value = isUserAuthenticated();
   getTitle();
+
   hasStats.value = await checkAuth(AUTH_PERMISSIONS.STAFF);
 });
 </script>
-<style scoped>
+
+<style scoped lang="scss">
+.home {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  &__image {
+    width: 30%;
+  }
+
+  &__login {
+    width: 30%;
+  }
+}
 .spacer-2 {
   height: 2rem;
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-footer>
+  <v-footer :app="true">
     {{ new Date().getFullYear() }} — &nbsp;
     <strong>Funerária Digital Doc ®</strong>
   </v-footer>
