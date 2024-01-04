@@ -1,5 +1,5 @@
 import { createNewAxiosInstance } from '@/api';
-import { loginUser } from '@/api/users';
+import { getProfileImage, loginUser } from '@/api/users';
 import router from '@/router';
 import { TOKEN_KEY } from '@/utils/constants';
 import jwt_decode from 'jwt-decode';
@@ -15,6 +15,7 @@ const user = reactive({
   email: '',
   role: '',
   expiration_date: 0,
+  imageBase64: '',
 });
 
 const isAuthFromTokenLoaded = ref(false);
@@ -29,6 +30,7 @@ export function useUser() {
     user.email = '';
     user.role = '';
     user.expiration_date = 0;
+    user.imageBase64 = '';
 
     deleteLocalStorage(TOKEN_KEY);
     createNewAxiosInstance();
@@ -56,16 +58,30 @@ export function useUser() {
 
   async function authenticateUserFromToken() {
     const token = getLocalStorage(TOKEN_KEY);
-    const toReturn = false
+    const toReturn = false;
+
     if (token) {
-      const auth = jwt_decode(token);
-      if (auth.exp * 1000 > new Date().getTime()) updateUser(auth);
+      const auth: any = jwt_decode(token);
+      if (auth.exp * 1000 > new Date().getTime()) {
+        updateUser(auth);
+
+        getProfileImage().then((resp) => {
+          if (resp.success && resp.data.image) {
+            changeUserProfileImage(resp.data.image);
+          }
+        });
+      }
+
       isAuthFromTokenLoaded.value = true;
     } else {
       isAuthFromTokenLoaded.value = true;
     }
-    return toReturn
+    return toReturn;
   }
+
+  const changeUserProfileImage = (imageBase64: string) => {
+    user.imageBase64 = imageBase64;
+  };
 
   return {
     user,
@@ -75,5 +91,6 @@ export function useUser() {
     authenticateUserFromToken,
     updateUser,
     logoutUser,
+    changeUserProfileImage,
   };
 }
