@@ -107,9 +107,9 @@ export const deleteTemplate = async (
 
 export function downloadTemplate(template: any) {
   try {
-    downloadTemplateFile(template.columns.id).then((resp: any) => {
+    downloadTemplateFile(template.id).then((resp: any) => {
       if (resp.success) {
-        clickDownloadFile(resp.data, template.columns.title);
+        clickDownloadFile(resp.data, template.title);
       } else {
         console.log('error', resp);
       }
