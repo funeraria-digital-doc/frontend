@@ -1,5 +1,5 @@
 <template>
-  <page title="Profile">
+  <page title="Perfil">
     <photo-upload
       :saveFunction="editProfileImage"
       :imageUrl="imageUrl"
