@@ -65,3 +65,14 @@ export async function recordsUpdateStatus(
     return errorResponse(e);
   }
 }
+
+export async function recordsListByStatus(
+  status: String
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiInstance.get(`/records/list-by-status/` + status);
+    return { success: true, data: response.data };
+  } catch (e: any) {
+    return errorResponse(e);
+  }
+}

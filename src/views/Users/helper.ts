@@ -5,11 +5,7 @@ import { getLabel } from '@/utils/datatableHelper';
 
 const { showSnackbar } = useSnackBar();
 
-export const getUsers = async (
-  loading: { value: boolean },
-  users: { value: any },
-  fields: any
-) => {
+export const getUsers = async (users: { value: any }, fields: any) => {
   listAllUsers().then((resp) => {
     if (resp.success) {
       const usersData = resp.data.users.map((user: any) => {
@@ -27,7 +23,6 @@ export const getUsers = async (
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 export const createUser = async (newUser: any, users: any, fields: any) => {

@@ -49,6 +49,6 @@ const data = {
   deleteText: 'Tem a certeza de que quer <br>eliminar esta Funerária?',
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   createEditButtons: { cancel: 'Cancelar', action: 'Guardar' },
-  canAction: canAction,
+  canAction: canAction
 };
 </script>

@@ -10,11 +10,7 @@ import { clickDownloadFile } from '@/utils/downloadFile';
 
 const { showSnackbar } = useSnackBar();
 
-export const getTemplates = async (
-  loading: { value: boolean },
-  templates: { value: any },
-  fields: any
-) => {
+export const getTemplates = async (templates: { value: any }, fields: any) => {
   templateList().then((resp) => {
     if (resp.success) {
       let templateData = [];
@@ -33,7 +29,6 @@ export const getTemplates = async (
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 

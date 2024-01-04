@@ -3,7 +3,7 @@ import { useSnackBar } from '@/composables/snackBar';
 
 const { showSnackbar } = useSnackBar();
 
-export const getGroups = async (loading, groups) => {
+export const getGroups = async (groups: { value: any }) => {
   groupsList().then((resp) => {
     if (resp.success) {
       const groupsData = resp.data.map((group: { id: any; name: any }) => {
@@ -16,7 +16,6 @@ export const getGroups = async (loading, groups) => {
     } else {
       console.error('erro', resp);
     }
-    loading.value = false;
   });
 };
 
