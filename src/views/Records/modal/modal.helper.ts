@@ -149,7 +149,8 @@ export function saveForm(
   emitCloseModal: Function,
   hasKeysMissing: any,
   forceSave: any,
-  missingKeys: any
+  missingKeys: any,
+  documentName: string = 'documento'
 ) {
   const auxForceSave = forceSave.value;
   form.value.validate().then((resp: any) => {
@@ -160,9 +161,13 @@ export function saveForm(
         auxForceSave
       ).then((docResp: any) => {
         if (docResp.success) {
-          clickDownloadFile({ data: docResp.data.file }, props.documentId.name);
+          clickDownloadFile(
+            { data: docResp.data.file },
+            `${documentName} ${props.documentId.name}`
+          );
           emitSnackMessages(['Documento emitido com sucesso.', '', true]);
           emitCloseModal();
+
           modalFields.value = {
             to_send_option: '',
             template: '',

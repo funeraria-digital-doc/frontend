@@ -94,7 +94,7 @@ export const fields = [
     col: 12,
     roles: AUTH_PERMISSIONS.STAFF,
     createDisplayRole: AUTH_PERMISSIONS.STAFF,
-    editDisplayRole: AUTH_PERMISSIONS.SUPER
+    editDisplayRole: AUTH_PERMISSIONS.SUPER,
   },
   {
     name: 'email',
@@ -104,7 +104,7 @@ export const fields = [
     col: 12,
     roles: AUTH_PERMISSIONS.STAFF,
     createDisplayRole: AUTH_PERMISSIONS.STAFF,
-    editDisplayRole: AUTH_PERMISSIONS.STAFF
+    editDisplayRole: AUTH_PERMISSIONS.STAFF,
   },
   {
     name: 'group',
@@ -115,7 +115,7 @@ export const fields = [
     items: await getGroups(),
     roles: AUTH_PERMISSIONS.SUPER,
     createDisplayRole: AUTH_PERMISSIONS.SUPER,
-    editDisplayRole: AUTH_PERMISSIONS.SUPER
+    editDisplayRole: AUTH_PERMISSIONS.SUPER,
   },
   {
     name: 'status',
@@ -130,7 +130,7 @@ export const fields = [
     ],
     roles: AUTH_PERMISSIONS.STAFF,
     createDisplayRole: AUTH_PERMISSIONS.SUPER,
-    editDisplayRole: AUTH_PERMISSIONS.STAFF
+    editDisplayRole: AUTH_PERMISSIONS.STAFF,
   },
   {
     name: 'is_superuser',
@@ -141,7 +141,7 @@ export const fields = [
     false_value_label: 'Não',
     roles: AUTH_PERMISSIONS.SUPER,
     createDisplayRole: AUTH_PERMISSIONS.SUPER,
-    editDisplayRole: AUTH_PERMISSIONS.SUPER
+    editDisplayRole: AUTH_PERMISSIONS.SUPER,
   },
   {
     name: 'is_staff',
@@ -152,6 +152,6 @@ export const fields = [
     false_value_label: 'Não',
     roles: AUTH_PERMISSIONS.SUPER,
     createDisplayRole: AUTH_PERMISSIONS.SUPER,
-    editDisplayRole: AUTH_PERMISSIONS.SUPER
+    editDisplayRole: AUTH_PERMISSIONS.SUPER,
   },
 ];

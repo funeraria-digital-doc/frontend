@@ -2,15 +2,16 @@
   <div class="page">
     <div class="d-flex" style="justify-content: space-between">
       <h1 class="page__title text-h6 text-md-h5 text-lg-h4">{{ title }}</h1>
+
       <v-btn
         v-if="back"
+        class="page__back-btn"
         type="button"
         dark
-        class="mb-2 d-flex align-self-center"
-        color="primary"
         @click="backRedirect(back)"
-        >Voltar</v-btn
       >
+        Voltar
+      </v-btn>
     </div>
 
     <!-- renders wrapped content -->
@@ -42,6 +43,9 @@ function backRedirect(link: string) {
 .page {
   &__title {
     margin-bottom: 1rem;
+  }
+  &__back-btn {
+    margin-right: 1rem;
   }
 }
 </style>

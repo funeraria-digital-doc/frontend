@@ -101,10 +101,12 @@ async function getGroups() {
 export const fields = [
   {
     name: 'title',
+    label: 'Titulo',
     type: 'text-field',
   },
   {
     name: 'group_id',
+    label: 'Funerária',
     type: 'select',
     items: await getGroups(),
   },

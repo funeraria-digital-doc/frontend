@@ -80,25 +80,23 @@
                   <div v-if="mode === 'create'">
                     <v-container v-for="field in createFields" :key="field">
                       <v-row>
-                        <v-col
-                          :cols="field.col"
-                          :sm="field.col"
-                          :md="field.col"
-                        >
+                        <v-col class="modal__col" :cols="field.col">
                           <v-text-field
                             v-if="field.type === 'text-field'"
                             :id="field.name"
                             v-model="editedItem[field.name]"
                             :rules="field.rules"
                             :label="field.label"
-                          ></v-text-field>
+                          />
 
                           <v-checkbox
                             v-if="field.type === 'checkbox'"
                             :id="field.name"
+                            class="modal__checkbox"
                             v-model="editedItem[field.name]"
                             :label="field.label"
                           />
+
                           <v-select
                             v-if="field.type === 'select'"
                             :id="field.name"
@@ -109,6 +107,7 @@
                             item-title="label"
                             item-value="value"
                             clearable
+                            autocomplete="off"
                           />
                         </v-col>
                       </v-row>
@@ -117,25 +116,23 @@
                   <div v-else>
                     <v-container v-for="field in editFields" :key="field">
                       <v-row>
-                        <v-col
-                          :cols="field.col"
-                          :sm="field.col"
-                          :md="field.col"
-                        >
+                        <v-col class="modal__col" :cols="field.col">
                           <v-text-field
                             v-if="field.type === 'text-field'"
                             :id="field.name"
                             v-model="editedItem[field.name]"
                             :rules="field.rules"
                             :label="field.label"
-                          ></v-text-field>
+                          />
 
                           <v-checkbox
                             v-if="field.type === 'checkbox'"
                             :id="field.name"
+                            class="modal__checkbox"
                             v-model="editedItem[field.name]"
                             :label="field.label"
                           />
+
                           <v-select
                             v-if="field.type === 'select'"
                             :id="field.name"
@@ -146,6 +143,7 @@
                             item-title="label"
                             item-value="value"
                             clearable
+                            autocomplete="off"
                           />
                         </v-col>
                       </v-row>
@@ -186,7 +184,17 @@
             class="text-h5 text-center"
             v-html="propsData.data.deleteText"
           ></v-card-title>
-          <v-card-actions>
+          <v-card-text class="delete-modal__content">
+            <p v-if="fields.length > 0 && serverItems[editedIndex]">
+              <b>{{ fields[0].label }}:</b>
+              {{ serverItems[editedIndex][fields[0].name] }}
+            </p>
+            <p v-if="fields.length > 1 && serverItems[editedIndex]">
+              <b>{{ fields[1].label }}:</b>
+              {{ serverItems[editedIndex][fields[1].name] }}
+            </p>
+          </v-card-text>
+          <v-card-actions class="delete-modal__actions-btns">
             <v-spacer></v-spacer>
             <v-btn color="blue-darken-1" variant="text" @click="closeDelete">{{
               propsData.data.deleteButtons.cancel
@@ -197,7 +205,6 @@
               @click="deleteItemConfirm"
               >{{ propsData.data.deleteButtons.action }}</v-btn
             >
-            <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -400,7 +407,7 @@ watch(dialogDelete, (val) => {
 function setFields() {
   let newEditedItem = {};
   for (let i = 0; i < fields.value.length; i++) {
-    newEditedItem[fields.value[i].name] = '';
+    newEditedItem[fields.value[i].name] = null;
   }
   editedItem.value = newEditedItem;
   defaultItem.value = newEditedItem;
@@ -439,4 +446,19 @@ onBeforeMount(() => {
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.modal__col {
+  padding-bottom: 0;
+}
+.modal__checkbox {
+  height: 2rem;
+}
+.delete-modal {
+  &__content {
+    margin-bottom: 1rem;
+  }
+  &__actions-btns {
+    margin: 1rem;
+  }
+}
+</style>
