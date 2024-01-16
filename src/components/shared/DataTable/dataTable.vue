@@ -165,7 +165,7 @@ import {
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
-import { getLabel } from '@/utils/datatableHelper';
+import { convertLabel } from '@/utils/datatableHelper';
 import CreateEditModal from './components/createEditModal.vue';
 
 export default defineComponent({
@@ -249,11 +249,14 @@ const canChangeStatus = computed(() => {
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   let newItem = {};
+
   for (let i = 0; i < Object.keys(item).length; i++) {
     const key = Object.keys(item)[i];
     const value = item[key];
-    newItem[key] = getLabel(key, value, fields.value);
+
+    newItem[key] = convertLabel(key, value, fields.value);
   }
+
   editedItem.value = newItem;
   dialog.value = true;
 }
