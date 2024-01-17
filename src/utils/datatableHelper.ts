@@ -21,3 +21,19 @@ export function getLabel(key: string, value: any, fields: any) {
 
   return label;
 }
+
+export function convertLabel(key: string, value: any, fields: any) {
+  const field = fields.find((f: { name: string }) => f.name === key);
+
+  if (field) {
+    if (field.type == 'checkbox') {
+      return value === field.true_value_label;
+    } else if (field.type == 'select') {
+      return field.items.find((i: any) => i.label === value).value;
+    } else {
+      return value;
+    }
+  }
+
+  return value;
+}
