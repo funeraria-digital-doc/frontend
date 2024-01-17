@@ -1,0 +1,120 @@
+<template>
+  <v-dialog v-model="dialog" max-width="500px">
+    <template v-slot:activator="{ props }">
+      <v-btn
+        color="primary"
+        dark
+        class="mb-2 d-flex align-self-end"
+        v-bind="props"
+      >
+        {{ btnCreateTitle }}
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title class="mt-3">
+        <span class="text-h5 ml-6">{{ title }}</span>
+      </v-card-title>
+      <v-card-text>
+        <v-form ref="form" validate-on="submit" @submit.prevent="save">
+          <v-container v-for="field in modeItems" :key="field">
+            <v-row>
+              <v-col class="modal__col" :cols="field.col">
+                <dynamic-field-input
+                  :field="dynamicField(field)"
+                  :classes="classes(field)"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue-darken-1" variant="text" @click="close">
+              {{ btnCancelTitle }}
+            </v-btn>
+            <v-btn color="blue-darken-1" variant="text" type="submit">
+              {{ btnActionTitle }}
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { dynamicFormValues } from '../../DynamicForm/dynamicForm.utils';
+
+export default defineComponent({
+  name: 'CreateEditModal',
+});
+</script>
+
+<script lang="ts" setup>
+import { defineProps, defineModel, ref, type PropType, watch } from 'vue';
+import DynamicFieldInput from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.vue';
+
+const propsData = defineProps({
+  btnActionTitle: {
+    type: String,
+    required: true,
+  },
+  btnCancelTitle: {
+    type: String,
+    required: true,
+  },
+  btnCreateTitle: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  modeItems: {
+    type: Array as PropType<any>,
+    required: true,
+  },
+  editedItem: {
+    type: Object,
+    required: true,
+  },
+});
+
+const dialog = defineModel() as any;
+const emit = defineEmits(['close', 'save']);
+
+const item = ref(propsData.editedItem);
+const form = ref();
+
+const close = () => emit('close');
+
+const save = async (input: any) => {
+  const defaultValue = item.value.id ? { id: item.value.id } : {};
+
+  dynamicFormValues(form, input, defaultValue).then(({ valid, values }) => {
+    valid && emit('save', values);
+  });
+};
+
+const dynamicField = (field: any) => ({
+  ...field,
+  input: field.type === 'text-field' ? 'text' : field.type,
+  value: item.value[field.name],
+});
+
+const classes = (field: any) =>
+  field.type === 'checkbox' ? ['modal__checkbox'] : [];
+
+watch(propsData, (newProps) => {
+  item.value = newProps.editedItem;
+});
+</script>
+<style lang="scss">
+.modal__col {
+  padding-bottom: 0;
+}
+.modal__checkbox {
+  height: 2rem;
+}
+</style>
