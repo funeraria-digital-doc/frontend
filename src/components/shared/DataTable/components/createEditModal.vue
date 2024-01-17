@@ -16,78 +16,16 @@
       </v-card-title>
       <v-card-text>
         <v-form ref="form" validate-on="submit" @submit.prevent="save">
-          <div v-if="mode === 'create'">
-            <v-container v-for="field in createFields" :key="field">
-              <v-row>
-                <v-col class="modal__col" :cols="field.col">
-                  <v-text-field
-                    v-if="field.type === 'text-field'"
-                    :id="field.name"
-                    v-model="item[field.name]"
-                    :rules="field.rules"
-                    :label="field.label"
-                  />
-
-                  <v-checkbox
-                    v-if="field.type === 'checkbox'"
-                    :id="field.name"
-                    class="modal__checkbox"
-                    v-model="item[field.name]"
-                    :label="field.label"
-                  />
-
-                  <v-select
-                    v-if="field.type === 'select'"
-                    :id="field.name"
-                    v-model="item[field.name]"
-                    :label="field.label"
-                    :rules="field.rules"
-                    :items="field.items"
-                    item-title="label"
-                    item-value="value"
-                    clearable
-                    autocomplete="off"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </div>
-          <div v-else>
-            <v-container v-for="field in editFields" :key="field">
-              <v-row>
-                <v-col class="modal__col" :cols="field.col">
-                  <v-text-field
-                    v-if="field.type === 'text-field'"
-                    :id="field.name"
-                    v-model="item[field.name]"
-                    :rules="field.rules"
-                    :label="field.label"
-                  />
-
-                  <v-checkbox
-                    v-if="field.type === 'checkbox'"
-                    :id="field.name"
-                    class="modal__checkbox"
-                    v-model="item[field.name]"
-                    :label="field.label"
-                  />
-
-                  <v-select
-                    v-if="field.type === 'select'"
-                    :id="field.name"
-                    v-model="item[field.name]"
-                    :label="field.label"
-                    :rules="field.rules"
-                    :items="field.items"
-                    item-title="label"
-                    item-value="value"
-                    clearable
-                    autocomplete="off"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </div>
+          <v-container v-for="field in modeItems" :key="field">
+            <v-row>
+              <v-col class="modal__col" :cols="field.col">
+                <dynamic-field-input
+                  :field="dynamicField(field)"
+                  :classes="classes(field)"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue-darken-1" variant="text" @click="close">
@@ -105,6 +43,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { dynamicFormValues } from '../../DynamicForm/dynamicForm.utils';
 
 export default defineComponent({
   name: 'CreateEditModal',
@@ -113,6 +52,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 import { defineProps, defineModel, ref, type PropType, watch } from 'vue';
+import DynamicFieldInput from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.vue';
 
 const propsData = defineProps({
   btnActionTitle: {
@@ -131,16 +71,8 @@ const propsData = defineProps({
     type: String,
     required: true,
   },
-  createFields: {
+  modeItems: {
     type: Array as PropType<any>,
-    required: true,
-  },
-  editFields: {
-    type: Array as PropType<any>,
-    required: true,
-  },
-  mode: {
-    type: String,
     required: true,
   },
   editedItem: {
@@ -156,7 +88,23 @@ const item = ref(propsData.editedItem);
 const form = ref();
 
 const close = () => emit('close');
-const save = () => emit('save', form.value, item.value);
+
+const save = async (input: any) => {
+  const defaultValue = item.value.id ? { id: item.value.id } : {};
+
+  dynamicFormValues(form, input, defaultValue).then(({ valid, values }) => {
+    valid && emit('save', values);
+  });
+};
+
+const dynamicField = (field: any) => ({
+  ...field,
+  input: field.type === 'text-field' ? 'text' : field.type,
+  value: item.value[field.name],
+});
+
+const classes = (field: any) =>
+  field.type === 'checkbox' ? ['modal__checkbox'] : [];
 
 watch(propsData, (newProps) => {
   item.value = newProps.editedItem;

@@ -1,5 +1,5 @@
 <template>
-  <div class="dynamic-field">
+  <div :class="strClasses">
     <v-text-field
       v-if="field.input === 'text'"
       :id="field.name"
@@ -87,10 +87,16 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  classes: {
+    type: Array<String>,
+    required: false,
+  },
 });
 
 const model = ref(props.field.value);
 const error = ref(props.errorMessages);
+
+const strClasses = props.classes ? props.classes.join(' ') : 'dynamic-field';
 
 // for image
 const imageUrl = ref(props.field.value);

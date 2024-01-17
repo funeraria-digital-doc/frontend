@@ -71,9 +71,7 @@
             :btn-action-title="propsData.data.createEditButtons.action"
             :btn-cancel-title="propsData.data.createEditButtons.cancel"
             :btn-create-title="propsData.data.createButtonTitle"
-            :create-fields="createFields"
-            :edit-fields="editFields"
-            :mode="mode"
+            :mode-items="modeItems()"
             :title="formTitle"
             :edited-item="editedItem"
             @close="close"
@@ -208,6 +206,10 @@ const editedItem = ref({});
 const defaultItem = ref({});
 const toggle = ref(true);
 
+const modeItems = () => {
+  return mode.value === 'create' ? createFields.value : editFields.value;
+};
+
 const toggleLabel = computed(() => {
   return toggle.value
     ? propsData.data.toggle.truelabel
@@ -293,25 +295,22 @@ function closeDelete() {
   });
 }
 
-async function save(form: any, newValues: any) {
-  const { valid } = await form.validate();
-  if (valid) {
-    try {
-      if (editedIndex.value > -1) {
-        propsData.data
-          .edit(newValues, editedIndex.value, serverItems, fields.value)
-          .then(() => {
-            close();
-          });
-      } else {
-        propsData.data.save(newValues, serverItems, fields.value).then(() => {
+async function save(newValues: any) {
+  try {
+    if (editedIndex.value > -1) {
+      propsData.data
+        .edit(newValues, editedIndex.value, serverItems, fields.value)
+        .then(() => {
           close();
         });
-      }
-    } catch (error) {
-      console.error(error);
-      // Handle the error here if necessary
+    } else {
+      propsData.data.save(newValues, serverItems, fields.value).then(() => {
+        close();
+      });
     }
+  } catch (error) {
+    console.error(error);
+    // Handle the error here if necessary
   }
 }
 
