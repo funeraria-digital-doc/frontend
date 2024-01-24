@@ -10,13 +10,23 @@ export function clickDownloadFile(data: any, title: string) {
   window.URL.revokeObjectURL(url);
 }
 
+export function clickDownloadPdf(data: any, title: string) {
+  const file = base64ToFile(data, title);
+  const url = window.URL.createObjectURL(new Blob([file]));
+  const link = document.createElement('a');
+  link.href = url;
+  const filename = title + '.pdf';
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
+
 export function clickDownloadImages(data: any, title: string) {
   for (let i = 0; i < Object.keys(data.data).length; i++) {
     const image = data.data[Object.keys(data.data)[i]];
     const newTitle = title + '_' + i;
     const filename = newTitle + '.png';
-    console.log('filename', filename)
-    console.log('image', image)
     const file = base64ToImage(image, filename);
     const url = window.URL.createObjectURL(new Blob([file]));
     const link = document.createElement('a');

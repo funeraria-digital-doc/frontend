@@ -1,5 +1,9 @@
 import { isDateOrDateTime } from '../../Templates/components/ValidationEditModal/validationEditModal.helper';
-import { clickDownloadFile, clickDownloadImages } from '@/utils/downloadFile';
+import {
+  clickDownloadFile,
+  clickDownloadImages,
+  clickDownloadPdf,
+} from '@/utils/downloadFile';
 import { generateDocument } from '@/api/recordTemplates';
 import moment from 'moment';
 import { getFormat } from '../helper';
@@ -161,14 +165,18 @@ export function saveForm(
         auxForceSave
       ).then((docResp: any) => {
         if (docResp.success) {
+          console.log('resp', resp.data);
           clickDownloadFile(
             { data: docResp.data.file },
             `${documentName} ${props.documentId.name}`
           );
-          clickDownloadImages(
-            { data: docResp.data.images },
-            props.documentId.name
-          );
+          if (docResp.data && docResp.data.images) {
+            clickDownloadImages(
+              { data: docResp.data.images },
+              props.documentId.name
+            );
+          }
+          clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
           emitSnackMessages(['Documento emitido com sucesso.', '', true]);
           emitCloseModal();
 
