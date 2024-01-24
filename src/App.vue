@@ -29,7 +29,7 @@
   </v-app>
 
   <loading
-    v-model:active="loadingSpinner.active"
+    v-model:active="isLoadingSpinnerActive"
     :is-full-page="true"
     transition="fade"
   />
@@ -63,7 +63,7 @@ export default defineComponent({
 import router from '@/router';
 
 const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
-const { loadingSpinner } = useLoadingSpinner();
+const { isLoadingSpinnerActive } = useLoadingSpinner();
 
 const sideNavLinks = [
   {

@@ -37,7 +37,7 @@ function getToken() {
 }
 
 //let token = getToken();
-const { loadingSpinner } = useLoadingSpinner();
+const { changeLoadingSpinnerState } = useLoadingSpinner();
 
 export let apiInstance = setupAxiosInstance();
 
@@ -54,11 +54,12 @@ function setupAxiosInstance() {
 
   instance.interceptors.response.use(
     (response) => {
-      loadingSpinner.active = false;
+      changeLoadingSpinnerState(false);
       return response;
     },
     (error) => {
-      loadingSpinner.active = false;
+      changeLoadingSpinnerState(false);
+
       if (
         (!error.response ||
           !error.response.status ||
@@ -78,11 +79,10 @@ function setupAxiosInstance() {
 
   instance.interceptors.request.use(
     (config) => {
-      loadingSpinner.active = true;
+      changeLoadingSpinnerState(true);
       return config;
     },
     (error) => {
-      loadingSpinner.active = true;
       return Promise.reject(error);
     }
   );
