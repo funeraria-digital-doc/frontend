@@ -1,11 +1,16 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 const loadingSpinner = reactive({
   active: false,
 });
 
 export function useLoadingSpinner() {
+  const changeLoadingSpinnerState = (state: boolean) => {
+    loadingSpinner.active = state;
+  };
+
   return {
-    loadingSpinner
-  }
+    isLoadingSpinnerActive: computed(() => loadingSpinner.active),
+    changeLoadingSpinnerState,
+  };
 }
