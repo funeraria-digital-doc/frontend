@@ -165,7 +165,6 @@ export function saveForm(
         auxForceSave
       ).then((docResp: any) => {
         if (docResp.success) {
-          console.log('resp', resp.data);
           clickDownloadFile(
             { data: docResp.data.file },
             `${documentName} ${props.documentId.name}`
