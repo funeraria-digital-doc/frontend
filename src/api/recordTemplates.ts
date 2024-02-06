@@ -24,7 +24,6 @@ export async function generateDocument(
         forceSave: forceSave,
       }
     );
-    console.log('aqui', response)
     return {
       success:
         response.data && response.data.hasOwnProperty('sucess')
