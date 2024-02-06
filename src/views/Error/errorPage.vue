@@ -9,6 +9,9 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { onBeforeMount } from 'vue';
+import { useUser } from '@/composables/user';
+import router from '@/router';
+import { watch } from 'vue';
 export default defineComponent({
   name: 'ErrorPage',
 });
@@ -18,7 +21,16 @@ import Page from '../../components/shared/Page/page.vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+const { user } = useUser();
+
 const message = ref('');
+
+const redirectToHome = (user: any) => {
+  if (user.imageBase64 !== '') {
+    router.push('/');
+  }
+};
+
 onBeforeMount(() => {
   if (route.meta.status === 'service-unavailable') {
     message.value =
@@ -33,6 +45,8 @@ onBeforeMount(() => {
       '<h3>Se o problema presistir, contacte os administradores do sistema.</h3>';
   }
 });
+
+watch(user, (newUser) => redirectToHome(newUser));
 </script>
 <style scoped>
 .img-max {

@@ -41,7 +41,10 @@ export default defineComponent({
 <script lang="ts" setup>
 import DynamicFieldInput from './DynamicFieldInput/dynamicFieldInput.vue';
 import type { FormFieldsGroup } from './dynamicForm.models';
-import { checkDuplicateNamesFormFields } from './dynamicForm.utils';
+import {
+  checkDuplicateNamesFormFields,
+  dynamicFormValues,
+} from './dynamicForm.utils';
 
 const props = defineProps({
   fieldsGroups: {
@@ -64,28 +67,10 @@ const form = ref();
 const errorMessage = (fieldName: string) =>
   (props.errorMessages ?? {})[fieldName];
 
-const onSubmit = async (input: any) => {
-  const { valid } = await form.value.validate();
-
-  if (valid) {
-    const values: any = {};
-
-    for (let element of input.target.elements) {
-      if (element.name) {
-        let value = element.value || null;
-
-        if (element.type === 'checkbox') {
-          value = element.checked;
-        } else if (element.type === 'file') {
-          value = element.attributes.value;
-        }
-
-        values[element.name] = value;
-      }
-    }
-
-    emit('on-submit', values);
-  }
+const onSubmit = (input: any) => {
+  dynamicFormValues(form, input).then(({ valid, values }) => {
+    valid && emit('on-submit', values);
+  });
 };
 
 onMounted(() => {

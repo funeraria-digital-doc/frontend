@@ -64,112 +64,19 @@
             Arquivar Selecionados
           </v-btn>
           <v-spacer></v-spacer>
-          <v-dialog
+
+          <create-edit-modal
             v-if="propsData.data.createAndEditByModal"
             v-model="dialog"
-            max-width="500px"
-          >
-            <template v-slot:activator="{ props }">
-              <v-btn
-                color="primary"
-                dark
-                class="mb-2 d-flex align-self-end"
-                v-bind="props"
-              >
-                {{ propsData.data.createButtonTitle }}
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="mt-3">
-                <span class="text-h5 ml-6">{{ formTitle }}</span>
-              </v-card-title>
-              <v-card-text>
-                <v-form ref="form" validate-on="submit" @submit.prevent="save">
-                  <div v-if="mode === 'create'">
-                    <v-container v-for="field in createFields" :key="field">
-                      <v-row>
-                        <v-col class="modal__col" :cols="field.col">
-                          <v-text-field
-                            v-if="field.type === 'text-field'"
-                            :id="field.name"
-                            v-model="editedItem[field.name]"
-                            :rules="field.rules"
-                            :label="field.label"
-                          />
-
-                          <v-checkbox
-                            v-if="field.type === 'checkbox'"
-                            :id="field.name"
-                            class="modal__checkbox"
-                            v-model="editedItem[field.name]"
-                            :label="field.label"
-                          />
-
-                          <v-select
-                            v-if="field.type === 'select'"
-                            :id="field.name"
-                            v-model="editedItem[field.name]"
-                            :label="field.label"
-                            :rules="field.rules"
-                            :items="field.items"
-                            item-title="label"
-                            item-value="value"
-                            clearable
-                            autocomplete="off"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </div>
-                  <div v-else>
-                    <v-container v-for="field in editFields" :key="field">
-                      <v-row>
-                        <v-col class="modal__col" :cols="field.col">
-                          <v-text-field
-                            v-if="field.type === 'text-field'"
-                            :id="field.name"
-                            v-model="editedItem[field.name]"
-                            :rules="field.rules"
-                            :label="field.label"
-                          />
-
-                          <v-checkbox
-                            v-if="field.type === 'checkbox'"
-                            :id="field.name"
-                            class="modal__checkbox"
-                            v-model="editedItem[field.name]"
-                            :label="field.label"
-                          />
-
-                          <v-select
-                            v-if="field.type === 'select'"
-                            :id="field.name"
-                            v-model="editedItem[field.name]"
-                            :label="field.label"
-                            :rules="field.rules"
-                            :items="field.items"
-                            item-title="label"
-                            item-value="value"
-                            clearable
-                            autocomplete="off"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </div>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue-darken-1" variant="text" @click="close">
-                      {{ propsData.data.createEditButtons.cancel }}
-                    </v-btn>
-                    <v-btn color="blue-darken-1" variant="text" type="submit">
-                      {{ propsData.data.createEditButtons.action }}
-                    </v-btn>
-                  </v-card-actions>
-                </v-form>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+            :btn-action-title="propsData.data.createEditButtons.action"
+            :btn-cancel-title="propsData.data.createEditButtons.cancel"
+            :btn-create-title="propsData.data.createButtonTitle"
+            :mode-items="modeItems()"
+            :title="formTitle"
+            :edited-item="editedItem"
+            @close="close"
+            @save="save"
+          />
 
           <div v-else class="d-flex" style="justify-content: end">
             <v-btn
@@ -256,10 +163,14 @@ import {
 import { onBeforeMount } from 'vue';
 import { useUser } from '@/composables/user';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
-import { getLabel } from '@/utils/datatableHelper';
+import { convertLabel } from '@/utils/datatableHelper';
+import CreateEditModal from './components/createEditModal.vue';
 
 export default defineComponent({
   name: 'GenericDataTable',
+  components: {
+    CreateEditModal,
+  },
 });
 </script>
 
@@ -271,26 +182,10 @@ const propsData = defineProps({
   },
 });
 const { user } = useUser();
-/*
-Exemplo de header
-type DataTableHeader = {
-    key: string;
-    value?: SelectItemKey;
-    title: string;
-    colspan?: number;
-    rowspan?: number;
-    fixed?: boolean;
-    align?: 'start' | 'end';
-    width?: number;
-    minWidth?: string;
-    maxWidth?: string;
-    sortable?: boolean;
-    sort?: DataTableCompareFunction;
-};
-*/
+
 const search = ref('');
 const selected = ref([]);
-const form = ref();
+
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = ref([]);
@@ -310,6 +205,10 @@ const editedIndex = ref(-1);
 const editedItem = ref({});
 const defaultItem = ref({});
 const toggle = ref(true);
+
+const modeItems = () => {
+  return mode.value === 'create' ? createFields.value : editFields.value;
+};
 
 const toggleLabel = computed(() => {
   return toggle.value
@@ -352,18 +251,21 @@ const canChangeStatus = computed(() => {
 function editItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
   let newItem = {};
+
   for (let i = 0; i < Object.keys(item).length; i++) {
     const key = Object.keys(item)[i];
     const value = item[key];
-    newItem[key] = getLabel(key, value, fields.value);
+
+    newItem[key] = convertLabel(key, value, fields.value);
   }
-  editedItem.value = Object.assign({}, newItem);
+
+  editedItem.value = newItem;
   dialog.value = true;
 }
 
 function deleteItem(item: any) {
   editedIndex.value = serverItems.value.indexOf(item);
-  editedItem.value = Object.assign({}, item);
+  editedItem.value = item;
   dialogDelete.value = true;
 }
 
@@ -393,27 +295,22 @@ function closeDelete() {
   });
 }
 
-async function save() {
-  const { valid } = await form.value.validate();
-  if (valid) {
-    try {
-      if (editedIndex.value > -1) {
-        propsData.data
-          .edit(editedItem.value, editedIndex.value, serverItems, fields.value)
-          .then(() => {
-            close();
-          });
-      } else {
-        propsData.data
-          .save(editedItem.value, serverItems, fields.value)
-          .then(() => {
-            close();
-          });
-      }
-    } catch (error) {
-      console.error(error);
-      // Handle the error here if necessary
+async function save(newValues: any) {
+  try {
+    if (editedIndex.value > -1) {
+      propsData.data
+        .edit(newValues, editedIndex.value, serverItems, fields.value)
+        .then(() => {
+          close();
+        });
+    } else {
+      propsData.data.save(newValues, serverItems, fields.value).then(() => {
+        close();
+      });
     }
+  } catch (error) {
+    console.error(error);
+    // Handle the error here if necessary
   }
 }
 
