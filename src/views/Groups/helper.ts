@@ -1,4 +1,10 @@
-import { groupsList, groupCreate, groupEdit, groupDelete } from '@/api/groups';
+import {
+  groupsList,
+  groupCreate,
+  groupEdit,
+  groupDelete,
+  groupGet,
+} from '@/api/groups';
 import { useSnackBar } from '@/composables/snackBar';
 
 const { showSnackbar } = useSnackBar();
@@ -17,6 +23,38 @@ export const getGroups = async (groups: { value: any }) => {
       console.error('erro', resp);
     }
   });
+};
+
+export const getGroup = async (id: string) => {
+  const mock = {
+    id: 4,
+    name: 'Funerária XPTO',
+    created_by_id: 1,
+    updated_by_id: 1,
+  };
+
+  try {
+    // remove return
+    return groupGet(id).then((resp) => {
+      if (resp.success) {
+        return mock;
+      } else {
+        // showSnackbar(
+        //   'DDOcorreu um erro ao obter os dados da funerária. <br>Por favor, tente novamente mais tarde',
+        //   JSON.stringify(resp.error.error),
+        //   false
+        // );
+
+        return mock;
+      }
+    });
+  } catch (e: any) {
+    showSnackbar(
+      'Ocorreu um erro ao obter os dados da funerária. <br>Por favor, tente novamente mais tarde.',
+      JSON.stringify(e),
+      false
+    );
+  }
 };
 
 export const createGroup = async (newGroup: any, groups: any) => {

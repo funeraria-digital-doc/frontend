@@ -5,6 +5,7 @@ const Home = () => import('@/views/Home/home.vue');
 const Profile = () => import('@/views/Profile/profile.vue');
 const Users = () => import('@/views/Users/users.vue');
 const Groups = () => import('@/views/Groups/groups.vue');
+const Group = () => import('@/views/Group/group.vue');
 const Templates = () => import('@/views/Templates/templates.vue');
 const Records = () => import('@/views/Records/records.vue');
 const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
@@ -39,6 +40,12 @@ const router = createRouter({
       name: 'groups',
       component: Groups,
       meta: { roles: getAuth('groups') },
+    },
+    {
+      path: '/group/:id',
+      name: 'group',
+      component: Group,
+      meta: { roles: getAuth('group') },
     },
     {
       path: '/templates',

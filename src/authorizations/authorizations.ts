@@ -6,6 +6,7 @@ const route_auth = {
   profile: AUTH_PERMISSIONS.USER,
   users: AUTH_PERMISSIONS.STAFF,
   groups: AUTH_PERMISSIONS.SUPER,
+  group: AUTH_PERMISSIONS.NO_AUTH,
   templates: AUTH_PERMISSIONS.SUPER,
   templates_create: AUTH_PERMISSIONS.SUPER,
   templates_edit: AUTH_PERMISSIONS.SUPER,
