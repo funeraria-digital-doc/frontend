@@ -117,6 +117,7 @@ export const fields = [
       { label: 'Nenhum', value: 'NONE' },
       { label: 'Documento', value: 'DOCUMENT' },
       { label: 'Email', value: 'EMAIL' },
+      { label: 'Imagem', value: 'IMAGE' },
       { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
     ],
   },
