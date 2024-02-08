@@ -1,5 +1,9 @@
 import { isDateOrDateTime } from '../../Templates/components/ValidationEditModal/validationEditModal.helper';
-import { clickDownloadFile } from '@/utils/downloadFile';
+import {
+  clickDownloadFile,
+  clickDownloadImages,
+  clickDownloadPdf,
+} from '@/utils/downloadFile';
 import { generateDocument } from '@/api/recordTemplates';
 import moment from 'moment';
 import { getFormat } from '../helper';
@@ -165,6 +169,13 @@ export function saveForm(
             { data: docResp.data.file },
             `${documentName} ${props.documentId.name}`
           );
+          if (docResp.data && docResp.data.images) {
+            clickDownloadImages(
+              { data: docResp.data.images },
+              props.documentId.name
+            );
+          }
+          clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
           emitSnackMessages(['Documento emitido com sucesso.', '', true]);
           emitCloseModal();
 
