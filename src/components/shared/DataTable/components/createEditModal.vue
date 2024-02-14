@@ -51,7 +51,7 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { defineProps, defineModel, ref, type PropType, watch } from 'vue';
+import { defineModel, ref, type PropType, watch } from 'vue';
 import DynamicFieldInput from '@/components/shared/DynamicForm/DynamicFieldInput/dynamicFieldInput.vue';
 
 const propsData = defineProps({

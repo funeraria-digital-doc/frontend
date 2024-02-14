@@ -29,14 +29,18 @@
         <v-row>
           <v-col cols="6" sm="6" md="6">
             <v-select
-              :id="`send_type_${template.send_type}`"
+              id="send_type"
               v-model="template.send_type"
               label="Tipo de Envio"
-              :items="getSelectItems('send_type')"
+              :items="constants.sendTypeOptions"
+              multiple
+              chips
+              closable-chips
+              clearable
               item-title="label"
               item-value="value"
               :error-messages="errorMessages.send_type"
-            />
+            ></v-select>
           </v-col>
           <v-col cols="6" sm="6" md="6">
             <v-file-input
@@ -229,7 +233,7 @@ const template = ref<Template>({
   send_email_to_bcc: [],
   send_email_to_cc: [],
   send_email_to: [],
-  send_type: 'NONE',
+  send_type: [],
   title: '',
   validations: [],
   file_validations: [],
@@ -261,13 +265,7 @@ const getSelectItems = (name: string) =>
   constants.fields.find((f) => f.name === name)?.items;
 
 const isEmailOption = computed(() => {
-  if (
-    template.value.send_type == 'EMAIL' ||
-    template.value.send_type == 'DOCUMENT_EMAIL'
-  ) {
-    return true;
-  }
-  return false;
+  return template.value.send_type.includes('EMAIL');
 });
 
 const templatesTitle = computed(() => {

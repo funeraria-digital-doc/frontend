@@ -14,6 +14,12 @@ export function getLabel(key: string, value: any, fields: any) {
       if (val && val['label']) {
         label = val['label'];
       }
+    } else if (field.type == 'multiselect') {
+      const valueLabels = value.map((item: any) => {
+        const val = field.items.find((i: { value: any }) => i.value === item);
+        return val.label
+      })
+      label = valueLabels.join(', ');
     } else {
       label = value;
     }
@@ -28,7 +34,7 @@ export function convertLabel(key: string, value: any, fields: any) {
   if (field) {
     if (field.type == 'checkbox') {
       return value === field.true_value_label;
-    } else if (field.type == 'select') {
+    } else if (field.type == 'select' || field.type == 'multiselect') {
       return field.items.find((i: any) => i.label === value).value;
     } else {
       return value;
