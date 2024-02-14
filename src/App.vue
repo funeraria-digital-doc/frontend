@@ -4,7 +4,7 @@
 
     <v-card class="app__container">
       <v-layout class="app__container">
-        <v-navigation-drawer permanent>
+        <v-navigation-drawer permanent v-if="!isOutsider">
           <v-list density="compact" nav>
             <v-list-item
               v-for="(item, index) in sideNavLinksComputed"
@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from 'vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRoute } from 'vue-router';
 import AppHeader from './components/shared/Header/header.vue';
 import AppFooter from './components/shared/Footer/footer.vue';
 import { useUser } from './composables/user';
@@ -62,8 +62,16 @@ export default defineComponent({
 <script lang="ts" setup>
 import router from '@/router';
 
-const { isAuthFromTokenLoaded, authenticateUserFromToken, user } = useUser();
+const {
+  isAuthFromTokenLoaded,
+  user,
+  isOutsider,
+  authenticateUserFromToken,
+  isUserAuthenticated,
+  setIsOutsider,
+} = useUser();
 const { isLoadingSpinnerActive } = useLoadingSpinner();
+const route = useRoute();
 
 const sideNavLinks = [
   {
@@ -129,6 +137,12 @@ async function processSideMenu() {
 
 watch(user, async () => {
   await processSideMenu();
+});
+
+watch(route, () => {
+  if (!isOutsider.value) return;
+
+  setIsOutsider(route.name === 'group' && !isUserAuthenticated());
 });
 
 onBeforeMount(async () => {

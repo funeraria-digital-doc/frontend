@@ -83,7 +83,9 @@ export const getGroups = async (groups: { value: any }) => {
 
 export const getGroup = async (id: string) => {
   try {
+    return mock;
     // remove return
+    // this endpoint needs to be open for everyone
     return groupGet(id).then((resp) => {
       if (resp.success) {
         return mock;
