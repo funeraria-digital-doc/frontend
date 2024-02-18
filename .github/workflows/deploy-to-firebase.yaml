@@ -22,9 +22,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: |
-            echo "registry=https://registry.npmjs.org/" > .npmrc
-            npm install 
+        run: npm install 
 
       - name: Build project
         run: npm run build-only
