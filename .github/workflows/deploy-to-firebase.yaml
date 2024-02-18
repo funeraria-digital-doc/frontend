@@ -20,12 +20,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install 
 
       - name: Build project
         run: npm run build-only
+
       - name: Defploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
