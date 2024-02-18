@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: List folders
-        run: ls -la
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -23,7 +20,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install 
+        run: |
+            echo "registry=https://registry.npmjs.org/" > .npmrc
+            npm install 
 
       - name: Build project
         run: npm run build-only
