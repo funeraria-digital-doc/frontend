@@ -26,8 +26,10 @@ jobs:
 
       - name: Build project
         run: npm run build-only
-
-    #   - name: Deploy to Firebase
-    #     uses: w9jds/firebase-action@v1
-    #     with:
-    #       args: deploy --project <your-firebase-project-id>
+      - name: Defploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+            repoToken: '${{ secrets.GITHUB_TOKEN }}'
+            firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FUNERARIA_FE }}'
+            channelId: live
+            projectId: funeraria-fe
