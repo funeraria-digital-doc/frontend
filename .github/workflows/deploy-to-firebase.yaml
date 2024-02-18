@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
             npm cache clean --force
+            npm config set registry https://registry.npmjs.org/
             npm install
 
       - name: Build project
