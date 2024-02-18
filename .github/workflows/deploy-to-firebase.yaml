@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-            npm cache clean --force
+            echo "registry=https://registry.npmjs.org/" > .npmrc
             npm install 
 
       - name: Build project
