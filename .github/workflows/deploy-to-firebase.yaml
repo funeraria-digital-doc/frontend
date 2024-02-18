@@ -3,7 +3,7 @@ name: Deploy to Firebase
 on:
   push:
     branches:
-      - main
+      - try-github-actions
 
 jobs:
   build-and-deploy:
