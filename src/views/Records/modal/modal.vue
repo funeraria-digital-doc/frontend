@@ -7,20 +7,6 @@
       <v-card-text>
         <v-form ref="form" validate-on="submit" @submit.prevent="save">
           <v-container>
-            <!-- <v-col>
-              <v-select
-                id="to_send_option_id"
-                v-model="modalFields.to_send_option"
-                label="Tipo de Envio"
-                :rules="rules"
-                :items="toSendOptionsItems"
-                item-title="label"
-                item-value="value"
-                clearable
-                disabled
-                autocomplete="off"
-              />
-            </v-col> -->
             <v-col>
               <v-select
                 id="template_id"
@@ -35,6 +21,20 @@
               />
             </v-col>
             <div v-if="isTemplateSelected">
+              <v-col>
+                <v-select
+                  id="to_send_option_id"
+                  v-model="modalFields.to_send_option"
+                  label="Tipo de Envio"
+                  :rules="rules"
+                  :items="toSendOptionsItems"
+                  item-title="label"
+                  item-value="value"
+                  clearable
+                  multiple
+                  autocomplete="off"
+                />
+              </v-col>
               <div
                 v-for="(validation, index) in templateValidations"
                 :key="index"
@@ -252,6 +252,7 @@ import {
   getDateFormated,
   getMissingKeysLabelHelper,
 } from './modal.helper';
+import { sendTypeOptions } from '../../Templates/constants';
 import PhotoUpload from '@/components/shared/PhotoUpload/photoUpload.vue';
 import router from '@/router';
 export default defineComponent({
@@ -265,7 +266,7 @@ export default defineComponent({
 <script lang="ts" setup>
 const form = ref();
 const modalFields = ref({
-  to_send_option: '',
+  to_send_option: [],
   template: null,
   validations: {},
   file_validations: {},
@@ -280,11 +281,7 @@ const hasKeysMissing = ref(false);
 const forceSave = ref(false);
 const missingKeys = ref();
 
-const toSendOptionsItems = [
-  { label: 'Documento', value: 'DOCUMENT' },
-  { label: 'Email', value: 'EMAIL' },
-  { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
-];
+let toSendOptionsItems = [];
 const booleanOptions = [
   { label: 'Sim', value: true },
   { label: 'Não', value: false },
@@ -303,7 +300,7 @@ function emitSnackMessages(message: any) {
 function confirmClose() {
   emitCloseModal();
   modalFields.value = {
-    to_send_option: '',
+    to_send_option: [],
     template: '',
     validations: {},
     file_validations: {},
@@ -314,7 +311,7 @@ function redirectToRecord() {
   hasKeysMissing.value = false;
   missingKeys.value = [];
   modalFields.value = {
-    to_send_option: '',
+    to_send_option: [],
     template: '',
     validations: {},
     file_validations: {},
@@ -410,10 +407,17 @@ watch(
       }
     });
     if (selectedTemplate?.send_type) {
+      getSendTypeLabels(selectedTemplate.send_type);
       modalFields.value.to_send_option = selectedTemplate.send_type;
     }
   }
 );
+
+function getSendTypeLabels(types) {
+  toSendOptionsItems = types.map((type) =>
+    sendTypeOptions.find((item) => item.value === type)
+  );
+}
 
 onBeforeMount(async () => {
   await getTemplates(props.documentId.id).then((resp) => {

@@ -112,13 +112,11 @@ export const fields = [
   },
   {
     name: 'send_type',
-    type: 'select',
+    type: 'multiselect',
     items: [
-      { label: 'Nenhum', value: 'NONE' },
       { label: 'Documento', value: 'DOCUMENT' },
       { label: 'Email', value: 'EMAIL' },
-      { label: 'Imagem', value: 'IMAGE' },
-      { label: 'Documento e Email', value: 'DOCUMENT_EMAIL' },
+      { label: 'Imagem', value: 'IMAGE' }
     ],
   },
   {
@@ -305,3 +303,9 @@ export const BooleanOptions = [
   { label: 'Sim', value: true, type: 'BOOLEAN' },
   { label: 'Não', value: false, type: 'BOOLEAN' },
 ];
+
+export const sendTypeOptions = [
+  { label: 'Email', value: 'EMAIL'},
+  { label: 'Documento', value: 'DOCUMENT'},
+  { label: 'Imagem', value: 'IMAGE'}
+]
