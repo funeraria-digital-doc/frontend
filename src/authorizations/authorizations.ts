@@ -17,6 +17,7 @@ const route_auth = {
   not_found: AUTH_PERMISSIONS.NO_AUTH,
   service_unavailable: AUTH_PERMISSIONS.NO_AUTH,
   others: AUTH_PERMISSIONS.NO_AUTH,
+  funeraria: AUTH_PERMISSIONS.NO_AUTH,
 };
 
 export function getAuth(route_name: string) {

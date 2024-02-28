@@ -27,7 +27,16 @@
         @click="field.clickFunction(item)"
         >{{ field.message }}</v-btn
       >
-      <p v-else>{{ item[field.name] }}</p>
+      <template v-else>
+        <p
+          v-if="field.clickFunction"
+          @click="field.clickFunction(item)"
+          class="pointer"
+        >
+          {{ item[field.name] }}
+        </p>
+        <p v-else>{{ item[field.name] }}</p>
+      </template>
     </template>
     <template v-slot:top>
       <div class="d-flex">
@@ -399,6 +408,13 @@ onBeforeMount(() => {
   }
   &__actions-btns {
     margin: 1rem;
+  }
+}
+.pointer {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 </style>

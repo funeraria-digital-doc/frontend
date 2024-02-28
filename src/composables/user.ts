@@ -8,7 +8,7 @@ import {
   getLocalStorage,
   saveLocalStorage,
 } from '@/utils/localStorage';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const user = reactive({
   name: '',
@@ -16,6 +16,7 @@ const user = reactive({
   role: '',
   expiration_date: 0,
   imageBase64: '',
+  isOutsider: true,
 });
 
 const isAuthFromTokenLoaded = ref(false);
@@ -83,8 +84,13 @@ export function useUser() {
     user.imageBase64 = imageBase64;
   };
 
+  const setIsOutsider = (isOutsider: boolean) => {
+    user.isOutsider = isOutsider;
+  };
+
   return {
     user,
+    isOutsider: computed(() => user.isOutsider),
     isUserAuthenticated,
     isAuthFromTokenLoaded,
     authenticateUser,
@@ -92,5 +98,6 @@ export function useUser() {
     updateUser,
     logoutUser,
     changeUserProfileImage,
+    setIsOutsider,
   };
 }

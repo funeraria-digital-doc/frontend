@@ -5,7 +5,7 @@
       <h6 class="text-h6">Funerária Digital Doc</h6>
     </div>
 
-    <div id="toolbar__user-actions">
+    <div v-if="!isOutsider" id="toolbar__user-actions">
       <v-btn v-if="!isUserAuthenticated()" @click="onOpenLogin">
         Entrar &nbsp;
         <v-icon>mdi-export</v-icon>
@@ -63,7 +63,7 @@ export default defineComponent({
 import router from '@/router';
 import { useUser } from '../../../composables/user';
 
-const { user, isUserAuthenticated, logoutUser } = useUser();
+const { user, isUserAuthenticated, logoutUser, isOutsider } = useUser();
 
 let isLoginModalOpen = ref(false);
 
@@ -76,7 +76,7 @@ const onCloseLogin = () => {
 };
 
 const handleHome = () => {
-  router.push('/');
+  !isOutsider.value && router.push('/');
 };
 
 const handleProfile = () => {
