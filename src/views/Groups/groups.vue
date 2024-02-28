@@ -27,7 +27,7 @@ export default defineComponent({
 import Page from '../../components/shared/Page/page.vue';
 
 const redirectToGroupPage = (item: any) => {
-  router.push({ name: 'group', params: { id: item.id } });
+  router.push({ name: 'funeraria', params: { slug: item.slug } });
 };
 
 const data = {

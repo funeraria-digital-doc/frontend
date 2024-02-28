@@ -11,56 +11,107 @@ const { showSnackbar } = useSnackBar();
 
 const mock = {
   id: 4,
-  name: 'Funerária XPTO',
+  slug: 'xpto',
+  name: 'A Nova Agência Funerária de Tomar',
   created_by_id: 1,
   updated_by_id: 1,
-  image: '',
-  description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nec
-        ipsum ultrices, aliquam augue sit amet, luctus arcu. Mauris non
-        consectetur risus. Maecenas fermentum leo in porttitor euismod. Vivamus
-        nec lorem tellus. Nulla sed rutrum ex, sit amet rutrum sapien. Mauris
-        velit sapien, rutrum eget neque eu, lacinia volutpat felis. Cras vel
-        nunc et nibh convallis semper vitae a eros. Quisque mollis ante vel
-        risus auctor pulvinar. Duis laoreet viverra malesuada. Duis mollis nunc
-        at posuere vehicula. Integer ut finibus nisi. Vestibulum bibendum neque
-        nec dui pellentesque volutpat. Morbi ut ante in urna placerat tempor.
-        Sed blandit, arcu in mattis eleifend, nunc ex blandit turpis, vel
-        venenatis sapien nisl id elit. Ut sapien sapien, molestie vel metus nec,
-        tempus tempor est. Integer rhoncus tortor eget facilisis finibus.`,
+  image:
+    'https://scontent.fopo2-2.fna.fbcdn.net/v/t39.30808-6/349136889_1260738941469993_7740583763255511368_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=efb6e6&_nc_ohc=qmgwDWK70AsAX---bqx&_nc_ht=scontent.fopo2-2.fna&oh=00_AfBn3kOGFnQ_nU4V0X0-N1tMvlzam9mxL0Zh5G_BlcsWug&oe=65E3B0A7',
+  subTitle:
+    'Pretendemos apoiá-lo a dignificar e homenagear o seu ente querido, de forma  única, célere e profissional',
+  description: `Em tempos de luto, prometemos cuidar de todas as suas necessidades. Prometemos fornecer-lhe serviço profissional e aconselhamento nas horas difíceis.
+Prestamos uma série de serviços que esperamos poder ajudá-lo quando mais necessita. O nosso serviço de repatriamento garante que o defunto regressa ao país de origem para o seu funeral, caso seja esse o seu desejo.
+
+Temos ligações com consulados, médicos legistas, alta comissariado, linhas aéreas ou marítimas e autoridades legais.
+
+Prestamos serviço e aconselhamento de cremação.
+
+Também fornecemos embalsamento e arte restauradora, cujo objectivo é garantir que o corpo resiste à deterioração.
+
+Também podemos facilitar serviços de exumação. Os nossos serviços incluem uma casa mortuária moderna, veículos bem equipados e uma sala de embalsamento. Prometemos aliviar-lhe o stress e pressão da situação nesta ocasião difícil.
+
+Ligue-nos a qualquer hora para solicitar um serviço profissional!`,
+  serviceDescription: `A nossa agência funerária oferece uma variedade de serviços.`,
   services: [
     {
-      title: 'Consultar Óbitos Recentes',
-      description:
-        'Procura informações sobre a despedida de alguém próximo? Aqui encontra as cerimónias realizadas nas últimas semanas e as que se irão efectuar nos próximos dias.',
+      title: 'Transporte',
+      image:
+        'https://funerariasantacasa24h.com.br/wp-content/uploads/2019/04/2019-04-extra-transporte-de-corpo.jpg',
     },
     {
-      title: 'Enviar Flores e Condolências',
-      description: `Expresse o seu apoio e homenagem a quem parte, comprando e enviando flores ou deixando as suas mensagens de condolências.                    
-Pode fazê-lo já aqui.`,
+      title: 'Flores Naturais',
+      image:
+        'https://www.interflora.pt/blog/wp-content/uploads/florista-ramo-1024x640.jpg',
     },
     {
-      title: 'Cerimónia com Cremação',
-      description: `É cada vez mais comum as famílias optarem por um funeral com cremação. Conheça todos os detalhes e decida se esta é a despedida certa para o seu ente querido.`,
+      title: 'Flores Artificiais',
+      image: 'https://img.fruugo.com/product/0/83/1004975830_max.jpg',
+    },
+    {
+      title: 'Velas',
+      image:
+        'https://www.raquelsilva.pt/wp-content/uploads/2020/07/15_6_led_candles.jpg',
     },
   ],
+  contacts: {
+    email: ['anovaagenciafunerariadetomar@hotmail.com'],
+    phoneNumbers: ['917 599 010', '919 924 048', '913 749 663', '918 741 923 '],
+    fixPhoneNumbers: ['249311012'],
+  },
   locations: [
     {
-      email: ['email_1@teste.pt'],
-      phoneNumbers: ['111111111', '111111112'],
-      address: 'Street Test 1, 1234, 1234-123, City, Country',
-      coords: [39.60368701414749, -8.41733119612382],
+      address:
+        'Avenida Doutor Cândido Madureira, número 100, 2300-531 Tomar, Portugal',
+      coords: [39.60216616485415, -8.413803258940865],
     },
     {
-      email: ['email_2@teste.pt'],
-      phoneNumbers: ['222222222', '222222223'],
-      address: 'Street Test 2, 1234, 1234-123, City, Country',
-      coords: [38.77659617619304, -9.134987033367352],
+      address: 'Castelo de Torres Novas, 2350-758 Torres Novas',
+      coords: [39.479529855618146, -8.540568949235606],
+    },
+  ],
+  deaths: [
+    {
+      image:
+        'https://site.funerariadigitaldoc.pt/wp-content/uploads/2024/02/pexels-ksenia-chernaya-8986691-scaled.jpg',
+      name: 'Maria Antunes',
+      date: 'Tomar 24/02/2024',
     },
     {
-      email: ['email_3@teste.pt'],
-      phoneNumbers: ['333333333', '333333334'],
-      address: 'Street Test 2, 1234, 1234-123, City, Country',
-      coords: [39.461590444057634, -8.473793499839573],
+      image:
+        'https://site.funerariadigitaldoc.pt/wp-content/uploads/2024/02/pexels-ksenia-chernaya-8986691-scaled.jpg',
+      name: 'Fernando Gomes',
+      date: 'Tomar 18/02/2024',
+    },
+    {
+      image:
+        'https://site.funerariadigitaldoc.pt/wp-content/uploads/2024/02/pexels-ksenia-chernaya-8986691-scaled.jpg',
+      name: 'Camila Sousa',
+      date: 'Tomar 22/01/2024',
+    },
+    {
+      image:
+        'https://site.funerariadigitaldoc.pt/wp-content/uploads/2024/02/pexels-ksenia-chernaya-8986691-scaled.jpg',
+      name: 'Lucas Silva',
+      date: 'Tomar 15/01/2024',
+    },
+  ],
+  qas: [
+    {
+      question:
+        'Como posso organizar um serviço funerário para um ente querido?',
+      answer:
+        'Para organizar um serviço funerário, entre em contacto conosco através do nosso número de telefone disponível na secção de contactos do nosso website. Estaremos prontos para orientá-lo em cada passo do processo, desde a escolha do caixão até a coordenação da cerimónia.',
+    },
+    {
+      question:
+        'Quais são as opções disponíveis para o local de descanso final?',
+      answer:
+        'Oferecemos diversas opções para o local de descanso final, incluindo sepulturas em cemitérios locais, cremação com urnas personalizadas e mausoléus. Podemos discutir as preferências da sua família e ajudá-lo a tomar decisões que melhor atendam às suas necessidades e tradições.',
+    },
+    {
+      question: 'Vocês fornecem serviços de pré-planeamento funerário?',
+      answer:
+        'Sim, oferecemos serviços de pré-planeamento funerário para aqueles que desejam aliviar o fardo emocional e financeiro para os seus entes queridos. Entre em contacto conosco para discutir as opções disponíveis e personalizar um plano que atenda aos seus desejos e necessidades específicos.',
     },
   ],
 };

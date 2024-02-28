@@ -50,7 +50,7 @@ import Loading from 'vue-loading-overlay';
 import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
 
 export default defineComponent({
-  name: 'LoginModal',
+  name: 'App',
   components: {
     AppHeader,
     AppFooter,
@@ -142,7 +142,7 @@ watch(user, async () => {
 watch(route, () => {
   if (!isOutsider.value) return;
 
-  setIsOutsider(route.name === 'group' && !isUserAuthenticated());
+  setIsOutsider(route.name === 'funeraria' && !isUserAuthenticated());
 });
 
 onBeforeMount(async () => {

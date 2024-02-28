@@ -6,7 +6,6 @@ const route_auth = {
   profile: AUTH_PERMISSIONS.USER,
   users: AUTH_PERMISSIONS.STAFF,
   groups: AUTH_PERMISSIONS.SUPER,
-  group: AUTH_PERMISSIONS.NO_AUTH,
   templates: AUTH_PERMISSIONS.SUPER,
   templates_create: AUTH_PERMISSIONS.SUPER,
   templates_edit: AUTH_PERMISSIONS.SUPER,
@@ -18,6 +17,7 @@ const route_auth = {
   not_found: AUTH_PERMISSIONS.NO_AUTH,
   service_unavailable: AUTH_PERMISSIONS.NO_AUTH,
   others: AUTH_PERMISSIONS.NO_AUTH,
+  funeraria: AUTH_PERMISSIONS.NO_AUTH,
 };
 
 export function getAuth(route_name: string) {
