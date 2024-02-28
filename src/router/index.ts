@@ -5,6 +5,7 @@ const Home = () => import('@/views/Home/home.vue');
 const Profile = () => import('@/views/Profile/profile.vue');
 const Users = () => import('@/views/Users/users.vue');
 const Groups = () => import('@/views/Groups/groups.vue');
+const Funeraria = () => import('@/views/Funeraria/funeraria.vue');
 const Templates = () => import('@/views/Templates/templates.vue');
 const Records = () => import('@/views/Records/records.vue');
 const TemplatesForm = () => import('@/views/Templates/templatesForm.vue');
@@ -108,6 +109,12 @@ const router = createRouter({
       redirect: { name: 'not_found' },
       name: 'others',
       meta: { roles: getAuth('others') },
+    },
+    {
+      path: '/funeraria/:id',
+      name: 'funeraria',
+      component: Funeraria,
+      meta: { roles: getAuth('funeraria') },
     },
   ],
 });

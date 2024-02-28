@@ -27,7 +27,7 @@
             <h3>
               Natural de Tomar, licenciado em Engenharia Informática, com 5 anos
               de experiência em desenvolvimento web. Atualmente a trabalhar como
-              front-end developer na empresa Mercedes-Benz.io.
+              front-end developer na empresa Mercedes-Benz.io
             </h3>
             <div class="contacts">
               <div class="contacts__element">

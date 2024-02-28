@@ -15,6 +15,7 @@ import {
   canAction,
 } from './helper';
 import { AUTH_PERMISSIONS } from '@/authorizations/constants';
+import router from '@/router';
 export default defineComponent({
   name: 'GroupsDatatable',
   components: {
@@ -24,6 +25,10 @@ export default defineComponent({
 </script>
 <script lang="ts" setup>
 import Page from '../../components/shared/Page/page.vue';
+
+const redirectToGroupPage = (item: any) => {
+  router.push({ name: 'funeraria', params: { slug: item.slug } });
+};
 
 const data = {
   createAndEditByModal: true,
@@ -37,6 +42,7 @@ const data = {
       roles: AUTH_PERMISSIONS.SUPER,
       createDisplayRole: AUTH_PERMISSIONS.SUPER,
       editDisplayRole: AUTH_PERMISSIONS.SUPER,
+      clickFunction: redirectToGroupPage,
     },
   ],
   save: createGroup,
@@ -49,6 +55,6 @@ const data = {
   deleteText: 'Tem a certeza de que quer <br>eliminar esta Funerária?',
   deleteButtons: { cancel: 'Não', action: 'Sim' },
   createEditButtons: { cancel: 'Cancelar', action: 'Guardar' },
-  canAction: canAction
+  canAction: canAction,
 };
 </script>
