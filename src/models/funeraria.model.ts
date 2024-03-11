@@ -33,6 +33,7 @@ export interface FunerariaContacts {
 }
 
 export interface FunerariaLocation {
+  town: string;
   address: string;
   coords: number[];
 }

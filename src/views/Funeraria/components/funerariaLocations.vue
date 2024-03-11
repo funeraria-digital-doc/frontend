@@ -14,7 +14,28 @@
             </l-map>
           </div>
 
-          <p><b>Morada:</b> {{ location.address }}</p>
+          <div class="funeraria-locations__card">
+            <div class="funeraria-locations__info">
+              <p class="funeraria-locations__info-town">
+                {{ location.town }}
+              </p>
+              <p class="funeraria-locations__info-address">
+                {{ location.address }}
+              </p>
+            </div>
+
+            <a
+              class="funeraria-locations__linkout"
+              :href="googleMapsLink(location.address)"
+              target="_blank"
+            >
+              <img
+                class="funeraria-locations__linkout-logo"
+                src="@/assets/google_maps.png"
+              />
+              <p class="funeraria-locations__linkout-text">Direções</p>
+            </a>
+          </div>
         </div>
       </v-carousel-item>
     </v-carousel>
@@ -43,22 +64,84 @@ import 'leaflet/dist/leaflet.css';
 
 const mapLayer =
   'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
+
+const googleMapsLink = (address: string) =>
+  `https://www.google.com/maps/search/${encodeURI(address)}`;
 </script>
 
 <style scoped lang="scss">
 .funeraria-locations {
   &__container {
-    margin-bottom: 3vw;
+    margin-bottom: 2vw;
   }
 
   &__map {
-    height: 20rem;
+    height: 35rem;
+  }
+
+  &__card {
+    position: absolute;
+    top: 0;
+    left: 85vw;
+    z-index: 999;
+    display: flex;
+    background-color: white;
+    color: black;
+    align-items: center;
+    padding: 1vw;
+    gap: 1rem;
+    border-radius: 2%;
+    margin-left: auto;
+    margin-top: 2rem;
+    margin-right: 2rem;
+  }
+
+  &__info {
+    max-width: 14vw;
+  }
+
+  &__info-town {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  &__info-address {
+    font-weight: 300;
+    line-height: normal;
+  }
+
+  &__linkout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__linkout-text {
+    color: black;
+    font-size: 0.8rem;
+
+    &:hover {
+      text-decoration: underline;
+      color: blue;
+    }
+  }
+
+  &__linkout-logo {
+    width: 2rem;
   }
 }
 @media screen and (max-width: 1024px) {
   .funeraria-locations {
-    &__container {
-      margin-bottom: 5vw;
+    &__card {
+      flex-direction: column;
+      padding: 3vw;
+      left: 60vw;
+      margin-top: 1rem;
+      margin-right: 1rem;
+    }
+
+    &__info {
+      max-width: 50vw;
     }
   }
 }
