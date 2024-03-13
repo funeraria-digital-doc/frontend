@@ -76,28 +76,28 @@ const googleMapsLink = (address: string) =>
   }
 
   &__map {
-    height: 35rem;
+    height: 30rem;
   }
 
   &__card {
     position: absolute;
     top: 0;
-    left: 85vw;
     z-index: 999;
     display: flex;
     background-color: white;
     color: black;
     align-items: center;
-    padding: 1vw;
+    padding: 1rem;
     gap: 1rem;
     border-radius: 2%;
     margin-left: auto;
-    margin-top: 2rem;
-    margin-right: 2rem;
+    margin-top: 1rem;
+    margin-right: 1rem;
+    right: 0;
   }
 
   &__info {
-    max-width: 14vw;
+    max-width: 18vw;
   }
 
   &__info-town {
@@ -119,6 +119,7 @@ const googleMapsLink = (address: string) =>
   &__linkout-text {
     color: black;
     font-size: 0.8rem;
+    font-weight: 300;
 
     &:hover {
       text-decoration: underline;
@@ -134,14 +135,10 @@ const googleMapsLink = (address: string) =>
   .funeraria-locations {
     &__card {
       flex-direction: column;
-      padding: 3vw;
-      left: 60vw;
-      margin-top: 1rem;
-      margin-right: 1rem;
     }
 
     &__info {
-      max-width: 50vw;
+      max-width: 28vw;
     }
   }
 }

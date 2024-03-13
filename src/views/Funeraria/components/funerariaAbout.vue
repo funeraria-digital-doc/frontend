@@ -33,26 +33,17 @@ export default defineComponent({
   &__container {
     display: flex;
     margin: 3vw 12vw;
+    margin-bottom: 6rem;
     gap: 10vw;
   }
 
-  &__text {
-    align-self: center;
-    font-size: 1vw !important;
-  }
-
   &__title {
-    font-size: 2vw !important;
     margin-bottom: 1vw;
     font-weight: bold;
   }
 
-  &__desc {
-    font-size: 1vw !important;
-  }
-
   &__image {
-    max-width: 30rem;
+    max-width: 25vw;
     object-fit: contain;
   }
 }
@@ -61,22 +52,11 @@ export default defineComponent({
   .funeraria-about {
     &__container {
       flex-direction: column;
-      gap: 5vw;
-
-      margin-bottom: 6vw;
-    }
-
-    &__title {
-      font-size: 3vw !important;
-    }
-
-    &__desc {
-      font-size: 2vw !important;
-      line-height: 3vw !important;
+      gap: 2rem;
     }
 
     &__image {
-      max-width: 30vw;
+      max-width: 50vw;
       align-self: center;
     }
   }

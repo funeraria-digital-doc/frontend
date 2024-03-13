@@ -67,19 +67,19 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
 .funeraria-services {
   &__container {
     margin: 3vw 12vw;
+    margin-bottom: 6rem;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   &__title {
-    font-size: 2vw !important;
-    margin-bottom: 1vw;
+    margin-bottom: 1rem;
     font-weight: bold;
   }
 
   &__desc {
-    font-size: 1vw !important;
+    text-align: center;
     margin-bottom: 3vw;
   }
 
@@ -87,7 +87,7 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
     display: flex;
     margin-inline: 5vw;
     place-content: space-evenly;
-    gap: 2vw;
+    gap: 1rem;
   }
 
   &__card {
@@ -106,28 +106,45 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
   }
 
   &__card-text {
-    font-size: 1vw !important;
     font-weight: bold;
-    margin-top: 0.5vw;
+    margin-top: 0.5rem;
     text-align: center;
-    height: 3vw;
+    height: 2rem;
   }
 }
 
 @media screen and (max-width: 1024px) {
   .funeraria-services {
-    &__title {
-      font-size: 3vw !important;
-    }
-
     &__desc {
-      font-size: 2vw !important;
+      margin-bottom: 2rem;
     }
 
     &__card-image {
       width: 28vw;
       height: 18vw;
     }
+  }
+
+  .v-carousel {
+    width: 120%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .funeraria-services {
+    &__card-image {
+      width: 45vw;
+      height: 35vw;
+    }
+
+    &__card-text {
+      margin-top: 0rem;
+      height: 1.5rem;
+    }
+  }
+
+  .v-carousel {
+    width: 120%;
   }
 }
 

@@ -66,7 +66,6 @@ const onSubmit = async () => {
 .funeraria-contacts-form {
   &__button {
     margin-top: 0.5vw;
-
     width: 100%;
   }
 }

@@ -59,14 +59,14 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
 .funeraria-deaths {
   &__container {
     margin: 3vw 12vw;
+    margin-bottom: 6rem;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   &__title {
-    font-size: 2vw !important;
-    margin-bottom: 1vw;
+    margin-bottom: 1.5rem;
     font-weight: bold;
   }
 
@@ -89,28 +89,39 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
   }
 
   &__card-name {
-    font-size: 1vw !important;
     font-weight: bold;
     margin-top: 0.7vw;
     margin-bottom: 0.3vw;
   }
 
   &__card-date {
-    font-size: 0.7vw !important;
     height: 3vw;
   }
 }
 
 @media screen and (max-width: 1024px) {
   .funeraria-deaths {
-    &__title {
-      font-size: 3vw !important;
-    }
-
     &__card-image {
       width: 28vw;
       height: 32vw;
     }
+  }
+
+  .v-carousel {
+    width: 120%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .funeraria-deaths {
+    &__card-image {
+      width: 45vw;
+      height: 54vw;
+    }
+  }
+
+  .v-carousel {
+    width: 120%;
   }
 }
 
