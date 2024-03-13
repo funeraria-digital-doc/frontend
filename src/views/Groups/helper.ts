@@ -9,14 +9,14 @@ import { useSnackBar } from '@/composables/snackBar';
 
 const { showSnackbar } = useSnackBar();
 
+// TODO: remove mock
 const mock = {
   id: 4,
-  slug: 'xpto',
   name: 'A Nova Agência Funerária de Tomar',
   created_by_id: 1,
   updated_by_id: 1,
   image:
-    'https://scontent.fopo2-2.fna.fbcdn.net/v/t39.30808-6/349136889_1260738941469993_7740583763255511368_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=efb6e6&_nc_ohc=qmgwDWK70AsAX---bqx&_nc_ht=scontent.fopo2-2.fna&oh=00_AfBn3kOGFnQ_nU4V0X0-N1tMvlzam9mxL0Zh5G_BlcsWug&oe=65E3B0A7',
+    'https://app-funeralonline.s3.amazonaws.com/media/entity/A_Nova_Ag%C3%AAncia_Funer%C3%A1ria_De_Tomar.jpg',
   subTitle:
     'Pretendemos apoiá-lo a dignificar e homenagear o seu ente querido, de forma  única, célere e profissional',
   description: `Em tempos de luto, prometemos cuidar de todas as suas necessidades. Prometemos fornecer-lhe serviço profissional e aconselhamento nas horas difíceis.
@@ -60,12 +60,13 @@ Ligue-nos a qualquer hora para solicitar um serviço profissional!`,
   },
   locations: [
     {
-      address:
-        'Avenida Doutor Cândido Madureira, número 100, 2300-531 Tomar, Portugal',
+      town: 'Tomar',
+      address: 'Avenida Doutor Cândido Madureira, número 100, 2300-531',
       coords: [39.60216616485415, -8.413803258940865],
     },
     {
-      address: 'Castelo de Torres Novas, 2350-758 Torres Novas',
+      town: 'Torres Novas',
+      address: 'Castelo de Torres Novas, 2350-758',
       coords: [39.479529855618146, -8.540568949235606],
     },
   ],

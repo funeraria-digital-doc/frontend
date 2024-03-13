@@ -41,58 +41,78 @@ export default defineComponent({
     width: 121%;
     object-fit: cover;
     opacity: 0.4;
+    object-position: 50% 45%;
   }
 
   &__name {
     position: absolute;
-    font-size: 3vw;
-    font-weight: bold;
-    top: 6vw;
+    top: 5vw;
     left: 12vw;
+    font-size: 3.5rem;
+    font-weight: bold;
+    line-height: 3rem;
+    margin-right: 1.5rem;
 
     &::after {
       content: '';
-      padding-bottom: 0.8vw;
-      border-bottom: 0.2vw solid red;
-      width: 20vw;
+      padding-bottom: 1rem;
+      border-bottom: 0.3rem solid red;
+      width: 20rem;
       display: block;
     }
   }
 
   &__sub-title {
     position: absolute;
-    margin-right: 12vw;
-    font-size: 1vw !important;
-    top: 12.3vw;
+    top: 10vw;
     left: 12vw;
+    margin-right: 12vw;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .funeraria-header {
+    &__image {
+      max-height: 40vw;
+      object-position: 50% 30%;
+    }
+
+    &__name {
+      line-height: 3.5rem;
+      top: 4rem;
+    }
+
+    &__sub-title {
+      top: 13.5rem;
+    }
   }
 }
 
 @media screen and (max-width: 600px) {
   .funeraria-header {
     &__image {
-      max-height: 40vw;
+      max-height: 60vw;
+      object-position: 50% 0%;
     }
 
     &__name {
-      font-size: 4vw !important;
-      line-height: 1rem !important;
-      top: 4vw;
+      font-size: 2rem !important;
+      line-height: 2rem !important;
+      top: 2rem;
 
       &::after {
         content: '';
-        padding-bottom: 1rem;
-        border-bottom: 0.3vw solid red;
-        width: 30vw;
+        padding-bottom: 0.3rem;
+        border-bottom: 0.2rem solid red;
+        width: 40vw;
         display: block;
       }
     }
 
     &__sub-title {
-      font-size: 2vw !important;
-      top: 12vw;
-
+      font-size: 0.9rem !important;
       line-height: 1rem !important;
+      top: 7.5rem;
     }
   }
 }

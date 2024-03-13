@@ -12,7 +12,7 @@
           <funeraria-contacts-form />
         </div>
         <div class="funeraria-contacts__info">
-          <h4 class="funeraria-contacts__upper-title">Para mais informações</h4>
+          <h4 class="funeraria-contacts__upper-title text-h4">Para mais informações</h4>
           <h4 class="funeraria-contacts__title text-h4">Contacte-nos!</h4>
 
           <p class="funeraria-contacts__sub-title font-weight-light">
@@ -27,13 +27,13 @@
             valiosa para nós, e estamos ansiosos para ouvir de si!
           </p>
 
-          <p class="funeraria-contacts__contact">
+          <p class="funeraria-contacts__contact text-body-1">
             {{ contacts.email.join(',') }}
           </p>
-          <p class="funeraria-contacts__contact">
+          <p class="funeraria-contacts__contact text-body-1">
             {{ contacts.phoneNumbers.join(', ') }}
           </p>
-          <p class="funeraria-contacts__contact">
+          <p class="funeraria-contacts__contact text-body-1">
             {{ contacts.fixPhoneNumbers.join(', ') }}
           </p>
         </div>
@@ -61,10 +61,8 @@ defineProps({
   flex-direction: column;
   align-items: center;
 
-  margin-bottom: 2vw;
-
   &__image {
-    max-height: 20vw;
+    max-height: 25rem;
     width: 121%;
     object-fit: cover;
     opacity: 0.4;
@@ -73,7 +71,7 @@ defineProps({
   &__container {
     padding-inline: 12vw;
     width: 100%;
-    top: -8vw;
+    top: -13rem;
   }
 
   &__card {
@@ -97,33 +95,29 @@ defineProps({
   }
 
   &__upper-title {
-    font-size: 2vw !important;
     font-weight: bold;
   }
 
   &__title {
-    font-size: 2vw !important;
-    margin-bottom: 1vw;
+    margin-bottom: 1.5rem;
     font-weight: bold;
 
     &::after {
       content: '';
-      padding-bottom: 0.8vw;
-      border-bottom: 0.2vw solid red;
-      width: 8.8vw;
+      padding-bottom: 0.5rem;
+      border-bottom: 0.2rem solid red;
+      width: 15rem;
       display: block;
     }
   }
 
   &__sub-title {
-    font-size: 0.8vw !important;
-    margin-bottom: 1vw;
+    margin-bottom: 2rem;
   }
 
   &__contact {
-    font-size: 0.8vw !important;
     font-weight: bold;
-    margin-bottom: 0.2vw;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -141,31 +135,6 @@ defineProps({
 
     &__info {
       width: 100%;
-      margin-bottom: 2vw;
-    }
-
-    &__upper-title {
-      font-size: 3vw !important;
-      line-height: 1.5rem !important;
-    }
-
-    &__title {
-      font-size: 3vw !important;
-      margin-bottom: 2vw;
-
-      &::after {
-        padding-bottom: 0.5vw;
-        width: 20vw;
-      }
-    }
-
-    &__sub-title {
-      font-size: 1.5vw !important;
-      margin-bottom: 2vw;
-    }
-
-    &__contact {
-      font-size: 2vw !important;
     }
   }
 }
