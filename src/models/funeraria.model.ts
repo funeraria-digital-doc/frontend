@@ -22,7 +22,6 @@ export interface FunerariaDeath {
 
 export interface FunerariaService {
   title: string;
-  description: string;
   image: string;
 }
 
@@ -33,6 +32,7 @@ export interface FunerariaContacts {
 }
 
 export interface FunerariaLocation {
+  town: string;
   address: string;
   coords: number[];
 }
