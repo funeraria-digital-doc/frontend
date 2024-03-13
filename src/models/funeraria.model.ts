@@ -22,7 +22,6 @@ export interface FunerariaDeath {
 
 export interface FunerariaService {
   title: string;
-  description: string;
   image: string;
 }
 

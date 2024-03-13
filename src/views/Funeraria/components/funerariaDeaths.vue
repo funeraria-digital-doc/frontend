@@ -68,6 +68,7 @@ watch([isDesktopView, isMobileView], ([newIsDesktopView, newIsMobileView]) => {
   &__title {
     margin-bottom: 1.5rem;
     font-weight: bold;
+    text-align: center;
   }
 
   &__card-container {

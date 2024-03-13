@@ -90,7 +90,6 @@ const googleMapsLink = (address: string) =>
     padding: 1rem;
     gap: 1rem;
     border-radius: 2%;
-    margin-left: auto;
     margin-top: 1rem;
     margin-right: 1rem;
     right: 0;

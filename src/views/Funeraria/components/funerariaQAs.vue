@@ -31,6 +31,7 @@ defineProps({
 .funeraria-qas {
   &__container {
     margin: 3vw 12vw;
+    margin-bottom: 4rem;
     display: flex;
     flex-direction: column;
     align-items: center;

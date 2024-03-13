@@ -9,9 +9,9 @@ import { useSnackBar } from '@/composables/snackBar';
 
 const { showSnackbar } = useSnackBar();
 
+// TODO: remove mock
 const mock = {
   id: 4,
-  slug: 'xpto',
   name: 'A Nova Agência Funerária de Tomar',
   created_by_id: 1,
   updated_by_id: 1,
