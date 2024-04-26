@@ -175,7 +175,11 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import * as constants from './constants';
-import { getSingleTemplate, formatDataBeforeRequest } from './helper';
+import {
+  getSingleTemplate,
+  formatDataBeforeRequest,
+  getVariablesFromPdf,
+} from './helper';
 import Page from '../../components/shared/Page/page.vue';
 import ValidationEditModal from './components/ValidationEditModal/validationEditModal.vue';
 import FileValidationEditModal from './components/FileValidationEditModal/fileValidationEditModal.vue';
@@ -350,17 +354,23 @@ async function save() {
 }
 
 const handleFileUpload = (file: Blob[]) => {
-  if (
-    file[0].type !==
+  if (file[0].type === 'application/pdf') {
+    console.log('tratar pdf');
+    getVariablesFromPdf(file[0]).then((resp) => {
+      console.log(resp.length);
+      if (resp.length > 0) {
+        let newValidations = resp.map((item: any) => {
+          return { ...defaultObj, name: item };
+        });
+        template.value.validations = newValidations ? newValidations : [];
+      }
+    });
+  } else if (
+    file[0].type ===
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   ) {
-    file_temp.value = null;
-    if (template.value.validations.length > 0) {
-      template.value.validations = [];
-    }
-    showSnackbar('O documento tem de ser do tipo .docx', '', false);
-  } else {
     getVariablesFromFile(file[0] as any).then((resp: any) => {
+      console.log('resp.data', resp.data);
       if (resp && resp.data) {
         if (file[0]) {
           const reader = new FileReader();
@@ -412,6 +422,12 @@ const handleFileUpload = (file: Blob[]) => {
           : [];
       }
     });
+  } else {
+    file_temp.value = null;
+    if (template.value.validations.length > 0) {
+      template.value.validations = [];
+    }
+    showSnackbar('O documento tem de ser do tipo .docx ou .pdf', '', false);
   }
 };
 
@@ -476,6 +492,7 @@ onBeforeMount(async () => {
         new File([template.value.file], template.value.file_name),
       ];
       mode.value = 'edit';
+      console.log('template.value.validations', template.value.validations);
     });
   } else if (route.name === 'templates_create') {
     mode.value = 'create';

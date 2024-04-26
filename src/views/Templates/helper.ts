@@ -7,6 +7,7 @@ import {
 import { useSnackBar } from '@/composables/snackBar';
 import { getLabel } from '@/utils/datatableHelper';
 import { clickDownloadFile } from '@/utils/downloadFile';
+import { PDFDocument } from 'pdf-lib';
 
 const { showSnackbar } = useSnackBar();
 
@@ -115,7 +116,7 @@ export function downloadTemplate(template: any) {
 }
 
 export const formatDataBeforeRequest = (templateData: any, mode: string) => {
-  let formData = {};
+  const formData = {};
 
   if (mode === 'create') {
     for (let i = 0; i < Object.keys(templateData).length; i++) {
@@ -206,3 +207,60 @@ export const formatDataBeforeRequest = (templateData: any, mode: string) => {
 export function canAction() {
   return true;
 }
+
+export async function getVariablesFromPdf(file: any) {
+  const variables: string[] = [];
+  await file.arrayBuffer().then((resp) => {
+    PDFDocument.load(resp).then((resp1) => {
+      const form = resp1.getForm();
+      const fields = form.getFields();
+      fields.map((field) => {
+        const fieldName = field.getName();
+        console.log(fieldName)
+        variables.push(fieldName);
+      });
+    });
+  });
+  console.log('antes', variables)
+  return variables;
+}
+
+// console.log(file.arrayBuffer());
+// file.arrayBuffer().then((resp) => {
+//   PDFDocument.load(resp).then((resp1) => {
+//     const form = resp1.getForm();
+//     const fields = form.getFields();
+//     const fieldData = fields.map((field) => {
+//       const fieldName = field.getName();
+//       const fieldType = field.constructor.name;
+//       console.log(`Field name: ${fieldName}, Field type: ${fieldType}`);
+//       return fieldName;
+//     });
+//     //console.log(fieldData);
+//     const telefone = form.getTextField(
+//       'topmostSubform[0].Page1[0].Nome_completo[0]'
+//     );
+//     telefone.setText('123456789');
+//     const radioGroup = form.getRadioGroup(
+//       'topmostSubform[0].Page1[0].RadioButtonList[0]'
+//     );
+//     const options = radioGroup.getOptions();
+//     radioGroup.select('2');
+
+//     const distrito = form.getField(
+//       'topmostSubform[0].Page1[0].Distrito[0]'
+//     );
+//     const distrito_options = distrito.getOptions();
+//     distrito.select('Aveiro')
+//     console.log('field data', distrito_options);
+
+//     resp1.save().then((pdfBytes) => {
+//       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+//       const url = URL.createObjectURL(blob);
+//       const link = document.createElement('a');
+//       link.href = url;
+//       link.download = 'output.pdf';
+//       link.click();
+//     });
+//   });
+// });
