@@ -17,7 +17,10 @@
           </v-list>
         </v-navigation-drawer>
 
-        <v-main class="app__page">
+        <v-main
+          class="app__page"
+          :class="{ 'app__page': true, 'app__page--mobile': isOutsider }"
+        >
           <div>
             <RouterView />
           </div>
@@ -48,6 +51,7 @@ import { getAuth } from './authorizations/authorizations';
 import { useLoadingSpinner } from './composables/loadingSpinner';
 import Loading from 'vue-loading-overlay';
 import ErrorSuccessMessage from '@/components/shared/ErrorSuccessMessages/errorSuccessMessages.vue';
+import { useMedia } from './composables/useMedia';
 
 export default defineComponent({
   name: 'App',
@@ -72,6 +76,7 @@ const {
 } = useUser();
 const { isLoadingSpinnerActive } = useLoadingSpinner();
 const route = useRoute();
+const { isMobileView } = useMedia();
 
 const sideNavLinks = [
   {
@@ -142,7 +147,13 @@ watch(user, async () => {
 watch(route, () => {
   if (!isOutsider.value) return;
 
-  setIsOutsider(route.name === 'funeraria' && !isUserAuthenticated());
+  // remove sidebar when in mobile view and on about page
+  if (isMobileView.value && route.name === 'about') {
+    setIsOutsider(true);
+  } else {
+    // remove sidebar when in funerari page view and not authenticated
+    setIsOutsider(route.name === 'funeraria' && !isUserAuthenticated());
+  }
 });
 
 onBeforeMount(async () => {
@@ -159,6 +170,10 @@ onBeforeMount(async () => {
   &__page {
     width: fit-content;
     margin: 2rem 10rem;
+  }
+
+  &__page--mobile {
+    margin: 2rem 2rem;
   }
 }
 </style>

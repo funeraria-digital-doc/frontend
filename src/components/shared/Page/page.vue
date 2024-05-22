@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="d-flex" style="justify-content: space-between">
-      <h1 class="page__title text-h6 text-md-h5 text-lg-h4">{{ title }}</h1>
+      <h1 class="page__title">{{ title }}</h1>
 
       <v-btn
         v-if="back"
@@ -43,6 +43,7 @@ function backRedirect(link: string) {
 .page {
   &__title {
     margin-bottom: 1rem;
+    font-size: 2.5rem;
   }
   &__back-btn {
     margin-right: 1rem;

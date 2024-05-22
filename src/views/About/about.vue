@@ -8,13 +8,86 @@
       <br />
       <h3>
         Centralizando toda a informação num único local, a plataforma permite
-        registar declarações de óbito, exportar os dados em diferentes
-        modelos, necessários para a realização de funerais, e gerir os dados
-        dos clientes.
+        registar declarações de óbito, exportar os dados em diferentes modelos,
+        necessários para a realização de funerais, e gerir os dados dos
+        clientes.
       </h3>
     </div>
 
-    <v-container>
+    <v-container v-if="isOutsider">
+      <v-card elevation="0">
+        <v-row class="px-2 py-2">
+          <img
+            :class="{
+              'about__profile-photo': true,
+              'about__profile-photo--mobile': isOutsider,
+            }"
+            src="@/assets/photos/rafa_photo.jpeg"
+          />
+
+          <v-row class="px-6 py-6">
+            <h4>
+              Natural de Tomar, licenciado em Engenharia Informática, com 5 anos
+              de experiência em desenvolvimento web. Atualmente a trabalhar como
+              front-end developer na empresa Mercedes-Benz.io
+            </h4>
+          </v-row>
+
+          <div :class="{ contacts: true, 'contacts--mobile': isOutsider }">
+            <div class="contacts__element">
+              <v-btn
+                class="contacts__linkedin"
+                color="blue"
+                icon="mdi-linkedin"
+                @click="
+                  redirectLinkedin(
+                    'https://www.linkedin.com/in/rafael-lopes-79851a150/'
+                  )
+                "
+              />
+              <h4>Rafael Lopes</h4>
+            </div>
+          </div>
+        </v-row>
+      </v-card>
+
+      <v-card elevation="0" class="mt-14">
+        <v-row class="px-2 py-2">
+          <img
+            :class="{
+              'about__profile-photo': true,
+              'about__profile-photo--mobile': isOutsider,
+            }"
+            src="@/assets/photos/joao_photo.jpeg"
+          />
+          <v-row class="px-6 py-6">
+            <h4>
+              Natural do Entroncamento, licenciado em Engenharia Informática,
+              com 4 anos de experiência em desenvolvimento web. Atualmente a
+              trabalhar como full-stack developer na empresa NOS.
+            </h4>
+          </v-row>
+
+          <div :class="{ contacts: true, 'contacts--mobile': isOutsider }">
+            <div class="contacts__element jce">
+              <v-btn
+                class="contacts__linkedin"
+                color="blue"
+                icon="mdi-linkedin"
+                @click="
+                  redirectLinkedin(
+                    'https://www.linkedin.com/in/jo%C3%A3o-alves-84aba4223/'
+                  )
+                "
+              />
+              <h4>João Alves</h4>
+            </div>
+          </div>
+        </v-row>
+      </v-card>
+    </v-container>
+
+    <v-container v-else>
       <v-card elevation="0">
         <v-row class="px-2 py-2">
           <v-col cols="3" sm="3" md="3" lg="3">
@@ -84,8 +157,10 @@
 </template>
 
 <script setup lang="ts">
+import { useUser } from '@/composables/user';
 import Page from '../../components/shared/Page/page.vue';
 
+const { isOutsider } = useUser();
 const redirectLinkedin = (url: string) => window.open(url);
 </script>
 
@@ -98,6 +173,13 @@ const redirectLinkedin = (url: string) => window.open(url);
   &__profile-photo {
     border-radius: 25%;
     width: 100%;
+
+    &--mobile {
+      width: 60%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 
   &__profile-info {
@@ -113,6 +195,10 @@ const redirectLinkedin = (url: string) => window.open(url);
   flex-direction: column;
   gap: 2rem;
   margin-top: 2rem;
+
+  &--mobile {
+    margin: 0.3rem 0 0.5rem 0.3rem;
+  }
 
   &__title {
     margin-bottom: 1rem;
