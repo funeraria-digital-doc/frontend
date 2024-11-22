@@ -58,7 +58,7 @@ const route = useRoute();
 const funeraria = ref<Funeraria>();
 
 onBeforeMount(() => {
-  getGroup(route.params.id as string).then((group: any) => {
+  getGroup(route.params.slug as string).then((group: any) => {
     funeraria.value = group;
   });
 });

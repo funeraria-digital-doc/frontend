@@ -19,7 +19,7 @@ export const headers = [
   {
     title: 'Email',
     align: 'end',
-    key: 'email',
+    key: 'family_member_email',
     sortable: true,
     roles: AUTH_PERMISSIONS.USER,
   },

@@ -166,6 +166,7 @@ export const recordsFields = [
   { label: 'Email', value: 'email', type: 'TEXT' },
   { label: 'Estado Civil', value: 'marital_status', type: 'SELECT' },
   { label: 'Número CC', value: 'cc', type: 'TEXT' },
+  { label: 'Validade do CC', value: 'cc_valid_until', type: 'TEXT' },
   { label: 'NIF', value: 'nif', type: 'TEXT' },
   { label: 'NISS', value: 'niss', type: 'TEXT' },
   { label: 'Data de Nascimento', value: 'birthday', type: 'DATE' },

@@ -23,7 +23,7 @@ export const getRecords = async (
           return {
             id: record.id,
             name: record.name,
-            email: record.email,
+            family_member_email: record.family_member_email,
             family_member_phone: record.family_member_phone,
             gender: getLabel('gender', record.gender, fields),
             status: getLabel('status', record.status, fields),

@@ -156,65 +156,60 @@ export function saveForm(
   missingKeys: any,
   documentName: string = 'documento'
 ) {
-  const auxForceSave = forceSave.value;
-  form.value.validate().then((resp: any) => {
-    if (resp.valid) {
-      generateDocument(
-        props.documentId.id,
-        modalFields.value,
-        auxForceSave
-      ).then((docResp: any) => {
-        if (docResp.success) {
-          clickDownloadFile(
-            { data: docResp.data.file },
-            `${documentName} ${props.documentId.name}`
-          );
-          if (docResp.data && docResp.data.images) {
-            clickDownloadImages(
-              { data: docResp.data.images },
-              props.documentId.name
-            );
-          }
-          clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
-          emitSnackMessages(['Documento emitido com sucesso.', '', true]);
-          emitCloseModal();
 
-          modalFields.value = {
-            to_send_option: '',
-            template: '',
-            validations: {},
-            file_validations: {},
-          };
-          hasKeysMissing.value = false;
-        } else {
-          if (docResp.data && docResp.data.missingVars) {
-            missingKeys.value = docResp.data.missingVars;
-            hasKeysMissing.value = true;
-          }
-          if (docResp.error && docResp.error.status.toString()[0] === '4') {
-            emitSnackMessages([
-              'Formulário preenchido incorretamente.',
-              'Preencha todos os campos em falta',
-              false,
-            ]);
-            getApiErrors(docResp.error, errorMessages);
-          } else {
-            emitSnackMessages([
-              'Ocorreu um erro. Tente novamente mais tarde.',
-              'Em caso de presistencia, contacte os administradores do sistema',
-              false,
-            ]);
-          }
+  const generateDocs = () => {
+    generateDocument(
+      props.documentId.id,
+      modalFields.value,
+      forceSave.value
+    ).then((docResp: any) => {
+      if (docResp.success) {
+        clickDownloadFile(
+          { data: docResp.data.file },
+          `${documentName} ${props.documentId.name}`
+        );
+        if (docResp.data && docResp.data.images) {
+          clickDownloadImages(
+            { data: docResp.data.images },
+            props.documentId.name
+          );
         }
-      });
-    } else {
-      emitSnackMessages([
-        'Formulário preenchido incorretamente.',
-        'Preencha todos os campos em falta',
-        false,
-      ]);
-    }
-  });
+        clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
+        emitSnackMessages(['Documento emitido com sucesso.', '', true]);
+        emitCloseModal();
+
+        modalFields.value = {
+          to_send_option: '',
+          template: '',
+          validations: {},
+          file_validations: {},
+        };
+        hasKeysMissing.value = false;
+        forceSave.value = false;
+      } else {
+        if (docResp.data && docResp.data.missingVars) {
+          missingKeys.value = docResp.data.missingVars;
+          hasKeysMissing.value = true;
+        }else{
+          emitSnackMessages([
+            'Ocorreu um erro. Tente novamente mais tarde.',
+            'Em caso de presistencia, contacte os administradores do sistema',
+            false,
+          ]);
+        }
+      }
+    });
+  }
+
+  if (forceSave.value) {
+    generateDocs();
+  } else {
+    form.value.validate().then((resp: any) => {
+      if (resp.valid) {
+        generateDocs();
+      }
+    });
+  }
 }
 
 export function getDatesPlaceholders(selected: any, validations: any) {

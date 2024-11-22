@@ -22,9 +22,8 @@ import { DeathDeclarationDeathForm } from './forms/deathDeclarationDeath.form';
 import { DeathDeclarationFuneralForm } from './forms/deathDeclarationFuneral.form';
 import { DeathDeclarationFamilyMemberForm } from './forms/deathDeclarationFamilyMember.form';
 import { recordCreate, recordEdit } from '@/api/records';
-import router from '@/router';
 import { onBeforeMount, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { checkErrors, getSingleRecord } from './helper';
 import type { FormFieldsGroup } from '@/components/shared/DynamicForm/dynamicForm.models';
 import { useSnackBar } from '@/composables/snackBar';
@@ -58,6 +57,7 @@ const fieldsGroups = ref<FormFieldsGroup[]>([
 ]);
 
 const route = useRoute();
+const router = useRouter();
 const { showSnackbar } = useSnackBar();
 
 const mode = ref('');
@@ -135,6 +135,24 @@ const onSubmit = (values: any) => {
 };
 
 onBeforeMount(async () => {
+  if (
+    router.options &&
+    router.options.history &&
+    router.options.history.state &&
+    router.options.history.state.missingKeys
+  ) {
+    const missingKeysArray = router.options.history.state.missingKeys;
+
+    fieldsGroups.value.forEach((fieldsGroup) =>
+      fieldsGroup.fields.forEach((field) => {
+        if (missingKeysArray && missingKeysArray.includes(field.name)) {
+          errorMessages.value[field.name] = ' ';
+        }
+      })
+    );
+  }
+  
+
   // clear errors
   fieldsGroups.value.forEach((fieldsGroup) =>
     fieldsGroup.fields.forEach((field) => {
