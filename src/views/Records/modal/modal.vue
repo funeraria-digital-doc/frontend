@@ -333,10 +333,10 @@ function redirectToRecord() {
   emitCloseModal();
 }
 
-function forceSaveDoc() {
+async function forceSaveDoc() {
   forceSave.value = true;
-  save().then(() => emitCloseModal() );
-  
+  save();
+  emitCloseModal();
 }
 
 function closeMissingModal() {

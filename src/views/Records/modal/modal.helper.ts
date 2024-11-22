@@ -164,17 +164,19 @@ export function saveForm(
       forceSave.value
     ).then((docResp: any) => {
       if (docResp.success) {
-        clickDownloadFile(
-          { data: docResp.data.file },
-          `${documentName} ${props.documentId.name}`
-        );
+        if (docResp.data.file) {
+          clickDownloadFile(
+            { data: docResp.data.file },
+            `${documentName} ${props.documentId.name}`
+          );
+        }
         if (docResp.data && docResp.data.images) {
           clickDownloadImages(
             { data: docResp.data.images },
             props.documentId.name
           );
         }
-        clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
+        //clickDownloadPdf({ data: docResp.data.pdf }, props.documentId.name);
         emitSnackMessages(['Documento emitido com sucesso.', '', true]);
         emitCloseModal();
 
@@ -190,7 +192,7 @@ export function saveForm(
         if (docResp.data && docResp.data.missingVars) {
           missingKeys.value = docResp.data.missingVars;
           hasKeysMissing.value = true;
-        }else{
+        } else {
           emitSnackMessages([
             'Ocorreu um erro. Tente novamente mais tarde.',
             'Em caso de presistencia, contacte os administradores do sistema',
