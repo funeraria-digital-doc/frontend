@@ -111,7 +111,7 @@ const router = createRouter({
       meta: { roles: getAuth('others') },
     },
     {
-      path: '/funeraria/:id',
+      path: '/funeraria/:slug',
       name: 'funeraria',
       component: Funeraria,
       meta: { roles: getAuth('funeraria') },

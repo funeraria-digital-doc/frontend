@@ -11,7 +11,9 @@ export async function groupsList(): Promise<ApiResponse<any>> {
 
 export async function groupGet(index: string): Promise<ApiResponse<any>> {
   try {
-    const response = await apiInstance.get(`/groups/view/${index}/`);
+    const response = await apiInstance.get(
+      `/groups/get-group-by-slug/${index}/`
+    );
     return { success: true, data: response.data };
   } catch (e: any) {
     return errorResponse(e);

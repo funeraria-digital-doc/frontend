@@ -226,6 +226,9 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-btn color="blue-darken-1" variant="text" @click="forceSaveDoc"
+          >Forçar</v-btn
+        >
         <v-btn color="blue-darken-1" variant="text" @click="redirectToRecord"
           >Preencher dados em falta</v-btn
         >
@@ -235,13 +238,16 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <!-- <v-dialog v-model="hasKeysMissing" max-width="500px" persistent>
-    
-  </v-dialog> -->
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, onBeforeMount, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  ref,
+  onBeforeMount,
+  watch,
+} from 'vue';
 import { getTemplates } from '@/api/recordTemplates';
 import type { TemplateInterface, ValidationInterface } from './modal.models';
 import {
@@ -308,6 +314,14 @@ function confirmClose() {
 }
 
 function redirectToRecord() {
+  const missingKeysToPush = missingKeys.value.map(
+    (key: any) => key.db_field_reference
+  );
+  router.push({
+    name: 'records_edit',
+    params: { id: props.documentId.id},
+    state: { missingKeys: missingKeysToPush },
+  });
   hasKeysMissing.value = false;
   missingKeys.value = [];
   modalFields.value = {
@@ -316,8 +330,13 @@ function redirectToRecord() {
     validations: {},
     file_validations: {},
   };
-  router.push({ name: 'records_edit', params: { id: props.documentId.id } });
   emitCloseModal();
+}
+
+function forceSaveDoc() {
+  forceSave.value = true;
+  save().then(() => emitCloseModal() );
+  
 }
 
 function closeMissingModal() {
@@ -333,7 +352,6 @@ function save() {
   const selectedDocName = templates.value.filter(
     (i) => i.value === modalFields.value.template
   )[0].label;
-
   saveForm(
     form,
     props,
@@ -423,7 +441,6 @@ onBeforeMount(async () => {
   await getTemplates(props.documentId.id).then((resp) => {
     templates.value = [];
     errorMessages.value = {};
-
     if (resp.success) {
       resp.data.data.map(
         (i: {
