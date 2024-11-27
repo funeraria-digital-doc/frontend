@@ -232,6 +232,7 @@ export const recordsFields = [
     value: 'leaving_mortuary_datetime',
     type: 'DATETIME',
   },
+  { label: 'Casa Mortuária', value: 'mortuary', type: 'TEXT' },
   {
     label: 'Data e Hora do Funeral',
     value: 'funeral_datetime',
