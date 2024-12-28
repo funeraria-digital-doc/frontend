@@ -182,7 +182,7 @@ export const recordsFields = [
   { label: 'Nome do Cônjuge', value: 'spouse_name', type: 'TEXT' },
   { label: 'Sexo do Cônjuge', value: 'spouse_gender', type: 'TEXT' },
   { label: 'Idade do Cônjuge', value: 'spouse_gender', type: 'TEXT' },
-  { label: 'Natural da Freguesia', value: 'naturality_parish', type: 'TEXT' },
+  { label: 'Natural da Freguesia', value: 'parish', type: 'TEXT' },
   {
     label: 'Natural do Municipio',
     value: 'naturality_municipality',
