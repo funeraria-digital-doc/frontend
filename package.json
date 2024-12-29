@@ -22,7 +22,7 @@
     "leaflet": "^1.9.4",
     "moment": "^2.29.4",
     "npm": "^9.9.2",
-    "vue": "^3.2.45",
+    "vue": "^3.5.13",
     "vue-animated-counter": "^0.2.0",
     "vue-loading-overlay": "^6.0.3",
     "vue-repeater": "^1.1.2",
