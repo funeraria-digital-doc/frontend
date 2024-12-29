@@ -161,5 +161,6 @@ export function canAction(itemRaw: {
     (user.role == 'staff' && itemRaw.role == 'user') ||
     (user.role == 'super' &&
       (itemRaw.role == 'staff' || itemRaw.role == 'user'));
+
   return isSameUser || isRoleLower;
 }
