@@ -8,7 +8,7 @@
       vertical
       multi-line
     >
-      <div>{{ message }}</div>
+      <div v-html="message"></div>
       <p>{{ subMessage }}</p>
     </v-snackbar>
   </div>
