@@ -25,6 +25,15 @@
           </label>
         </div>
       </v-row>
+
+      <v-btn
+        v-if="props.downloadFile && props.imageUrl"
+        type="button"
+        class="download-button"
+        @click="downloadImage"
+      >
+        Descarregar fotografia
+      </v-btn>
     </v-container>
   </div>
 </template>
@@ -39,7 +48,15 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // saveFunction - callback to save it on BE
-const props = defineProps(['saveFunction', 'imageUrl', 'id', 'label', 'title']);
+const props = defineProps([
+  'saveFunction',
+  'imageUrl',
+  'id',
+  'label',
+  'title',
+  'downloadFile',
+  'downloadName',
+]);
 
 // save - callback to save the file object on FE
 const emit = defineEmits(['save']);
@@ -93,6 +110,13 @@ async function saveImage(base64File: string, file: any) {
     handleSave(base64File, file);
   }
 }
+
+const downloadImage = () => {
+  const link = document.createElement('a');
+  link.href = props.imageUrl;
+  link.download = props.downloadName ?? 'profile-image';
+  link.click();
+};
 </script>
 
 <style scoped>
@@ -102,6 +126,8 @@ async function saveImage(base64File: string, file: any) {
   align-items: center;
   grid-area: control;
   margin-bottom: 20px;
+
+  width: 100%;
 }
 
 .profile-label {
@@ -152,5 +178,9 @@ async function saveImage(base64File: string, file: any) {
 
 .profile-save {
   margin-top: 10px;
+}
+
+.download-button {
+  width: 100%;
 }
 </style>

@@ -1,10 +1,12 @@
 <template>
   <page title="Perfil">
-    <photo-upload
-      :saveFunction="editProfileImage"
-      :imageUrl="imageUrl"
-      @save="saveFile"
-    ></photo-upload>
+    <div class="profile__photo">
+      <photo-upload
+        :saveFunction="editProfileImage"
+        :imageUrl="imageUrl"
+        @save="saveFile"
+      ></photo-upload>
+    </div>
 
     <v-btn
       class="profile__change-password"
@@ -123,6 +125,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .profile {
+  &__photo {
+    width: 10rem;
+  }
+
   &__change-password {
     margin-top: -1rem;
     margin-bottom: 2rem;
