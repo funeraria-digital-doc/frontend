@@ -6,6 +6,8 @@ export const DeathDeclarationDefunctForm: DynamicField[] = [
     label: 'Carregar fotografia',
     name: 'photo',
     input: 'file',
+    downloadFile: true,
+    downloadName: 'Foto do defunto',
   },
   {
     items: [

@@ -65,6 +65,8 @@
       :id="field.name"
       :imageUrl="imageUrl"
       :label="field.label"
+      :download-file="field.downloadFile"
+      :download-name="field.downloadName"
       @save="saveFile"
     />
   </div>
