@@ -1,4 +1,4 @@
-export interface DynamicField {
+export interface DynamicField extends FileDynamicField {
   label: string;
   input: string;
   name: string;
@@ -9,14 +9,20 @@ export interface DynamicField {
 }
 
 type DynamicFieldType =
-  | 'text'
   | 'checkbox'
-  | 'select'
-  | 'date'
   | 'date-time'
+  | 'date'
+  | 'file'
+  | 'select'
+  | 'text'
   | 'time';
 
 interface SelectOption {
   label: string;
   value: string;
+}
+
+interface FileDynamicField {
+  downloadFile?: boolean;
+  downloadName?: string;
 }
