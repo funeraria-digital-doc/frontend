@@ -6,7 +6,7 @@ export async function loginUser(data: {
 }): Promise<ApiResponse<any>> {
   try {
     const response = await apiInstance.post('/accounts/login/', {
-      username: data.email.value,
+      email: data.email.value,
       password: data.password.value,
     });
 
