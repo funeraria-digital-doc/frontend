@@ -4,7 +4,7 @@
       <v-row>
         <v-text-field
           v-model="email"
-          label="Nome de utilizador"
+          label="Email"
           :rules="fieldRules"
         />
       </v-row>
