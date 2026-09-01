@@ -1,46 +1,87 @@
-# vue-template
+# Funeraria Digital Doc - Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Web application built to simplify the daily operations of funeral homes. The platform centralizes client information, death declarations and legal documentation in a single place, allowing staff to register records, generate the different document templates required for a funeral, manage users and groups, and track statistics.
 
-## Recommended IDE Setup
+This repository contains the frontend client, built with Vue 3, TypeScript and Vuetify, consuming a Django REST Framework API.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Tech Stack
 
-## Type Support for `.vue` Imports in TS
+* Vue 3 (Composition API) with TypeScript
+* Vite as build tool and dev server
+* Vuetify 3 for UI components
+* Vue Router 4 for client side routing and role based navigation guards
+* Axios for HTTP requests, with JWT based authentication
+* Vue3 ApexCharts for statistics and reporting charts
+* Vue Leaflet for map based location display
+* Firebase Hosting for deployment
+* ESLint and Prettier for linting and code formatting
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+## Features
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+* JWT authentication with role based access control (public, user, staff and super roles)
+* Records management: create, edit, list and export death declarations
+* Dynamic, configurable document templates used to generate the paperwork required for each funeral
+* User and group management for funeral home staff
+* Statistics dashboard with charts (records per day, per month, deaths by district, deaths by user)
+* Public facing page per funeral home, with services, locations and contact information
+* Responsive layout for desktop and mobile usage
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+## Project Structure
 
-## Customize configuration
+```
+src/
+  api/            HTTP client and endpoint definitions per domain (records, users, groups, templates, stats)
+  authorizations/ Route level role based access control
+  components/     Shared and reusable Vue components
+  composables/    Reusable composition functions (user session, snackbar, loading spinner, media queries)
+  models/         TypeScript interfaces and types
+  router/         Application routes
+  utils/          Generic helper functions
+  views/          Page level components, one folder per feature/route
+```
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## Prerequisites
 
-## Project Setup
+* Node.js 20 or later
+* npm
+* A running instance of the backend API
+
+## Getting Started
+
+Install the dependencies:
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Create a `.env` file in the project root with the backend API URL:
+
+```
+VITE_API_BASE_URL=http://localhost:8000/
+```
+
+Start the development server:
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## Available Scripts
 
-```sh
-npm run build
-```
+| Command              | Description                                          |
+| --------------------- | ----------------------------------------------------- |
+| `npm run dev`         | Starts the Vite development server with hot reload    |
+| `npm run build`       | Type checks and builds the app for production          |
+| `npm run build-only`  | Builds the app for production without type checking     |
+| `npm run preview`     | Serves the production build locally                     |
+| `npm run type-check`  | Runs TypeScript type checking with `vue-tsc`            |
+| `npm run lint`        | Lints and auto fixes the codebase with ESLint            |
+| `npm run deploy`      | Builds the app and deploys it to Firebase Hosting        |
 
-### Lint with [ESLint](https://eslint.org/)
+## Deployment
 
-```sh
-npm run lint
-```
+The application is deployed to Firebase Hosting. Continuous deployment is configured through GitHub Actions: on every pull request merged into `main`, the workflow installs dependencies, builds the project and publishes it automatically.
+
+## Recommended IDE Setup
+
+VS Code with the Volar extension for Vue 3 and TypeScript support.
